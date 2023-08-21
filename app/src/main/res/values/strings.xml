@@ -1,0 +1,80 @@
+<resources>
+    <string name="app_name">The Arc XP</string>
+    <string name="orgName">arcsales</string>
+    <string name="environment">sandbox</string>
+    <string name="siteName">arcsales</string>
+    <string name="commerceUrl">https://arcsales-arcsales-sandbox.api.cdn.arcpublishing.com</string>
+    <string name="contentUrl">https://arcsales-arcsales-sandbox.web.arc-cdn.net</string>
+    <string name="site_key">key</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="navigation_drawer_open">open</string>
+    <string name="navigation_drawer_close">close</string>
+
+    <string name="empty_collection">Get Collection result was Empty</string>
+    <string name="create_account">Create Account</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up_with_facebook">Sign Up with Facebook</string>
+    <string name="sign_up_with_google">Sign Up with Google</string>
+    <string name="terms_string">By creating an account you agree to our Terms of Service, Privacy Policy and Community Policy.</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="your_account_has_been_created">Your account has been created.</string>
+    <string name="success">Success</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="email_address">Email address</string>
+    <string name="last_name">Last Name</string>
+    <string name="first_name">First Name</string>
+    <string name="name">Name</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="new_password">New Password</string>
+    <string name="hint">**********</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="password_no_match">Password does not match</string>
+    <string name="update_password">Update Password</string>
+    <string name="enter_email">Enter the email address associated with your account. We will send you a password reset link.</string>
+    <string name="send_password">Send Password Reset Email</string>
+    <string name="incorrect_info">The information you provided is incorrect.\nPlese try again.</string>
+    <string name="remember_me">Remember me</string>
+    <string name="no_account">Don\'t have an account?</string>
+
+    <string name="tos_url">https://www.washingtonpost.com/terms-of-service/2011/11/18/gIQAldiYiN_story.html</string>
+    <string name="pp_url">https://www.washingtonpost.com/privacy-policy/2011/11/18/gIQASIiaiN_story.html</string>
+    <string name="policies">Policies</string>
+    <string name="software_versions">Software Versions</string>
+
+    <string name="readingTime">Time To Read: %s minutes</string>
+    <string name="video_id_not_found">video id not found</string>
+    <string name="article">Article</string>
+    <string name="playvideo">Play Video</string>
+    <string name="searchtag">search</string>
+    <string name="video">Video</string>
+    <string name="login">Login</string>
+    <string name="register_account">Register Account</string>
+    <string name="register">Register</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="nav_host">Nav Host</string>
+    <string name="signup_successful">Signup Successful</string>
+    <string name="change_password">Change Password</string>
+    <string name="web_section">Web Section</string>
+    <string name="login_with_google">LoginWithGoogle</string>
+    <string name="paywall">Paywall</string>
+    <string name="fb_signin">   Sign In with Facebook</string>
+    <string name="google_signin">   Sign In with Google</string>
+    <string name="search_results">Search Results</string>
+
+    <string name="search_hint">Search Term</string>
+
+    <string name="no_search_results">No results found</string>
+    <string name="continue_reading_tv">Create Account to continue reading.</string>
+    <string name="have_account_tv">Already have an account?</string>
+    <string name="signIn_tv">Sign in</string>
+    <string name="get_story_tv">Get every story</string>
+    <string name="tv_8"><![CDATA[You can <b>cancel anytime.</b>]]></string>
+    <string name="account">Account</string>
+    <string name="hometag">home</string>
+    <string name="accounttag">account</string>
+    <string name="videotag">video</string>
+
+</resources>

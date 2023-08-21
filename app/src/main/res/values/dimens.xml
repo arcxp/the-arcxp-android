@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="top_image_height">250dp</dimen>
+
+    <dimen name="app_sdk_margin">30dp</dimen>
+    <integer name="collection_page_size">20</integer>
+
+    <dimen name="search_item_image_width">120dp</dimen>
+    <dimen name="search_item_image_height">70dp</dimen>
+
+    <dimen name="video_item_image_width">120dp</dimen>
+    <dimen name="video_item_image_height">70dp</dimen>
+
+    <dimen name="gallery_item_container_height">250dp</dimen>
+    <dimen name="gallery_tab_size">5dp</dimen>
+    <dimen name="top_margin_from_view">100dp</dimen>
+    <dimen name="paywall_margins">24dp</dimen>
+    <dimen name="paywall_large_font_margin">40dp</dimen>
+    <dimen name="close_button_margin">16dp</dimen>
+
+    <dimen name="search_results_margin">16dp</dimen>
+    <dimen name="section_top_margin">0dp</dimen>
+
+    <dimen name="recycler_view_margin">16dp</dimen>
+    <dimen name="recycler_margin">20dp</dimen>
+</resources>

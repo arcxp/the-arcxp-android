@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="top_image_height">500dp</dimen>
+
+    <dimen name="search_item_image_width">200dp</dimen>
+    <dimen name="search_item_image_height">120dp</dimen>
+
+    <dimen name="video_item_image_width">200dp</dimen>
+    <dimen name="video_item_image_height">120dp</dimen>
+
+    <dimen name="gallery_item_container_height">600dp</dimen>
+    <dimen name="gallery_tab_size">9dp</dimen>
+    <dimen name="section_top_margin">10dp</dimen>
+</resources>
