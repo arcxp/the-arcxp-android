@@ -25,14 +25,14 @@ class MainApplication: Application() {
             //Set the base URL for content.  Set the organization, site and environment.
             //These values can be gotten from the ArcXP admin
             .setBaseUrl(url = getString(R.string.contentUrl))
-            .setOrgName(name = "arcsales")
-            .setSite(site = "site")
-            .setEnvironment(env = "sandbox")
+            .setOrgName(name = getString(R.string.orgName))
+            .setSite(site = getString(R.string.siteName))
+            .setEnvironment(env = getString(R.string.environment))
             //This is an additional parameter put on the base URL that retrieves the
             //section data for mobile devices.
-            .setNavigationEndpoint(endpoint = "mobile-nav")
+            .setNavigationEndpoint(endpoint = getString(R.string.navigation_endpoint))
             //This is a string corresponding to a video collection content alias
-            .setVideoCollectionName(videoCollectionName = "mobile-video")
+            .setVideoCollectionName(videoCollectionName = getString(R.string.video_endpoint))
             //Content SDK caches data to decrease the amount of bandwidth needed.
             //This value can be between 10 and 1024 MB
             .setCacheSize(sizeInMB = 1024)

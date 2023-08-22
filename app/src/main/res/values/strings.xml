@@ -1,10 +1,15 @@
 <resources>
     <string name="app_name">The Arc XP</string>
+
+    <!-- client defined setup-->
     <string name="orgName">arcsales</string>
     <string name="environment">sandbox</string>
-    <string name="siteName">arcsales</string>
+    <string name="siteName">site</string>
     <string name="commerceUrl">https://arcsales-arcsales-sandbox.api.cdn.arcpublishing.com</string>
     <string name="contentUrl">https://arcsales-arcsales-sandbox.web.arc-cdn.net</string>
+    <string name="navigation_endpoint">mobile-nav</string>
+    <string name="video_endpoint">mobile-video</string>
+
     <string name="site_key">key</string>
     <string name="dismiss">Dismiss</string>
     <string name="navigation_drawer_open">open</string>
