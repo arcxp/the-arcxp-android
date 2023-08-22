@@ -16,8 +16,13 @@ import com.arcxp.content.ArcXPContentConfig
  *
  */
 class MainApplication : Application() {
+
+    private var showAds = false
+
     override fun onCreate() {
         super.onCreate()
+
+        showAds = resources.getBoolean(R.bool.show_ads)
 
         //Initialize the ArcXP Content SDK
         val contentConfig = ArcXPContentConfig.Builder()
@@ -67,5 +72,16 @@ class MainApplication : Application() {
             baseUrl = getString(R.string.contentUrl)
         )
 
+        //Check for ad enablement
+        if (ArcXPMobileSDK.commerceManager().sessionIsActive()) {
+            showAds = false;
+        }
+    }
+
+    fun showAds(): Boolean {
+        if (ArcXPMobileSDK.commerceManager().sessionIsActive()) {
+            return false
+        }
+        return showAds
     }
 }

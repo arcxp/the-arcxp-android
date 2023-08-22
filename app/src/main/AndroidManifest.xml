@@ -29,6 +29,13 @@
                 android:resource="@xml/arc_x_p_widget_info" />
         </receiver>
 
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id"/>
+        <meta-data
+            android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"
+            android:value="true"/>
+
         <activity
             android:name=".ArcXPWidgetConfigureActivity"
             android:exported="false">

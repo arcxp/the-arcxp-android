@@ -10,7 +10,6 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import com.arcxp.ArcXPMobileSDK
 import com.arcxp.commons.throwables.ArcXPException
 import com.arcxp.commons.throwables.ArcXPSDKErrorType
 import com.arcxp.video.ArcMediaPlayer
@@ -22,6 +21,7 @@ import com.arcxp.content.extendedModels.*
 import com.arcxp.content.models.*
 import com.arcxp.commons.util.Failure
 import com.arcxp.commons.util.Success
+import com.arcxp.thearcxp.MainApplication
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentArticleBinding
 import com.arcxp.thearcxp.utils.*
@@ -30,8 +30,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.FitCenter
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.ads.AdListener
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.arcxp.ArcXPMobileSDK
 
 /**
  * Displays an article in a fragment
@@ -112,6 +114,7 @@ class ArticleFragment : BaseFragment() {
      * and build a view for it.  Dynamically attach each view to the layout.
      */
     private fun displayStory(storyResponse: ArcXPStory) {
+
         binding.storyTitle.text = storyResponse.title()
         if (storyResponse.subheadlines().isNotEmpty()) {
             binding.storySubtitle.text = storyResponse.subheadlines()
@@ -158,7 +161,7 @@ class ArticleFragment : BaseFragment() {
                         textView.setLinkTextColor(Color.BLUE)
                         val wordsInContent = textView.text.split(" ")
                         wordsInArticle += wordsInContent.size
-                        binding.innerLayout.addView(textView)
+                        binding.contentLayout.addView(textView)
                         textView.movementMethod = LinkMovementMethod.getInstance()
                     }
                 }
@@ -168,7 +171,7 @@ class ArticleFragment : BaseFragment() {
                             "[ <a href=${it.url} target=_blank>${it.content}</a> ]",
                             requireContext()
                         )
-                    binding.innerLayout.addView(textView)
+                    binding.contentLayout.addView(textView)
                     textView.movementMethod = LinkMovementMethod.getInstance()
                 }
                 is Image -> {
@@ -177,15 +180,15 @@ class ArticleFragment : BaseFragment() {
                         caption = it.caption.toString(),
                         activity = requireActivity()
                     )
-                    binding.innerLayout.addView(imageAndCaption.first)
+                    binding.contentLayout.addView(imageAndCaption.first)
                     if (!it.caption.isNullOrEmpty()) {
-                        binding.innerLayout.addView((imageAndCaption.second))
+                        binding.contentLayout.addView((imageAndCaption.second))
                     }
                 }
                 is Video -> {
                     if (it._id != null) {
                         val player = ArcMediaPlayer.createPlayer(requireActivity())
-                        binding.innerLayout.addView(
+                        binding.contentLayout.addView(
                             createVideoView(
                                 activity = requireActivity(),
                                 arcMediaPlayer = player
@@ -254,6 +257,8 @@ class ArticleFragment : BaseFragment() {
             }
         }
 
+        loadAds(storyResponse)
+
         binding.spin.visibility = GONE
     }
 
@@ -277,8 +282,8 @@ class ArticleFragment : BaseFragment() {
         tabLayout.tabGravity = TabLayout.GRAVITY_CENTER
         tabLayout.setSelectedTabIndicatorHeight(0) //TODO find non deprecated way to do this
 
-        binding.innerLayout.addView(viewPager)
-        binding.innerLayout.addView(tabLayout)
+        binding.contentLayout.addView(viewPager)
+        binding.contentLayout.addView(tabLayout)
 
         TabLayoutMediator(tabLayout, viewPager) { tab, _ -> // Styling each tab here
             tab.setIcon(R.drawable.gallery_tab_layout_indicator_selector)
@@ -286,6 +291,27 @@ class ArticleFragment : BaseFragment() {
                 requireContext().resources.getInteger(R.integer.gallery_tab_padding)
             tab.view.setPadding(paddingSize, 0, paddingSize, 0)
         }.attach()
+    }
+
+    private fun loadAds(storyResponse: ArcXPStory) {
+
+        if ((requireActivity().application as MainApplication).showAds()) {
+            binding.topAdFrameLayout.visibility = View.VISIBLE
+            binding.bottomAdFrameLayout.visibility = View.VISIBLE
+            createBannerAdView(
+                requireActivity(),
+                binding.topAdFrameLayout,
+                storyResponse?.taxonomy,
+                object : AdListener() {})
+            createBannerAdView(
+                requireActivity(),
+                binding.bottomAdFrameLayout,
+                storyResponse?.taxonomy,
+                object : AdListener() {})
+        } else {
+            binding.topAdFrameLayout.visibility = View.GONE
+            binding.bottomAdFrameLayout.visibility = View.GONE
+        }
     }
 
     private fun onError(error: ArcXPException) {

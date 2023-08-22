@@ -4,9 +4,12 @@ import android.view.LayoutInflater
 import android.view.View.GONE
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.arcxp.content.extendedModels.*
+import com.arcxp.content.models.Taxonomy
 import com.arcxp.thearcxp.R
+import com.arcxp.thearcxp.databinding.AdItemLayoutBinding
 import com.arcxp.thearcxp.databinding.FirstItemLayoutBinding
 import com.arcxp.thearcxp.databinding.ItemLayoutBinding
 import com.arcxp.thearcxp.viewmodel.MainViewModel
@@ -17,10 +20,12 @@ import com.bumptech.glide.request.RequestOptions
 
 private const val FIRST_ITEM = 0
 private const val NOT_FIRST_ITEM = 1
+private const val AD_ITEM = 2
 
 class SectionRecyclerAdapter(
-    private val items: Map<Int, ArcXPCollection>,
-    private val vm: MainViewModel
+    private val items: Map<Int, Any?>,
+    private val vm: MainViewModel,
+    private val fragment: Fragment
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -116,22 +121,39 @@ class SectionRecyclerAdapter(
         }
     }
 
+    inner class AdViewHolder(val binding: AdItemLayoutBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(
+            item: Taxonomy?
+        ) {
+            createNativeAdView(fragment.requireActivity(), binding.adFrame, item)
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == FIRST_ITEM) {
-            FirstViewHolder(
+        if (viewType == FIRST_ITEM) {
+            return FirstViewHolder(
                 binding = FirstItemLayoutBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
                 )
             )
-        } else {
-            RemainingViewHolder(
+        } else if (viewType == NOT_FIRST_ITEM) {
+            return RemainingViewHolder(
                 binding = ItemLayoutBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
                 )
+            )
+        } else {
+            return AdViewHolder(
+                binding = AdItemLayoutBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false)
             )
         }
     }
@@ -140,13 +162,19 @@ class SectionRecyclerAdapter(
         if (getItemViewType(position) == FIRST_ITEM) {
             items[position]?.let {
                 (holder as FirstViewHolder).bind(
-                    item = it,
+                    item = it as ArcXPCollection
+                )
+            }
+        } else if (getItemViewType(position) == NOT_FIRST_ITEM) {
+            items[position]?.let {
+                (holder as RemainingViewHolder).bind(
+                    item = it as ArcXPCollection
                 )
             }
         } else {
             items[position]?.let {
-                (holder as RemainingViewHolder).bind(
-                    item = it
+                (holder as AdViewHolder).bind(
+                    item = it as Taxonomy
                 )
             }
         }
@@ -157,10 +185,14 @@ class SectionRecyclerAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == 0) {
-            FIRST_ITEM
+        if (position == 0) {
+            return FIRST_ITEM
         } else {
-            NOT_FIRST_ITEM
+            return if (items[position] is Taxonomy || items[position] == null) {
+                AD_ITEM
+            } else {
+                NOT_FIRST_ITEM
+            }
         }
     }
 }

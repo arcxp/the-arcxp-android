@@ -8,8 +8,8 @@
     <string name="contentUrl">https://arcsales-arcsales-sandbox.web.arc-cdn.net</string>
     <string name="navigation_endpoint">mobile-nav</string>
     <string name="video_endpoint">mobile-video</string>
-    <string name="tos_url">https://www.washingtonpost.com/terms-of-service/2011/11/18/gIQAldiYiN_story.html</string>
-    <string name="pp_url">https://www.washingtonpost.com/privacy-policy/2011/11/18/gIQASIiaiN_story.html</string>
+    <string name="tos_url">https://www.washingtonpost.com/information/2022/01/01/terms-of-service/</string>
+    <string name="pp_url">https://www.arcxp.com/privacy/</string>
 
     <!--App Strings-->
     <string name="dismiss">Dismiss</string>

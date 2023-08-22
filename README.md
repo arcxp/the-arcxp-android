@@ -5,12 +5,12 @@ to build, clone the project
 
 open in android studio
 
-for the resizer requirement, you will need to provide a resizer key 
-If you don’t have it, please contact your Technical Delivery Manager (TDM). Your key should not be shared or made public.
+checkout the latest tag
 
-you can place it in local.properties file at root of project
-resizer_key = XXXXX
+by running this terminal command:
 
-This is required to avoid downloading larger images than necessary and thus incurring unnecessary bandwidth costs.
+git checkout v1.0.0
+
+(or whichever latest tag on tags link above)
 
 run app from android studio (or use gradle command assembleArcPartnersDebug)

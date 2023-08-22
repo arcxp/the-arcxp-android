@@ -13,6 +13,7 @@ import com.arcxp.content.extendedModels.ArcXPCollection
 import com.arcxp.content.models.ArcXPSection
 import com.arcxp.commons.util.Failure
 import com.arcxp.commons.util.Success
+import com.arcxp.thearcxp.MainApplication
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentSectionBinding
 import com.arcxp.thearcxp.utils.*
@@ -24,7 +25,7 @@ class SectionFragment : BaseSectionFragment() {
     private val binding get() = _binding!!
     private var sectionName: String? = null
     private var path: String? = null
-    private val items = mutableMapOf<Int, ArcXPCollection>()
+    private val items = mutableMapOf<Int, Any?>()
 
     private var canRequestNextPagination = true
     private var lastLoaded = 0
@@ -120,11 +121,23 @@ class SectionFragment : BaseSectionFragment() {
     }
 
     private fun onGetCollectionSuccess(response: Map<Int, ArcXPCollection>) {
+        var index = 0
+        if (items.size > 0) {
+            index = items.size - 1
+        }
+
         response.forEach {
             addToMap(
-                index = it.key,
+                index = index,
                 collection = it.value
             )
+            index++
+            if ((requireActivity().application as MainApplication).showAds()) {
+                if (index % resources.getInteger(R.integer.section_ad_frequency) == 0) {
+                    items[index] = it.value.promoItem?.basic?.taxonomy
+                    index++
+                }
+            }
         }
 
         binding.recycler.adapter?.notifyItemRangeChanged(
@@ -139,7 +152,8 @@ class SectionFragment : BaseSectionFragment() {
         binding.recycler.layoutManager = LinearLayoutManager(requireContext())
         binding.recycler.adapter = SectionRecyclerAdapter(
             items = items,
-            vm = vm
+            vm = vm,
+            this
         )
     }
 

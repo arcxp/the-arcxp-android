@@ -5,7 +5,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.Gravity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -34,7 +34,9 @@ import com.arcxp.thearcxp.utils.collectOneTimeEvent
 import com.arcxp.thearcxp.utils.getNameToUseFromSection
 import com.arcxp.thearcxp.viewmodel.MainViewModel
 import com.arcxp.thearcxp.viewmodel.MainViewModel.FragmentView.*
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.navigation.NavigationView
+import com.google.android.ump.*
 
 /**
  * The only activity in the app.
@@ -54,6 +56,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var searchViewItem: MenuItem
     private lateinit var searchView: SearchView
+
+    private lateinit var consentInformation: ConsentInformation
+    private lateinit var consentForm: ConsentForm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,6 +128,9 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.addOnBackStackChangedListener {
             checkFragments()
         }
+
+        //Isolate all ads logic
+        initAds()
 
         init()
 
@@ -361,5 +369,65 @@ class MainActivity : AppCompatActivity() {
     private fun sensorLock(rotationOn: Boolean) {
         requestedOrientation =
             if (rotationOn) ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
+
+    private fun initAds() {
+        if ((application as MainApplication).showAds()) {
+            val debugSettings = ConsentDebugSettings.Builder(this)
+                .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
+                .addTestDeviceHashedId("3e2f8b7f-0d21-4822-808e-10ca1ad1abe1")
+                .build()
+
+            val params = ConsentRequestParameters
+                .Builder()
+                .setConsentDebugSettings(debugSettings)
+                .build()
+
+            consentInformation = UserMessagingPlatform.getConsentInformation(this)
+
+            consentInformation.reset()
+
+            consentInformation.requestConsentInfoUpdate(
+                this,
+                params,
+                {
+                    if (consentInformation.isConsentFormAvailable) {
+                        loadForm()
+                    }
+                },
+                {
+                    Log.e("ArcXP", "${it.message}")
+                })
+        }
+
+        //Initialize google ads
+        MobileAds.initialize(this) {}
+    }
+
+    //Load the ads consent form
+    private fun loadForm() {
+        // Loads a consent form. Must be called on the main thread.
+        UserMessagingPlatform.loadConsentForm(
+            this,
+            {
+                this.consentForm = it
+                if (consentInformation.consentStatus == ConsentInformation.ConsentStatus.REQUIRED) {
+                    consentForm.show(
+                        this,
+                        ConsentForm.OnConsentFormDismissedListener {
+                            if (consentInformation.consentStatus == ConsentInformation.ConsentStatus.OBTAINED) {
+                                // App can start requesting ads.
+                            }
+
+                            // Handle dismissal by reloading form.
+                            loadForm()
+                        }
+                    )
+                }
+            },
+            {
+                // Handle the error.
+            }
+        )
     }
 }
