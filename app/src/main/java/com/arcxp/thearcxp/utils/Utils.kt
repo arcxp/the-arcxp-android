@@ -8,6 +8,8 @@ import android.text.Html
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -26,9 +28,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 
 fun createImageView(url: String, caption: String?, activity: Activity): Pair<ImageView, TextView> {
     val imageView = ImageView(activity)
-    val layoutParams = LinearLayout.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-    )
+    val layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
     layoutParams.setMargins(0, 10, 0, 0)
     imageView.layoutParams = layoutParams
     Glide.with(activity)
@@ -59,7 +59,6 @@ fun createVideoView(
 ): ArcVideoFrame {
     val arcMediaPlayerConfigBuilder = ArcMediaPlayerConfig.Builder()
     val videoView = ArcVideoFrame(context = activity.applicationContext)
-
     // setting height and width of the VideoView in our linear layout
     val displayMetrics = DisplayMetrics()
     activity.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
@@ -70,9 +69,12 @@ fun createVideoView(
     )
     layoutParams.setMargins(10, 20, 10, 20)
     videoView.layoutParams = layoutParams
-    arcMediaPlayerConfigBuilder.setVideoFrame(videoView/*videoFrame*/)
-    arcMediaPlayerConfigBuilder.setActivity(activity)
-    arcMediaPlayerConfigBuilder.setMaxBitRate(235152000)
+
+
+    arcMediaPlayerConfigBuilder.setVideoFrame(videoFrame = videoView)
+    arcMediaPlayerConfigBuilder.setActivity(activity = activity)
+    arcMediaPlayerConfigBuilder.setMaxBitRate(rate = Int.MAX_VALUE)
+    arcMediaPlayerConfigBuilder.setShouldShowFullScreenButton(shouldShowFullScreenButton = true)
     arcMediaPlayer.configureMediaPlayer(arcMediaPlayerConfigBuilder.build())
     arcMediaPlayer.initMedia(
         fromJson(
@@ -90,10 +92,7 @@ fun createVideoView(
 fun createTextView(content: String, context: Context): TextView {
     val newTextView = TextView(context)
     newTextView.setTextColor(context.resources.getColor(R.color.grey))
-    val layoutParams = LinearLayout.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-    )
+    val layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
     layoutParams.setMargins(0, 10, 0, 10)
     newTextView.layoutParams = layoutParams
 

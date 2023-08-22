@@ -78,12 +78,12 @@ class ArticleFragment : BaseFragment() {
             //Check to see if the paywall needs to be triggered
             vm.evaluateForPaywall(
                 id = id,
-                contentType = "story",
+                contentType = AnsTypes.STORY.type,
                 section = null,
-                deviceType = "mobile"
+                deviceType = getString(R.string.device_type)
             ).observe(viewLifecycleOwner) {
                 if (!it.show) {
-                    Paywall().show(requireFragmentManager(), getString(R.string.paywall))
+                    Paywall().show(parentFragmentManager, getString(R.string.paywall))
                 }
             }
         }
@@ -91,13 +91,13 @@ class ArticleFragment : BaseFragment() {
             onBackPressedHandler()
         }
         binding.shareButton.setOnClickListener {
-            Toast.makeText(requireContext(), "Share not implemented yet", Toast.LENGTH_SHORT)
+            Toast.makeText(requireContext(), getString(R.string.share_message), Toast.LENGTH_SHORT)
                 .show()
         }
     }
 
     private fun containGalleries(storyResponse: ArcXPContentElement) =
-        storyResponse.content_elements?.any { it.type == "gallery" }
+        storyResponse.content_elements?.any { it.type == AnsTypes.GALLERY.type }
 
     /**
      * Display the story contents.  Loop through each element in the response
@@ -113,7 +113,7 @@ class ArticleFragment : BaseFragment() {
 
         //if article contains a gallery, show first at top, else should show promo image
         if (containsGalleries == true) {
-            val gallery = storyResponse.content_elements?.find { it.type == "gallery" }
+            val gallery = storyResponse.content_elements?.find { it.type == AnsTypes.GALLERY.type }
             gallery?.let { gallery(gallery = it) }
         } else {
             val topImage =
@@ -179,7 +179,7 @@ class ArticleFragment : BaseFragment() {
                         createVideoView(
                             content = it,
                             activity = requireActivity(),
-                            player
+                            arcMediaPlayer = player
                         )
                     )
                     arcMediaPlayers.add(player)

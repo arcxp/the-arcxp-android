@@ -3,8 +3,6 @@ package com.arcxp.thearcxp.tabfragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -12,6 +10,7 @@ import androidx.core.view.isVisible
 import com.arc.arcvideo.listeners.ArcVideoEventsListener
 import com.arc.arcvideo.model.ArcVideoStream
 import com.arc.arcvideo.model.TrackingType
+import com.arc.arcvideo.model.TrackingType.*
 import com.arc.arcvideo.model.TrackingTypeData
 import com.arcxp.commerce.ArcXPCommerceSDK
 import com.arcxp.content.sdk.models.ArcXPContentError
@@ -22,6 +21,7 @@ import com.arcxp.content.sdk.util.MoshiController.toJson
 import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentPlayvideoBinding
+import com.arcxp.thearcxp.utils.AnsTypes
 import com.arcxp.thearcxp.utils.Paywall
 
 class PlayVideoFragment : BaseFragment(), Paywall.OnPaywallCancelledListener {
@@ -59,24 +59,17 @@ class PlayVideoFragment : BaseFragment(), Paywall.OnPaywallCancelledListener {
 
         val id = requireArguments().getString(KEY, "")
 
-        binding.backButton?.setOnClickListener {
-            cleanupVideoOnClose()
-        }
-        binding.shareButton?.setOnClickListener {
-            Toast.makeText(requireContext(), "Share not implemented yet", Toast.LENGTH_SHORT).show()
-        }
-
         if (vm.arcMediaPlayer == null) {
             loadVideo(id)
             if (ArcXPCommerceSDK.isInitialized()) {
                 vm.evaluateForPaywall(
                     id = id,
-                    contentType = "video",
+                    contentType = AnsTypes.VIDEO.type,
                     section = null,
-                    deviceType = "mobile"
+                    deviceType = getString(R.string.device_type)
                 ).observe(viewLifecycleOwner) {
                     if (!it.show) {
-                        paywall.show(requireFragmentManager(), getString(R.string.paywall))
+                        paywall.show(parentFragmentManager, getString(R.string.paywall))
                     }
                 }
             }
@@ -87,13 +80,18 @@ class PlayVideoFragment : BaseFragment(), Paywall.OnPaywallCancelledListener {
 
     private fun playVideo(video: ArcVideoStream) {
         vm.createVideoPlayer()
-        vm.arcMediaPlayerConfigBuilder.setVideoFrame(binding.videoFrame)
-        vm.arcMediaPlayerConfigBuilder.enablePip(pipEnabled)
-        vm.arcMediaPlayerConfigBuilder.setActivity(requireActivity())
-        vm.arcMediaPlayerConfigBuilder.setAutoStartPlay(false)
-        vm.arcMediaPlayerConfigBuilder.setDisableControlsToggleWithTouch(true)
-        vm.arcMediaPlayer?.configureMediaPlayer(vm.arcMediaPlayerConfigBuilder.build())
-        vm.arcMediaPlayer?.initMedia(video)
+        vm.arcMediaPlayerConfigBuilder.setVideoFrame(videoFrame = binding.videoFrame)
+        vm.arcMediaPlayerConfigBuilder.enablePip(enable = pipEnabled)
+        vm.arcMediaPlayerConfigBuilder.setActivity(activity = requireActivity())
+        vm.arcMediaPlayerConfigBuilder.setAutoStartPlay(play = false)
+        vm.arcMediaPlayerConfigBuilder.setShouldShowBackButton(shouldShowBackButton = true)
+        vm.arcMediaPlayerConfigBuilder.setShouldShowFullScreenButton(shouldShowFullScreenButton = false)
+        vm.arcMediaPlayerConfigBuilder.showSeekButton(show = true)
+        vm.arcMediaPlayerConfigBuilder.useDialogForFullscreen(use = true)
+        vm.arcMediaPlayerConfigBuilder.setDisableControlsToggleWithTouch(disable = true)
+        vm.arcMediaPlayer?.configureMediaPlayer(config = vm.arcMediaPlayerConfigBuilder.build())
+        vm.arcMediaPlayer?.initMediaWithShareURL(video = video, "a url string")
+        vm.arcMediaPlayer?.setFullscreen(full = true)
         vm.arcMediaPlayer?.displayVideo()
         setVideoTracking()
     }
@@ -101,6 +99,7 @@ class PlayVideoFragment : BaseFragment(), Paywall.OnPaywallCancelledListener {
     //There are a lot of places in the code that need to shut
     //down the video and the fragment.  They all call this method
     private fun cleanupVideoOnClose() {
+        vm.arcMediaPlayer?.setFullscreen(full = false)
         vm.disposeVideoPlayer()
         requireActivity().supportFragmentManager.popBackStack()
         dismissSnackBar()
@@ -122,14 +121,6 @@ class PlayVideoFragment : BaseFragment(), Paywall.OnPaywallCancelledListener {
         isInPip = isInPictureInPictureMode
         if (!isInPictureInPictureMode) {
             vm.arcMediaPlayer?.returnToNormalFromPip()
-            //Hide the app bar and bottom nav bar when
-            //going into PIP so they aren't in the PIP window
-            binding.appBar?.visibility = VISIBLE
-            binding.bottom?.visibility = VISIBLE
-        } else {
-            //Restore the views when exiting PIP
-            binding.appBar?.visibility = GONE
-            binding.bottom?.visibility = GONE
         }
     }
 
@@ -147,12 +138,22 @@ class PlayVideoFragment : BaseFragment(), Paywall.OnPaywallCancelledListener {
                 videoData: TrackingTypeData.TrackingVideoTypeData?
             ) {
                 when (type) {
-                    TrackingType.ON_PLAYER_TOUCHED -> {
-                        if (vm.arcMediaPlayer!!.isControlsVisible) {
-                            vm.arcMediaPlayer!!.hideControls()
+                    ON_PLAYER_TOUCHED -> {
+                        if (vm.arcMediaPlayer?.isControlsVisible == true) {
+                            vm.arcMediaPlayer?.hideControls()
                         } else {
-                            vm.arcMediaPlayer!!.showControls()
+                            vm.arcMediaPlayer?.showControls()
                         }
+                    }
+                    ON_SHARE -> {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.share_message),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    BACK_BUTTON_PRESSED -> {
+                        cleanupVideoOnClose()
                     }
                     else -> {}
                 }
@@ -192,7 +193,7 @@ class PlayVideoFragment : BaseFragment(), Paywall.OnPaywallCancelledListener {
                     onError(
                         error = ArcXPContentError(
                             ArcXPContentSDKErrorType.SERVER_ERROR,
-                            "Could not load video."
+                            getString(R.string.video_load_error)
                         )
                     )
                 }

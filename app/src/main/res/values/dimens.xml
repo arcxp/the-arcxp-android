@@ -17,6 +17,7 @@
     <dimen name="paywall_margins">24dp</dimen>
     <dimen name="paywall_large_font_margin">40dp</dimen>
     <dimen name="close_button_margin">16dp</dimen>
+    <dimen name="extra_close_button_margin">4dp</dimen>
 
     <dimen name="search_results_margin">16dp</dimen>
     <dimen name="section_top_margin">0dp</dimen>

@@ -81,5 +81,8 @@
     <string name="hometag">home</string>
     <string name="accounttag">account</string>
     <string name="videotag">video</string>
+    <string name="share_message">Share not implemented yet</string>
+    <string name="video_load_error">Could not load video.</string>
+    <string name="device_type">mobile</string>
 
 </resources>

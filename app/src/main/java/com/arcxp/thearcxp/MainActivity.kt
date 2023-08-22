@@ -26,6 +26,7 @@ import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.databinding.ActivityMainBinding
 import com.arcxp.thearcxp.tabfragment.*
+import com.arcxp.thearcxp.utils.AnsTypes
 import com.arcxp.thearcxp.viewmodel.MainViewModel
 import com.arcxp.thearcxp.viewmodel.MainViewModel.FragmentView.*
 import com.google.android.material.navigation.NavigationView
@@ -126,8 +127,8 @@ class MainActivity : AppCompatActivity() {
         val contentType = item.first
         val contentId = item.second
         when (contentType) {
-            "story" -> openArticle(contentId)
-            "video" -> openVideo(contentId)
+            AnsTypes.STORY.type -> openArticle(contentId)
+            AnsTypes.VIDEO.type -> openVideo(contentId)
         }
         vm.clearLastView()
     }

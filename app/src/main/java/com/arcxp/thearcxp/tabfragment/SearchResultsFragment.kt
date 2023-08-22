@@ -18,6 +18,7 @@ import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentSearchresultsBinding
 import com.arcxp.thearcxp.databinding.SearchItemLayoutBinding
+import com.arcxp.thearcxp.utils.AnsTypes
 import com.arcxp.thearcxp.utils.spinner
 import com.bumptech.glide.Glide
 
@@ -205,7 +206,7 @@ class SearchResultsFragment : BaseFragment() {
                     .error(requireContext().resources.getDrawable(R.mipmap.ic_launcher)).fitCenter()
                     .into(binding.videoImage)
 
-                if (item.type != null &&  item.type == "video") {
+                if (item.type != null &&  item.type == AnsTypes.VIDEO.type) {
                     binding.playIcon.visibility = View.VISIBLE
                 }
                 if (binding.author.text.toString().isEmpty()) {
