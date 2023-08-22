@@ -12,8 +12,8 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.arcxp.content.sdk.ArcXPContentSDK
-import com.arcxp.content.sdk.util.Success
+import com.arcxp.ArcXPMobileSDK
+import com.arcxp.commons.util.Success
 import com.arcxp.thearcxp.databinding.ArcXPWidgetConfigureBinding
 import com.arcxp.thearcxp.utils.TAG
 import kotlinx.coroutines.*
@@ -42,7 +42,7 @@ class ArcXPWidgetConfigureActivity : Activity() {
         setContentView(binding.root)
 
         ioScope.launch {
-            ArcXPContentSDK.contentManager().getSectionListSuspend().apply {
+            ArcXPMobileSDK.contentManager().getSectionListSuspend().apply {
                 if (this is Success) {
                     success.forEach {
                         configSectionListItems.add(it.navigation.nav_title.toString())

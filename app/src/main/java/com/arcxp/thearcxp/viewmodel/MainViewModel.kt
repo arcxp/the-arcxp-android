@@ -2,29 +2,28 @@ package com.arcxp.thearcxp.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.arc.arcvideo.ArcMediaClient
-import com.arc.arcvideo.ArcMediaPlayer
-import com.arc.arcvideo.ArcMediaPlayerConfig
-import com.arc.arcvideo.ArcVideoStreamCallback
-import com.arc.arcvideo.model.ArcVideoResponse
-import com.arc.arcvideo.model.ArcVideoSDKErrorType
-import com.arc.arcvideo.model.ArcVideoStream
-import com.arc.arcvideo.model.VideoVO
-import com.arcxp.commerce.ArcXPCommerceSDK
+import com.arcxp.ArcXPMobileSDK
+import com.arcxp.commons.throwables.ArcXPSDKErrorType
+import com.arcxp.video.ArcMediaClient
+import com.arcxp.video.ArcMediaPlayer
+import com.arcxp.video.ArcMediaPlayerConfig
+import com.arcxp.video.ArcVideoStreamCallback
+import com.arcxp.video.model.ArcVideoResponse
+import com.arcxp.video.model.ArcVideoStream
+import com.arcxp.video.model.VideoVO
 import com.arcxp.commerce.ArcXPPageviewEvaluationResult
-import com.arcxp.commerce.apimanagers.ArcXPIdentityListener
+import com.arcxp.commerce.callbacks.ArcXPIdentityListener
 import com.arcxp.commerce.extendedModels.ArcXPProfileManage
 import com.arcxp.commerce.models.ArcXPAuth
 import com.arcxp.commerce.models.ArcXPIdentity
 import com.arcxp.commerce.models.ArcXPUser
-import com.arcxp.commerce.util.ArcXPError
-import com.arcxp.content.sdk.ArcXPContentSDK
-import com.arcxp.content.sdk.extendedModels.ArcXPCollection
-import com.arcxp.content.sdk.extendedModels.ArcXPStory
-import com.arcxp.content.sdk.models.*
-import com.arcxp.content.sdk.util.Either
-import com.arcxp.content.sdk.util.Failure
-import com.arcxp.content.sdk.util.Success
+import com.arcxp.commons.throwables.ArcXPException
+import com.arcxp.commons.util.Either
+import com.arcxp.commons.util.Failure
+import com.arcxp.commons.util.Success
+import com.arcxp.content.extendedModels.ArcXPCollection
+import com.arcxp.content.extendedModels.ArcXPStory
+import com.arcxp.content.models.*
 import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.tabfragment.BaseSectionFragment
 import com.arcxp.thearcxp.tabfragment.SectionFragment
@@ -34,7 +33,6 @@ import com.facebook.login.widget.LoginButton
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import com.arcxp.commerce.util.Either as EitherCommerce
 
 /**
  * View model class for the app
@@ -49,8 +47,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //Event sent when the section list has been loaded
     private val _sectionsListEvent =
-        MutableLiveData<Either<ArcXPContentError, List<ArcXPSection>>>()
-    val sectionsListEvent: LiveData<Either<ArcXPContentError, List<ArcXPSection>>> =
+        MutableLiveData<Either<ArcXPException, List<ArcXPSection>>>()
+    val sectionsListEvent: LiveData<Either<ArcXPException, List<ArcXPSection>>> =
         _sectionsListEvent
 
     //Event sent when a section is selected from the view pager
@@ -75,7 +73,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val sensorLockEvent: LiveData<Boolean> = _sensorLockEvent
 
     //Event observed by PlayVideoFragment to request video by id from Video Center
-    private val _videoResultEvent = Channel<Either<ArcXPContentError, ArcVideoStream>>()
+    private val _videoResultEvent = Channel<Either<ArcXPException, ArcVideoStream>>()
     val videoResultEvent = _videoResultEvent.receiveAsFlow()
 
     var sections = HashMap<String, ArcXPSection>()
@@ -92,8 +90,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var isStartup = true
 
     val videoClient = ArcMediaClient.Companion.createClient(
-        orgName = ArcXPContentSDK.arcxpContentConfig().orgName,
-        environment = ArcXPContentSDK.arcxpContentConfig().environment
+        orgName = ArcXPMobileSDK.organization,
+        serverEnvironment = ArcXPMobileSDK.environment
     )
 
     //Keep the video configuration here so it does not get
@@ -101,7 +99,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val arcMediaPlayerConfigBuilder = ArcMediaPlayerConfig.Builder()
 
     fun getSectionList(owner: LifecycleOwner) {
-        ArcXPContentSDK.contentManager().getSectionList().observe(owner) { result ->
+        ArcXPMobileSDK.contentManager().getSectionList().observe(owner) { result ->
             when (result) {
                 is Success -> {
                     sections.clear()
@@ -121,14 +119,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         newPassword: String,
         oldPassword: String,
         listener: ArcXPIdentityListener?
-    ): LiveData<EitherCommerce<ArcXPError, ArcXPIdentity>> {
-        return ArcXPCommerceSDK.commerceManager()
+    ): LiveData<Either<ArcXPException, ArcXPIdentity>> {
+        return ArcXPMobileSDK.commerceManager()
             .updatePassword(newPassword, oldPassword, object : ArcXPIdentityListener() {
                 override fun onPasswordChangeSuccess(it: ArcXPIdentity) {
                     listener?.onPasswordChangeSuccess(it)
                 }
 
-                override fun onPasswordChangeError(error: ArcXPError) {
+                override fun onPasswordChangeError(error: ArcXPException) {
                     listener?.onPasswordChangeError(error)
                 }
             })
@@ -151,29 +149,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loginWithGoogle(activity: MainActivity, owner: LifecycleOwner): LiveData<ArcXPAuth> {
-        return ArcXPCommerceSDK.commerceManager().loginWithGoogle(activity)
+        return ArcXPMobileSDK.commerceManager().loginWithGoogle(activity)
     }
 
     fun loginWithFacebook(fbButton: LoginButton, owner: LifecycleOwner): LiveData<ArcXPAuth> {
-        return ArcXPCommerceSDK.commerceManager().loginWithFacebook(fbButton)
+        return ArcXPMobileSDK.commerceManager().loginWithFacebook(fbButton)
     }
 
     fun login(
         email: String,
         password: String,
         owner: LifecycleOwner
-    ): LiveData<EitherCommerce<ArcXPError, ArcXPAuth>> {
-        return ArcXPCommerceSDK.commerceManager().login(email, password)
+    ): LiveData<Either<ArcXPException, ArcXPAuth>> {
+        return ArcXPMobileSDK.commerceManager().login(email, password)
     }
 
-    fun logout(listener: ArcXPIdentityListener? = null): LiveData<EitherCommerce<ArcXPError, Boolean>> {
+    fun logout(listener: ArcXPIdentityListener? = null): LiveData<Either<ArcXPException, Boolean>> {
         contentId = Pair("", "")
-        return ArcXPCommerceSDK.commerceManager().logout(object : ArcXPIdentityListener() {
+        return ArcXPMobileSDK.commerceManager().logout(object : ArcXPIdentityListener() {
             override fun onLogoutSuccess() {
                 listener?.onLogoutSuccess()
             }
 
-            override fun onLogoutError(error: ArcXPError) {
+            override fun onLogoutError(error: ArcXPException) {
                 listener?.onLogoutError(error)
 
             }
@@ -181,14 +179,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun rememberUser(isChecked: Boolean) {
-        ArcXPCommerceSDK.commerceManager().rememberUser(isChecked)
+        ArcXPMobileSDK.commerceManager().rememberUser(isChecked)
     }
 
     fun isLoggedIn(): LiveData<Boolean> {
-        return ArcXPCommerceSDK.commerceManager().isLoggedIn()
+        return ArcXPMobileSDK.commerceManager().isLoggedIn()
     }
 
-    fun commerceErrors() = ArcXPCommerceSDK.commerceManager().errors
+    fun commerceErrors() = ArcXPMobileSDK.commerceManager().errors
 
     fun signUp(
         username: String,
@@ -196,8 +194,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         email: String,
         firstname: String,
         lastname: String
-    ): LiveData<ArcXPUser> {
-        return ArcXPCommerceSDK.commerceManager().signUp(
+    ): LiveData<Either<ArcXPException, ArcXPUser>> {
+        return ArcXPMobileSDK.commerceManager().signUp(
             username = username,
             password = password,
             email = email,
@@ -206,13 +204,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
-    fun getUserProfile(listener: ArcXPIdentityListener? = null): LiveData<EitherCommerce<ArcXPError, ArcXPProfileManage>> {
-        return ArcXPCommerceSDK.commerceManager().getUserProfile(object : ArcXPIdentityListener() {
+    fun getUserProfile(listener: ArcXPIdentityListener? = null): LiveData<Either<ArcXPException, ArcXPProfileManage>> {
+        return ArcXPMobileSDK.commerceManager().getUserProfile(object : ArcXPIdentityListener() {
             override fun onFetchProfileSuccess(profileResponse: ArcXPProfileManage) {
                 listener?.onFetchProfileSuccess(profileResponse)
             }
 
-            override fun onProfileError(error: ArcXPError) {
+            override fun onProfileError(error: ArcXPException) {
                 listener?.onProfileError(error)
             }
         })
@@ -241,7 +239,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         deviceType: String?
     ): LiveData<ArcXPPageviewEvaluationResult> {
         contentId = Pair(contentType!!, id)
-        return ArcXPCommerceSDK.commerceManager().evaluatePage(
+        return ArcXPMobileSDK.commerceManager().evaluatePage(
             pageId = id,
             contentType = contentType,
             contentSection = section,
@@ -255,21 +253,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         id: String,
         from: Int = 0,
         size: Int = 20
-    ): LiveData<Either<ArcXPContentError, Map<Int, ArcXPCollection>>> {
-        return ArcXPContentSDK.contentManager().getCollection(id, from = from, size = size)
+    ): LiveData<Either<ArcXPException, Map<Int, ArcXPCollection>>> {
+        return ArcXPMobileSDK.contentManager().getCollection(id, from = from, size = size)
     }
 
     //Retrieve a video collection based user configured video collection name/content alias
     fun getVideoCollection(
         from: Int = 0,
         size: Int = 20
-    ): LiveData<Either<ArcXPContentError, Map<Int, ArcXPCollection>>> {
-        return ArcXPContentSDK.contentManager().getVideoCollection(from = from, size = size)
+    ): LiveData<Either<ArcXPException, Map<Int, ArcXPCollection>>> {
+        return ArcXPMobileSDK.contentManager().getVideoCollection(from = from, size = size)
     }
 
     //Retrieve a story based on ID
-    fun getStory(id: String): LiveData<Either<ArcXPContentError, ArcXPStory>> {
-        return ArcXPContentSDK.contentManager().getArcXPStory(id)
+    fun getStory(id: String): LiveData<Either<ArcXPException, ArcXPStory>> {
+        return ArcXPMobileSDK.contentManager().getArcXPStory(id)
     }
 
     //Retrieve a video based on ID
@@ -289,18 +287,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             override fun onLiveVideos(videos: List<VideoVO>?) {}
 
             override fun onError(
-                type: ArcVideoSDKErrorType,
+                type: ArcXPSDKErrorType,
                 message: String,
                 value: Any?
             ) {
                 viewModelScope.launch {
-                    _videoResultEvent.trySend(Failure(
-                        failure = ArcXPContentError(
-                            ArcXPContentSDKErrorType.SERVER_ERROR,
-                            message,
-                            value
+                    _videoResultEvent.trySend(
+                        Failure(
+                            failure = ArcXPException(
+                                message = message,
+                                type = ArcXPSDKErrorType.SERVER_ERROR,
+                                value = value
+                            )
                         )
-                    ))
+                    )
                 }
             }
 

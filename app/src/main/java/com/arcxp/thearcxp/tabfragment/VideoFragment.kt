@@ -10,10 +10,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.arcxp.content.sdk.extendedModels.*
-import com.arcxp.content.sdk.models.ArcXPContentError
-import com.arcxp.content.sdk.util.Failure
-import com.arcxp.content.sdk.util.Success
+import com.arcxp.commons.throwables.ArcXPException
+import com.arcxp.content.extendedModels.*
+import com.arcxp.commons.util.Failure
+import com.arcxp.commons.util.Success
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FirstItemLayoutBinding
 import com.arcxp.thearcxp.databinding.FragmentVideoBinding
@@ -82,7 +82,7 @@ class VideoFragment : BaseFragment() {
         }
     }
 
-    private fun onError(error: ArcXPContentError) {
+    private fun onError(error: ArcXPException) {
         //to ignore inevitable empty list error at end of collections
         if (error.message != getString(R.string.empty_collection)) {
             showSnackBar(

@@ -11,7 +11,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.text.bold
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.arcxp.content.sdk.models.ArcXPContentError
+import com.arcxp.commons.throwables.ArcXPException
 import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.viewmodel.MainViewModel
@@ -28,14 +28,14 @@ open class BaseFragment : Fragment() {
     }
 
     fun showSnackBar(
-        error: ArcXPContentError,
+        error: ArcXPException,
         view: View,
         viewId: Int,
         dismissible: Boolean = true,
         onDismiss: () -> Unit = {}
     ) {
         val message = SpannableStringBuilder()
-            .bold { append("${error.type.name}:\n") }
+            .bold { append("${error.type?.name}:\n") }
             .append(error.message)
         val snackBar =
             Snackbar.make(view, message, Snackbar.LENGTH_INDEFINITE)

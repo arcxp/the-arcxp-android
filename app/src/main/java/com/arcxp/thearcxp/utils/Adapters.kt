@@ -4,9 +4,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.arcxp.content.sdk.models.Image
-import com.arcxp.content.sdk.models.imageUrl
-import com.arcxp.content.sdk.util.fallback
+import com.arcxp.commons.util.fallback
+import com.arcxp.content.models.Image
+import com.arcxp.content.models.imageUrl
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.GalleryViewItemBinding
 import com.bumptech.glide.Glide

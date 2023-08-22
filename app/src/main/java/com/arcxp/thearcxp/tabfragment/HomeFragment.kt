@@ -7,9 +7,9 @@ import android.view.View.GONE
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import com.arcxp.content.sdk.models.ArcXPContentError
-import com.arcxp.content.sdk.util.Failure
-import com.arcxp.content.sdk.util.Success
+import com.arcxp.commons.throwables.ArcXPException
+import com.arcxp.commons.util.Failure
+import com.arcxp.commons.util.Success
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentHomeBinding
 import com.arcxp.thearcxp.utils.getNameToUseFromSection
@@ -55,7 +55,7 @@ class HomeFragment : BaseFragment() {
         }
     }
 
-    private fun onError(error: ArcXPContentError) {
+    private fun onError(error: ArcXPException) {
         showSnackBar(
             error = error,
             view = binding.collectionViewFragment,

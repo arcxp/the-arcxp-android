@@ -78,13 +78,14 @@
         app:layout_constraintStart_toStartOf="@id/guideline_start"
         app:layout_constraintTop_toBottomOf="@id/have_account" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/subscribe_btn"
         style="@style/Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_larger"
         android:backgroundTint="@color/paywall_button"
+        android:padding="@dimen/padding_large"
         android:text="@string/create_account"
         android:textColor="@color/text"
         app:layout_constraintEnd_toEndOf="@id/guideline_end"

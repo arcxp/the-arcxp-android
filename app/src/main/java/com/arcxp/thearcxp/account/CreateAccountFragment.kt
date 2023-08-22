@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.arcxp.commerce.ArcXPCommerceSDK
+import com.arcxp.ArcXPMobileSDK
 import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentCreateAccountBinding
@@ -47,7 +47,7 @@ class CreateAccountFragment : Fragment() {
         }
 
         binding.btnFacebook.setOnClickListener {
-            ArcXPCommerceSDK.commerceManager()
+            ArcXPMobileSDK.commerceManager()
                 .loginWithFacebook(binding.btnFacebook)
                 .observe(viewLifecycleOwner)
                 {
@@ -56,7 +56,7 @@ class CreateAccountFragment : Fragment() {
         }
 
         binding.googleButton.setOnClickListener {
-            ArcXPCommerceSDK.commerceManager()
+            ArcXPMobileSDK.commerceManager()
                 .loginWithGoogle(requireActivity() as MainActivity)
                 .observe(viewLifecycleOwner)
                 {

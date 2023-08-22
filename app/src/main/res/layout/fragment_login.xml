@@ -106,15 +106,28 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/password"
-                app:layout_constraintBottom_toBottomOf="@id/login_password_edit"
+                app:layout_constraintBottom_toBottomOf="@id/login_password_layout"
                 app:layout_constraintEnd_toEndOf="@id/login_guideline_edit_text_begin"
                 app:layout_constraintStart_toStartOf="@id/guideline_start"
-                app:layout_constraintTop_toTopOf="@id/login_password_edit" />
+                app:layout_constraintTop_toTopOf="@id/login_password_layout" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/login_password_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:hintEnabled="false"
+                android:paddingTop="@dimen/space_small"
+                app:passwordToggleTint="@color/grey"
+                app:layout_constraintEnd_toEndOf="@id/guideline_end"
+                app:layout_constraintStart_toStartOf="@id/login_guideline_edit_text_begin"
+                app:layout_constraintTop_toBottomOf="@id/login_email_edit"
+                app:passwordToggleDrawable="@drawable/show_password_selector"
+                app:passwordToggleEnabled="true">
 
             <EditText
                 android:id="@+id/login_password_edit"
                 style="@style/SignInEditText"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_small"
                 android:hint="@string/password_masked_hint"
@@ -123,18 +136,20 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@id/login_guideline_edit_text_begin"
                 app:layout_constraintTop_toBottomOf="@id/login_email_edit" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/login_button"
                 style="@style/Button"
+                android:padding="@dimen/padding_large"
                 android:layout_width="0dp"
+                android:enabled="true"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space"
-                android:background="@drawable/button_shape"
                 android:text="@string/sign_in"
                 app:layout_constraintEnd_toEndOf="@+id/guideline_end"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
-                app:layout_constraintTop_toBottomOf="@+id/login_password_edit" />
+                app:layout_constraintTop_toBottomOf="@+id/login_password_layout" />
 
             <TextView
                 android:id="@+id/error_message"
@@ -204,14 +219,16 @@
                 app:layout_constraintStart_toStartOf="@+id/login_remember_me_checkbox"
                 app:layout_constraintTop_toBottomOf="@+id/login_forgot_password_button" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/login_newFacebookBtn"
-                style="@style/FacebookSignInButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/facebook_btn"
-                android:drawableStart="@drawable/ic_baseline_fb"
+                android:layout_marginTop="@dimen/space"
                 android:text="@string/fb_signin"
+                style="@style/Button"
+                app:iconTint="@null"
+                android:padding="@dimen/padding_large"
+                app:icon="@drawable/ic_baseline_fb"
                 app:layout_constraintEnd_toEndOf="@+id/guideline_end"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
                 app:layout_constraintTop_toBottomOf="@+id/login_forgot_password_button" />
@@ -220,20 +237,22 @@
                 android:id="@+id/login_btn_google"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/google_btn"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/login_newGoogleBtn" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/login_newGoogleBtn"
-                style="@style/GoogleSignInButton"
                 android:layout_width="0dp"
+                android:layout_marginTop="@dimen/space"
                 android:layout_height="wrap_content"
-                android:background="@drawable/google_btn"
-                android:drawableStart="@drawable/googleg_standard_color_18"
+                android:padding="@dimen/padding_large"
                 android:text="@string/google_signin"
+                style="@style/GoogleButton"
+                app:iconTint="@null"
+                android:enabled="true"
+                app:icon="@drawable/googleg_standard_color_18"
                 app:layout_constraintEnd_toEndOf="@+id/guideline_end"
                 app:layout_constraintStart_toStartOf="@+id/guideline_start"
                 app:layout_constraintTop_toBottomOf="@+id/login_newFacebookBtn" />

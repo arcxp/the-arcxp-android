@@ -5,7 +5,7 @@ import android.view.View.GONE
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.arcxp.content.sdk.extendedModels.*
+import com.arcxp.content.extendedModels.*
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FirstItemLayoutBinding
 import com.arcxp.thearcxp.databinding.ItemLayoutBinding

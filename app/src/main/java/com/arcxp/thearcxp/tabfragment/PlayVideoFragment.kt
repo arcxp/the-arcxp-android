@@ -8,17 +8,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
-import com.arc.arcvideo.listeners.ArcKeyListener
-import com.arc.arcvideo.listeners.ArcVideoEventsListener
-import com.arc.arcvideo.model.ArcVideoStream
-import com.arc.arcvideo.model.TrackingType
-import com.arc.arcvideo.model.TrackingType.*
-import com.arc.arcvideo.model.TrackingTypeData
-import com.arcxp.commerce.ArcXPCommerceSDK
-import com.arcxp.content.sdk.models.ArcXPContentError
-import com.arcxp.content.sdk.util.Either
-import com.arcxp.content.sdk.util.Failure
-import com.arcxp.content.sdk.util.Success
+import com.arcxp.ArcXPMobileSDK
+import com.arcxp.commons.throwables.ArcXPException
+import com.arcxp.video.listeners.ArcKeyListener
+import com.arcxp.video.listeners.ArcVideoEventsListener
+import com.arcxp.video.model.ArcVideoStream
+import com.arcxp.video.model.TrackingType
+import com.arcxp.video.model.TrackingType.*
+import com.arcxp.video.model.TrackingTypeData
+import com.arcxp.commons.util.Either
+import com.arcxp.commons.util.Failure
+import com.arcxp.commons.util.Success
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentPlayvideoBinding
 import com.arcxp.thearcxp.utils.AnsTypes
@@ -68,7 +68,7 @@ class PlayVideoFragment : BaseFragment(), Paywall.PaywallListener, ArcKeyListene
 
         if (vm.arcMediaPlayer == null) {
             loadVideo(id = id)
-            if (ArcXPCommerceSDK.isInitialized()) {
+            if (ArcXPMobileSDK.commerceInitialized()) {
                 vm.evaluateForPaywall(
                     id = id,
                     contentType = AnsTypes.VIDEO.type,
@@ -87,7 +87,7 @@ class PlayVideoFragment : BaseFragment(), Paywall.PaywallListener, ArcKeyListene
         collectOneTimeEvent(flow = vm.videoResultEvent, collect = ::handleVideo)
     }
 
-    private fun handleVideo(result: Either<ArcXPContentError, ArcVideoStream>) =
+    private fun handleVideo(result: Either<ArcXPException, ArcVideoStream>) =
         when (result) {
             is Success -> playVideo(result.success)
             is Failure -> onError(result.failure)
@@ -207,7 +207,7 @@ class PlayVideoFragment : BaseFragment(), Paywall.PaywallListener, ArcKeyListene
         })
     }
 
-    private fun onError(error: ArcXPContentError) {
+    private fun onError(error: ArcXPException) {
         showSnackBar(
             error = error,
             view = binding.root,

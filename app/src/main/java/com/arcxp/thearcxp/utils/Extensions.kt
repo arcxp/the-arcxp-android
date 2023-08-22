@@ -2,11 +2,12 @@ package com.arcxp.thearcxp.utils
 
 import android.content.Context
 import android.util.Log
+import android.util.Patterns
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.arcxp.content.sdk.models.ArcXPSection
+import com.arcxp.content.models.ArcXPSection
 import com.arcxp.thearcxp.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -25,6 +26,8 @@ fun Context.showErrorDialog(
         }.setNegativeButton("Cancel", null)
         .show()
 }
+
+fun CharSequence?.isValidEmail() = !isNullOrEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
 //fun ArcXPStory.print(): String {
 //    val output = StringBuilder()

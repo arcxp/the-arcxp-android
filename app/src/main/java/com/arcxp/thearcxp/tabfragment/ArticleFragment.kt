@@ -10,17 +10,18 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import com.arc.arcvideo.ArcMediaPlayer
-import com.arc.arcvideo.ArcVideoStreamCallback
-import com.arc.arcvideo.model.ArcVideoResponse
-import com.arc.arcvideo.model.ArcVideoSDKErrorType
-import com.arc.arcvideo.model.ArcVideoStream
-import com.arc.arcvideo.model.VideoVO
-import com.arcxp.commerce.ArcXPCommerceSDK
-import com.arcxp.content.sdk.extendedModels.*
-import com.arcxp.content.sdk.models.*
-import com.arcxp.content.sdk.util.Failure
-import com.arcxp.content.sdk.util.Success
+import com.arcxp.ArcXPMobileSDK
+import com.arcxp.commons.throwables.ArcXPException
+import com.arcxp.commons.throwables.ArcXPSDKErrorType
+import com.arcxp.video.ArcMediaPlayer
+import com.arcxp.video.ArcVideoStreamCallback
+import com.arcxp.video.model.ArcVideoResponse
+import com.arcxp.video.model.ArcVideoStream
+import com.arcxp.video.model.VideoVO
+import com.arcxp.content.extendedModels.*
+import com.arcxp.content.models.*
+import com.arcxp.commons.util.Failure
+import com.arcxp.commons.util.Success
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentArticleBinding
 import com.arcxp.thearcxp.utils.*
@@ -81,7 +82,7 @@ class ArticleFragment : BaseFragment() {
             }
         }
 
-        if (ArcXPCommerceSDK.isInitialized()) {
+        if (ArcXPMobileSDK.commerceInitialized()) {
             //Check to see if the paywall needs to be triggered
             vm.evaluateForPaywall(
                 id = id,
@@ -143,7 +144,7 @@ class ArticleFragment : BaseFragment() {
             if (storyResponse.author().isNotEmpty()) {
                 binding.storyDate.visibility = VISIBLE
                 binding.storyAuthor.visibility = VISIBLE
-                binding.storyAuthor.text = "By ${storyResponse.author()}"
+                binding.storyAuthor.text = getString(R.string.By_author, storyResponse.author())
                 binding.storyDate.text = storyResponse.date()
             }
         }
@@ -209,15 +210,15 @@ class ArticleFragment : BaseFragment() {
                                 override fun onLiveVideos(videos: List<VideoVO>?) {}
 
                                 override fun onError(
-                                    type: ArcVideoSDKErrorType,
+                                    type: ArcXPSDKErrorType,
                                     message: String,
                                     value: Any?
                                 ) {
                                     onError(
-                                        ArcXPContentError(
-                                            ArcXPContentSDKErrorType.SERVER_ERROR,
-                                            message,
-                                            value
+                                        ArcXPException(
+                                            message = message,
+                                            type = ArcXPSDKErrorType.SERVER_ERROR,
+                                            value = value
                                         )
                                     )
                                 }
@@ -227,7 +228,7 @@ class ArticleFragment : BaseFragment() {
                 }
                 is Gallery -> {
                     //if we have a gallery, it is already shown at top, so no need to show it twice
-                    if (skipNextGallerySinceAlreadyDisplayed == true) {
+                    if (skipNextGallerySinceAlreadyDisplayed) {
                         skipNextGallerySinceAlreadyDisplayed = false
                     } else {
                         gallery(gallery = it)
@@ -287,7 +288,7 @@ class ArticleFragment : BaseFragment() {
         }.attach()
     }
 
-    private fun onError(error: ArcXPContentError) {
+    private fun onError(error: ArcXPException) {
         showSnackBar(
             error = error,
             view = binding.root,

@@ -9,12 +9,13 @@ import android.net.Uri
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import com.arcxp.content.sdk.ArcXPContentSDK
-import com.arcxp.content.sdk.extendedModels.ArcXPCollection
-import com.arcxp.content.sdk.extendedModels.thumbnail
-import com.arcxp.content.sdk.models.ArcXPContentError
-import com.arcxp.content.sdk.util.Either
-import com.arcxp.content.sdk.util.Success
+import com.arcxp.ArcXPMobileSDK
+import com.arcxp.ArcXPMobileSDK.application
+import com.arcxp.commons.throwables.ArcXPException
+import com.arcxp.content.extendedModels.ArcXPCollection
+import com.arcxp.content.extendedModels.thumbnail
+import com.arcxp.commons.util.Either
+import com.arcxp.commons.util.Success
 import com.arcxp.thearcxp.ArcXPWidget.Companion.ARTICLE_ID_KEY
 import com.arcxp.thearcxp.utils.TAG
 import kotlinx.coroutines.CoroutineScope
@@ -57,8 +58,8 @@ class ArcXPWidgetService : RemoteViewsService() {
 
             val coroutineContext = CoroutineScope(Dispatchers.IO + SupervisorJob())
             coroutineContext.launch {
-                val result: Either<ArcXPContentError, Map<Int, ArcXPCollection>> =
-                    ArcXPContentSDK.contentManager().getCollectionSuspend(sectionId)
+                val result: Either<ArcXPException, Map<Int, ArcXPCollection>> =
+                    ArcXPMobileSDK.contentManager().getCollectionSuspend(sectionId)
                 if (result is Success) {
                     result.success.forEach { entry ->
                         entry.value.headlines.basic?.let { headlinesBasics.add(it) }
@@ -70,7 +71,7 @@ class ArcXPWidgetService : RemoteViewsService() {
                     }
                     AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetId, R.id.widgetListView)
                 } else {
-                    Log.d(TAG, "WidgetItemFactory Failure")
+                    Log.d(TAG, application().getString(R.string.widget_factory_failure))
                 }
             }
         }

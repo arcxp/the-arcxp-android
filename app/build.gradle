@@ -19,7 +19,7 @@ android {
 
     defaultConfig {
         applicationId "com.arcxp.thearcxp"
-        minSdk 23
+        minSdk 22
         targetSdk 33
         versionCode 5
         versionName project.property("app_version")
@@ -109,14 +109,10 @@ dependencies {
 
     //include sdks
     //for client implementations, just use 'implementation ..' instead of creating/using arcPartnersImplementation flavor
-    arcPartnersImplementation 'arcxp-sdk-android:arcxp-content-sdk-android:1.0.3'
-    arcPartnersImplementation 'arcxp-sdk-android:arcxp-commerce-sdk-android:1.0.3'
-    arcPartnersImplementation 'arcxp-sdk-android:arcxp-video-sdk-android:1.6.1'
+    arcPartnersImplementation 'arcxp-sdk-android:arcxp-mobile-sdk-android:1.0.0'
 
     //internal use only!
-    arcXPInternalImplementation project(":arcxp-content-sdk-android")
-    arcXPInternalImplementation project(":arcxp-commerce-sdk-android")
-    arcXPInternalImplementation project(":arcxp-video-sdk-android")
+    arcXPInternalImplementation project(":arcxp-mobile-sdk-android")
 
 
     implementation 'androidx.fragment:fragment-ktx:1.5.5'

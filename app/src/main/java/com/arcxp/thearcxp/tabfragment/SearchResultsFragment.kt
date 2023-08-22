@@ -11,11 +11,11 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.arcxp.content.sdk.ArcXPContentSDK
-import com.arcxp.content.sdk.extendedModels.*
-import com.arcxp.content.sdk.models.ArcXPContentError
-import com.arcxp.content.sdk.util.Failure
-import com.arcxp.content.sdk.util.Success
+import com.arcxp.ArcXPMobileSDK
+import com.arcxp.commons.throwables.ArcXPException
+import com.arcxp.content.extendedModels.*
+import com.arcxp.commons.util.Failure
+import com.arcxp.commons.util.Success
 import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentSearchresultsBinding
@@ -105,7 +105,7 @@ class SearchResultsFragment : BaseFragment() {
         binding.spin.setImageDrawable(spinner(requireContext()))
         var from = 0
         if (lastLoaded > 0) from = lastLoaded + 1
-        ArcXPContentSDK.contentManager().search(
+        ArcXPMobileSDK.contentManager().search(
             searchTerm = query!!,
             from = from,
             size = requireContext().resources.getInteger(R.integer.collection_page_size)
@@ -168,7 +168,7 @@ class SearchResultsFragment : BaseFragment() {
         vm.openVideo(id)
     }
 
-    private fun onError(error: ArcXPContentError) {
+    private fun onError(error: ArcXPException) {
         showSnackBar(
             error = error,
             view = binding.root,

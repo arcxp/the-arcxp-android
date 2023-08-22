@@ -1,7 +1,6 @@
 <resources>
-    <string name="app_name">The Arc XP</string>
-
     <!-- client defined setup-->
+    <string name="app_name">The Arc XP</string>
     <string name="orgName">arcsales</string>
     <string name="environment">sandbox</string>
     <string name="siteName">site</string>
@@ -9,15 +8,16 @@
     <string name="contentUrl">https://arcsales-arcsales-sandbox.web.arc-cdn.net</string>
     <string name="navigation_endpoint">mobile-nav</string>
     <string name="video_endpoint">mobile-video</string>
+    <string name="tos_url">https://www.washingtonpost.com/terms-of-service/2011/11/18/gIQAldiYiN_story.html</string>
+    <string name="pp_url">https://www.washingtonpost.com/privacy-policy/2011/11/18/gIQASIiaiN_story.html</string>
 
-    <string name="site_key">key</string>
+    <!--App Strings-->
     <string name="dismiss">Dismiss</string>
     <string name="navigation_drawer_open">open</string>
     <string name="navigation_drawer_close">close</string>
-
     <string name="empty_collection">Get Collection result was Empty</string>
     <string name="create_account">Create Account</string>
-    <string name="sign_up">Sign Up</string>
+    <string name="sign_up">Sign Up With Arc XP</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up_with_facebook">Sign Up with Facebook</string>
     <string name="sign_up_with_google">Sign Up with Google</string>
@@ -27,7 +27,7 @@
     <string name="success">Success</string>
     <string name="password">Password</string>
     <string name="password_hint">Password Entry</string>
-    <string name="password_success">Success! A password reset email link has been sent to:<![CDATA[<br/>%1$s]]></string>
+    <string name="password_success">If there is an account associated with <![CDATA[<br/>%1$s]]>, you will receive an email shortly to reset your password. Thank you.</string>
     <string name="email">Email</string>
     <string name="email_address">Email address</string>
     <string name="last_name">Last Name</string>
@@ -44,12 +44,8 @@
     <string name="incorrect_info">The information you provided is incorrect.\nPlease try again.</string>
     <string name="remember_me">Remember me</string>
     <string name="no_account">Don\'t have an account?</string>
-
-    <string name="tos_url">https://www.washingtonpost.com/terms-of-service/2011/11/18/gIQAldiYiN_story.html</string>
-    <string name="pp_url">https://www.washingtonpost.com/privacy-policy/2011/11/18/gIQASIiaiN_story.html</string>
     <string name="policies">Policies</string>
     <string name="software_versions">Software Versions</string>
-
     <string name="readingTime">Time To Read: %s minutes</string>
     <string name="video_id_not_found">video id not found</string>
     <string name="article">Article</string>
@@ -72,7 +68,6 @@
     <string name="search_results">Search Results</string>
     <string name="search">Search</string>
     <string name="search_hint">Search Term</string>
-
     <string name="no_search_results">No results found</string>
     <string name="continue_reading">Create Account to continue reading.</string>
     <string name="have_account">Already have an account?</string>
@@ -113,4 +108,15 @@
     <string name="arc_logo_content_description">Arc XP Logo</string>
     <string name="password_masked_hint">**********</string>
     <string name="user_name">%1$s %2$s</string>
+    <string name="first_name_error">Missing input in first name field</string>
+    <string name="last_name_error">Missing input in list name field</string>
+    <string name="email_error">Email must be formatted correctly (i.e. name@domain.com)</string>
+    <string name="password_error">Missing input in password field</string>
+    <string name="uppercase_pattern">^(?=.*[A-Z])</string>
+    <string name="lowercase_pattern">^(?=.*[a-z])</string>
+    <string name="numerical_pattern">^(?=.*\\d)</string>
+    <string name="special_pattern">^(?=.*[-+_!@#$%^&amp;*., ?])</string>
+    <string name="check_username_password">Please check username and password and try again.</string>
+    <string name="SDK_colon_version">SDK: %s</string>
+    <string name="By_author">By %s</string>
 </resources>

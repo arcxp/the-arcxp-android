@@ -200,7 +200,7 @@
 
     <TextView
         android:id="@+id/styled_controller_title_tv"
-        style="@style/AppTitleTextViewStyle"
+        style="@style/VideoTitleTextViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_medium"

@@ -11,14 +11,15 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager2.widget.ViewPager2
-import com.arc.arcvideo.ArcMediaPlayer
-import com.arc.arcvideo.ArcMediaPlayerConfig
-import com.arc.arcvideo.views.ArcVideoFrame
-import com.arcxp.content.sdk.models.Image
-import com.arcxp.content.sdk.models.imageUrl
-import com.arcxp.content.sdk.util.fallback
+import com.arcxp.commons.util.fallback
+import com.arcxp.video.ArcMediaPlayer
+import com.arcxp.video.ArcMediaPlayerConfig
+import com.arcxp.video.views.ArcVideoFrame
+import com.arcxp.content.models.Image
+import com.arcxp.content.models.imageUrl
 import com.arcxp.thearcxp.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -120,7 +121,7 @@ fun spinner(context: Context): CircularProgressDrawable {
     val circularProgressDrawable = CircularProgressDrawable(context)
     circularProgressDrawable.strokeWidth = 5f
     circularProgressDrawable.centerRadius = 30f
-    circularProgressDrawable.setColorSchemeColors(context.getColor(R.color.primaryDark))
+    circularProgressDrawable.setColorSchemeColors(ContextCompat.getColor(context, R.color.primaryDark))
     circularProgressDrawable.start()
     return circularProgressDrawable
 }

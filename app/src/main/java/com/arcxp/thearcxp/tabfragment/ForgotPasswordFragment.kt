@@ -8,15 +8,16 @@ import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
+import com.arcxp.ArcXPMobileSDK
 import com.arcxp.commerce.ArcXPCommerceManager
-import com.arcxp.commerce.ArcXPCommerceSDK
-import com.arcxp.commerce.apimanagers.ArcXPIdentityListener
+import com.arcxp.commerce.callbacks.ArcXPIdentityListener
 import com.arcxp.commerce.models.ArcXPRequestPasswordReset
-import com.arcxp.commerce.util.ArcXPError
-import com.arcxp.content.sdk.models.ArcXPContentError
+import com.arcxp.commons.throwables.ArcXPException
 import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentForgotPasswordBinding
+import com.arcxp.thearcxp.utils.isValidEmail
 
 class ForgotPasswordFragment : BaseFragment() {
     private var _binding: FragmentForgotPasswordBinding? = null
@@ -34,7 +35,11 @@ class ForgotPasswordFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        commerceManager = ArcXPCommerceSDK.commerceManager()
+        commerceManager = ArcXPMobileSDK.commerceManager()
+
+        binding.resetEmailEdit.doOnTextChanged { _, _, _, _ ->
+            binding.resetEmailButton.isEnabled = binding.resetEmailEdit.text.isValidEmail()
+        }
 
         binding.resetEmailButton.setOnClickListener {
             if (success) {
@@ -71,7 +76,7 @@ class ForgotPasswordFragment : BaseFragment() {
                             success = true
                         }
 
-                        override fun onPasswordResetNonceFailure(error: ArcXPError) {
+                        override fun onPasswordResetNonceFailure(error: ArcXPException) {
                             showSpinner(false)
                         }
                     })
@@ -80,11 +85,12 @@ class ForgotPasswordFragment : BaseFragment() {
 
     }
 
+
     private fun showSpinner(visible: Boolean) {
         binding.forgotPasswordSpinner.isVisible = visible
     }
 
-    private fun onError(error: ArcXPContentError) {
+    private fun onError(error: ArcXPException) {
         showSnackBar(
             error = error,
             view = binding.root,

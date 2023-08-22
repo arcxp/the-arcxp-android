@@ -12,7 +12,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageButton
-import android.widget.SearchView
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -22,9 +22,9 @@ import androidx.core.view.size
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.arcxp.content.sdk.models.ArcXPSection
-import com.arcxp.content.sdk.util.Failure
-import com.arcxp.content.sdk.util.Success
+import com.arcxp.content.models.ArcXPSection
+import com.arcxp.commons.util.Failure
+import com.arcxp.commons.util.Success
 import com.arcxp.thearcxp.ArcXPWidget.Companion.WIDGET_ARTICLE_ID_KEY
 import com.arcxp.thearcxp.account.CreateAccountFragment
 import com.arcxp.thearcxp.databinding.ActivityMainBinding

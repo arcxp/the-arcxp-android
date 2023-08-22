@@ -166,25 +166,11 @@
             app:layout_constraintTop_toBottomOf="@id/versions" />
 
         <TextView
-            android:id="@+id/contentSdkVersion"
+            android:id="@+id/sdkVersion"
             style="@style/AccountSubsections"
             app:layout_constraintStart_toStartOf="@id/guideline_start"
             app:layout_constraintTop_toBottomOf="@id/app_version"
-            tools:text="content version" />
-
-        <TextView
-            android:id="@+id/commerceSdkVersion"
-            style="@style/AccountSubsections"
-            app:layout_constraintStart_toStartOf="@id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@id/contentSdkVersion"
-            tools:text="commerce version" />
-
-        <TextView
-            android:id="@+id/videoSdkVersion"
-            style="@style/AccountSubsections"
-            app:layout_constraintStart_toStartOf="@id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@id/commerceSdkVersion"
-            tools:text="video version" />
+            tools:text="sdk version" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

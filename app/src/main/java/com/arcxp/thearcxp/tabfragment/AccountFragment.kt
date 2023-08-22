@@ -7,13 +7,10 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.arc.arcvideo.ArcXPVideoSDK
-import com.arcxp.commerce.ArcXPCommerceSDK
-import com.arcxp.commerce.apimanagers.ArcXPIdentityListener
+import com.arcxp.ArcXPMobileSDK
+import com.arcxp.commerce.callbacks.ArcXPIdentityListener
 import com.arcxp.commerce.extendedModels.ArcXPProfileManage
-import com.arcxp.commerce.util.ArcXPError
-import com.arcxp.content.sdk.ArcXPContentSDK
-import com.arcxp.content.sdk.models.ArcXPContentError
+import com.arcxp.commons.throwables.ArcXPException
 import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.account.CreateAccountFragment
@@ -41,7 +38,7 @@ class AccountFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (!ArcXPCommerceSDK.isInitialized()) {
+        if (!ArcXPMobileSDK.commerceInitialized()) {
             binding.header.visibility = GONE
             binding.loginLayout.visibility = GONE
             binding.createLayout.visibility = GONE
@@ -55,7 +52,7 @@ class AccountFragment : BaseFragment() {
             }
 
             binding.loginLayout.setOnClickListener {
-                if (ArcXPCommerceSDK.commerceManager().sessionIsActive()) {
+                if (ArcXPMobileSDK.commerceManager().sessionIsActive()) {
                     vm.logout(object : ArcXPIdentityListener() {
                         override fun onLogoutSuccess() {
                             binding.userName.visibility = GONE
@@ -63,7 +60,7 @@ class AccountFragment : BaseFragment() {
                             binding.createAccountText.text = getString(R.string.create_account)
                         }
 
-                        override fun onLogoutError(error: ArcXPError) {
+                        override fun onLogoutError(error: ArcXPException) {
                             requireActivity().showErrorDialog(
                                 title = error.type?.name ?: getString(R.string.error),
                                 message = error.localizedMessage
@@ -79,14 +76,14 @@ class AccountFragment : BaseFragment() {
                 }
             }
 
-            if (!ArcXPCommerceSDK.commerceManager().sessionIsActive()) {
+            if (!ArcXPMobileSDK.commerceManager().sessionIsActive()) {
                 vm.logout(object : ArcXPIdentityListener() {
                     override fun onLogoutSuccess() {}
                 })
             }
 
             binding.createLayout.setOnClickListener {
-                if (ArcXPCommerceSDK.commerceManager().sessionIsActive()) {
+                if (ArcXPMobileSDK.commerceManager().sessionIsActive()) {
                     (requireActivity() as MainActivity).openFragment(
                         changePasswordFragment,
                         true,
@@ -102,11 +99,10 @@ class AccountFragment : BaseFragment() {
             }
         }
 
-        binding.contentSdkVersion.text =
-            "Content: ${ArcXPContentSDK.getVersion(requireContext())}"
-        binding.commerceSdkVersion.text =
-            "Commerce: ${ArcXPCommerceSDK.getVersion(requireContext())}"
-        binding.videoSdkVersion.text = "Video: ${ArcXPVideoSDK.getVersion(requireContext())}"
+        binding.sdkVersion.text = getString(
+            R.string.SDK_colon_version,
+            ArcXPMobileSDK.getVersion(requireContext().applicationContext)
+        )
 
         binding.tosLayout.setOnClickListener {
             openFragment(
@@ -133,7 +129,7 @@ class AccountFragment : BaseFragment() {
                 showProfile(profileResponse)
             }
 
-            override fun onProfileError(error: ArcXPError) {
+            override fun onProfileError(error: ArcXPException) {
                 requireActivity().showErrorDialog(
                     title = error.type?.name ?: getString(R.string.error),
                     message = error.localizedMessage
@@ -150,7 +146,7 @@ class AccountFragment : BaseFragment() {
         binding.userName.visibility = VISIBLE
     }
 
-    private fun onError(error: ArcXPContentError) {
+    private fun onError(error: ArcXPException) {
         showSnackBar(
             error = error,
             view = binding.root,

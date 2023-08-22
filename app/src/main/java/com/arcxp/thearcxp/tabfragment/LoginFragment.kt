@@ -7,16 +7,13 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
-import com.arcxp.commerce.ArcXPCommerceSDK
-import com.arcxp.commerce.apimanagers.ArcXPIdentityListener
+import com.arcxp.ArcXPMobileSDK
+import com.arcxp.commerce.callbacks.ArcXPIdentityListener
 import com.arcxp.commerce.models.ArcXPAuth
-import com.arcxp.commerce.util.ArcXPError
-import com.arcxp.commerce.util.Failure
-import com.arcxp.commerce.util.Success
-import com.arcxp.content.sdk.models.ArcXPContentError
+import com.arcxp.commons.throwables.ArcXPException
+import com.arcxp.commons.util.Failure
+import com.arcxp.commons.util.Success
 import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.account.CreateAccountFragment
@@ -27,7 +24,7 @@ import com.arcxp.thearcxp.utils.showErrorDialog
 class LoginFragment : BaseFragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private val commerceManager = ArcXPCommerceSDK.commerceManager()
+    private val commerceManager = ArcXPMobileSDK.commerceManager()
     private val forgotPassword = ForgotPasswordFragment()
 
     override fun onCreateView(
@@ -87,14 +84,6 @@ class LoginFragment : BaseFragment() {
             )
         }
 
-        binding.loginEmailEdit.doOnTextChanged { _, _, _, _ ->
-            resetFields()
-        }
-
-        binding.loginPasswordEdit.doOnTextChanged { _, _, _, _ ->
-            resetFields()
-        }
-
         binding.loginForgotPasswordButton.setOnClickListener {
             (activity as MainActivity).openFragment(
                 forgotPassword,
@@ -104,20 +93,22 @@ class LoginFragment : BaseFragment() {
         }
 
         binding.loginButton.setOnClickListener {
-            showSpinner(visible = true)
-            vm.login(
-                binding.loginEmailEdit.text.toString(),
-                binding.loginPasswordEdit.text.toString(), viewLifecycleOwner
-            ).observe(viewLifecycleOwner) {
-                when (it) {
-                    is Success -> {
-                        showSpinner(visible = false)
-                        (activity as MainActivity).supportFragmentManager.popBackStack()
-                        vm.restoreContentEvent()
-                        binding.loginEmailEdit.text.clear()
-                        binding.loginPasswordEdit.text.clear()
+            if (validateInput()) {
+                showSpinner(visible = true)
+                vm.login(
+                    binding.loginEmailEdit.text.toString(),
+                    binding.loginPasswordEdit.text.toString(), viewLifecycleOwner
+                ).observe(viewLifecycleOwner) {
+                    when (it) {
+                        is Success -> {
+                            showSpinner(visible = false)
+                            (activity as MainActivity).supportFragmentManager.popBackStack()
+                            vm.restoreContentEvent()
+                            binding.loginEmailEdit.text.clear()
+                            binding.loginPasswordEdit.text.clear()
+                        }
+                        is Failure -> showError(error = it.failure)
                     }
-                    is Failure -> showError(error = it.l)
                 }
             }
 
@@ -133,20 +124,13 @@ class LoginFragment : BaseFragment() {
                 override fun onLoginSuccess(response: ArcXPAuth) {
                 }
 
-                override fun onLoginError(error: ArcXPError) {
+                override fun onLoginError(error: ArcXPException) {
                 }
             })
     }
 
-    private fun showError(error: ArcXPError) {
+    private fun showError(error: ArcXPException) {
         showSpinner(false)
-        val errorColor = ContextCompat.getColor(requireContext(), R.color.error)
-        binding.loginEmailLabel.setTextColor(errorColor)
-        binding.loginEmailEdit.setTextColor(errorColor)
-        binding.loginEmailEdit.isSelected = true
-        binding.loginPasswordEdit.isSelected = true
-        binding.loginPasswordLabel.setTextColor(errorColor)
-        binding.loginPasswordEdit.setTextColor(errorColor)
         binding.errorMessage.visibility = VISIBLE
         requireActivity().showErrorDialog(
             title = error.type?.name ?: getString(R.string.error),
@@ -154,19 +138,20 @@ class LoginFragment : BaseFragment() {
         )
     }
 
-    private fun resetFields() {
-        val normalTextColor = ContextCompat.getColor(requireContext(), R.color.text)
-        val editTextColor = ContextCompat.getColor(requireContext(), R.color.edit_text)
-        binding.loginEmailEdit.isSelected = false
-        binding.loginPasswordEdit.isSelected = false
-        binding.loginEmailEdit.setTextColor(editTextColor)
-        binding.loginEmailLabel.setTextColor(normalTextColor)
-        binding.loginPasswordEdit.setTextColor(editTextColor)
-        binding.loginPasswordLabel.setTextColor(normalTextColor)
-        binding.errorMessage.visibility = GONE
+    private fun validateInput() : Boolean {
+        var valid = true
+        if (binding.loginEmailEdit.text.isBlank()) {
+            binding.loginEmailEdit.error = getString(R.string.email_error)
+            valid = false
+        }
+        if (binding.loginPasswordEdit.text.isBlank()) {
+            binding.loginPasswordEdit.error = getString(R.string.password_error)
+            valid = false
+        }
+        return valid
     }
 
-    private fun onError(error: ArcXPContentError) {
+    private fun onError(error: ArcXPException) {
         showSnackBar(
             error = error,
             view = binding.loginFragment,
