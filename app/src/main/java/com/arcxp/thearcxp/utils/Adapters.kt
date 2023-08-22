@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.arcxp.commons.util.fallback
+import com.arcxp.commons.util.Utils.fallback
 import com.arcxp.content.models.Image
 import com.arcxp.content.models.imageUrl
 import com.arcxp.thearcxp.R

@@ -88,6 +88,14 @@ android {
 
 dependencies {
 
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
+            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
+        }
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
+            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+        }
+    }
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
@@ -119,7 +127,7 @@ dependencies {
 
     //include sdks
     //for client implementations, just use 'implementation ..' instead of creating/using arcPartnersImplementation flavor
-    arcPartnersImplementation 'arcxp-sdk-android:arcxp-mobile-sdk-android:1.0.0'
+    arcPartnersImplementation 'arcxp-sdk-android:arcxp-mobile-sdk-android:1.0.1'
 
     //internal use only!
     arcXPInternalImplementation project(":arcxp-mobile-sdk-android")
