@@ -24,6 +24,7 @@ import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.tabfragment.BaseSectionFragment
 import com.arcxp.thearcxp.tabfragment.SectionFragment
 import com.arcxp.thearcxp.tabfragment.WebSectionFragment
+import com.arcxp.thearcxp.utils.getNameToUseFromSection
 import com.facebook.login.widget.LoginButton
 import com.arcxp.commerce.util.Either as EitherCommerce
 
@@ -76,7 +77,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 is Success -> {
                     sections.clear()
                     result.success.forEach { section ->
-                        sections[section.navigation.nav_title] = section
+                        sections[section.getNameToUseFromSection()] = section
                     }
                     _sectionsListEvent.postValue(Success(result.success))
                 }

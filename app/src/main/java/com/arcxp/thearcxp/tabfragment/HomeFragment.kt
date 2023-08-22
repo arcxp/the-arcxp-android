@@ -12,6 +12,7 @@ import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentHomeBinding
+import com.arcxp.thearcxp.utils.getNameToUseFromSection
 import com.arcxp.thearcxp.utils.spinner
 
 class HomeFragment : BaseFragment() {
@@ -36,8 +37,9 @@ class HomeFragment : BaseFragment() {
                 is Success -> {
                     var id = 0
                     it.success.forEach {
-                        vm.sectionsIndexMap[id] = it.navigation.nav_title
-                        vm.indexSectionMap[it.navigation.nav_title] = id++
+                        val name = it.getNameToUseFromSection()
+                        vm.sectionsIndexMap[id] = name
+                        vm.indexSectionMap[name] = id++
                     }
 
                     binding.pager.adapter = SectionsAdapter()
@@ -49,7 +51,7 @@ class HomeFragment : BaseFragment() {
         }
 
         vm.sectionEvent.observe(viewLifecycleOwner) {
-            binding.pager.currentItem = vm.indexSectionMap[it.navigation.nav_title]!!
+            binding.pager.currentItem = vm.indexSectionMap[it.getNameToUseFromSection()]!!
         }
     }
 

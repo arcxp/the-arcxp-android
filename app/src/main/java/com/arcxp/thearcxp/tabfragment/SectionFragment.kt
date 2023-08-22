@@ -19,6 +19,7 @@ import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentSectionBinding
 import com.arcxp.thearcxp.utils.RecyclerAdapter
+import com.arcxp.thearcxp.utils.getNameToUseFromSection
 import com.arcxp.thearcxp.utils.spinner
 
 
@@ -202,7 +203,7 @@ class SectionFragment : BaseSectionFragment() {
             val frag = SectionFragment()
             val args = Bundle()
             args.putString(PATH_NAME_KEY, section.id)
-            args.putString(SECTION_NAME_KEY, section.navigation.nav_title)
+            args.putString(SECTION_NAME_KEY, section.getNameToUseFromSection())
             frag.arguments = args
             return frag
         }

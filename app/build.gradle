@@ -108,9 +108,9 @@ dependencies {
 
     //include sdks
     //for client implementations, just use 'implementation ..' instead of creating/using arcPartnersImplementation flavor
-    arcPartnersImplementation 'arcxp-sdk-android:arcxp-content-sdk-android:1.0.0'
+    arcPartnersImplementation 'arcxp-sdk-android:arcxp-content-sdk-android:1.0.1'
     arcPartnersImplementation 'arcxp-sdk-android:arcxp-commerce-sdk-android:1.0.1'
-    arcPartnersImplementation 'arcxp-sdk-android:arcxp-video-sdk-android:1.5.10'
+    arcPartnersImplementation 'arcxp-sdk-android:arcxp-video-sdk-android:1.5.11'
 
     //internal use only!
     arcXPInternalImplementation project(":arcxp-content-sdk-android")

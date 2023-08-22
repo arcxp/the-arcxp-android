@@ -27,6 +27,7 @@ import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.databinding.ActivityMainBinding
 import com.arcxp.thearcxp.tabfragment.*
 import com.arcxp.thearcxp.utils.AnsTypes
+import com.arcxp.thearcxp.utils.getNameToUseFromSection
 import com.arcxp.thearcxp.viewmodel.MainViewModel
 import com.arcxp.thearcxp.viewmodel.MainViewModel.FragmentView.*
 import com.google.android.material.navigation.NavigationView
@@ -148,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         val menu = navigationView.menu
 
         sections.forEach {
-            menu.add(it.navigation.nav_title)
+            menu.add(it.getNameToUseFromSection())
 
             val menuItem = menu.getItem(menu.size - 1)
             menuItem.setActionView(R.layout.drawer_item)
