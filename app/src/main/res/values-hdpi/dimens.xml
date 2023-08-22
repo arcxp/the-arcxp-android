@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="top_section_image_height">170dp</dimen>
+    <dimen name="top_section_padding">5dp</dimen>
+
+    <integer name="article_video_height">290</integer>
+
+    <dimen name="section_thumbnail_height">72dp</dimen>
+    <dimen name="bottom_navigation_height">65dp</dimen>
+
+    <dimen name="padding_small">1dp</dimen>
+    <dimen name="padding_large">10dp</dimen>
+    <dimen name="padding_xlarge">20dp</dimen>
+
+    <dimen name="article_title_text_size">18sp</dimen>
+    <dimen name="article_subtitle_text_size">14sp</dimen>
+    <dimen name="article_body_text_size">12sp</dimen>
+    <dimen name="article_credits_text_size">12sp</dimen>
+
+    <dimen name="text_size_large">30sp</dimen>
+    <dimen name="text_size">15sp</dimen>
+    <dimen name="text_size_small">13sp</dimen>
+    <dimen name="text_size_extra_small">12sp</dimen>
+
+
+
+    <dimen name="space_xsmall">2dp</dimen>
+    <dimen name="space_small">5dp</dimen>
+    <dimen name="space">8dp</dimen>
+    <dimen name="space_medium">10dp</dimen>
+    <dimen name="space_large">12dp</dimen>
+    <dimen name="space_larger">15dp</dimen>
+    <dimen name="space_xlarge">24dp</dimen>
+
+</resources>

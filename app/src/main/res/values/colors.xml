@@ -1,18 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF000000</color>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <color name="primary">@color/white</color>
+    <color name="primaryDark">@color/black</color>
+
+    <color name="primaryAccent">@color/blue</color>
+    <color name="error">@color/red</color>
+
+    <color name="menuBackground">@color/black</color>
+    <color name="background">@color/primary</color>
+
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="off_white">#D1D1D1</color>
+
     <color name="blue">#2196F3</color>
+    <color name="blue_darker">#FF0D70BA</color>
     <color name="red">#F44336</color>
     <color name="grey">#646464</color>
+    <color name="yellow">#ECBA04</color>
     <color name="gallery_tab_selected">#676767</color>
     <color name="gallery_tab_not_selected">#C1C0C0</color>
-    <color name="item_layout_text_color">@color/black</color>
-    <color name="item_layout_bg_color">@color/white</color>
+
+    <color name="text">@color/primaryDark</color>
+    <color name="text_muted">@color/grey</color>
+    <color name="text_menu">@color/white</color>
+
+    <color name="edit_text">@color/black</color>
+    <color name="edit_text_background">@color/white</color>
+    <color name="edit_text_hint">@color/primaryAccent</color>
+
+    <color name="button_background">@color/primaryAccent</color>
+    <color name="button_border">@color/blue_darker</color>
+    <color name="button_text">@color/white</color>
+    <color name="button_text_dark">@color/black</color>
+    <color name="paywall_button">@color/yellow</color>
+    <color name="facebook_button">@color/primaryAccent</color>
+    <color name="facebook_button_border">@color/blue_darker</color>
+    <color name="google_button">@color/white</color>
+
+    <color name="google_button_border">@color/off_white</color>
+
+    <color name="highlighted_text">@color/primaryAccent</color>
+    <color name="app_title_color">@color/white</color>
+    <color name="section_text_color">@color/text</color>
+    <color name="section_summary_color">@color/text</color>
+    <color name="section_credits_color">@color/text</color>
+
+    <color name="section_divider_color">@color/primaryDark</color>
+
+    <color name="splash_screen_background">@color/menuBackground</color>
+    <color name="splash_screen_text">@color/text_menu</color>
+    <color name="google_sign_in_button_text">@color/black</color>
+    <color name="video_background">@color/black </color>
+
+    <color name="icon">@color/primaryDark</color>
 </resources>

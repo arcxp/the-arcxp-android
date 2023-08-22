@@ -4,18 +4,22 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.arcxp.content.sdk.models.Image
+import com.arcxp.content.sdk.models.imageUrl
+import com.arcxp.content.sdk.util.fallback
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.GalleryViewItemBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 
 class GalleryAdapter(
     private val context: Context,
-    private val images: List<String?>,
-    private val captions: List<String?>,
-    private val titles: List<String?>
+    private val images: List<Image>,
 ) :
     RecyclerView.Adapter<GalleryAdapter.MyViewHolder>() {
+
 
     override fun getItemCount() = images.size
 
@@ -23,16 +27,21 @@ class GalleryAdapter(
         RecyclerView.ViewHolder(binding.root)
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.binding.caption.text = captions[position]
-        holder.binding.title.text = titles[position]
+        holder.binding.caption.text = images[position].caption
+        holder.binding.title.text = images[position].subtitle
 
         Glide.with(context)
-            .load(images[position])
+            .load(images[position].imageUrl())
             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-            .error(R.drawable.ic_baseline_error_24_black)
+            .error(Glide.with(context)
+                .load(images[position].fallback())
+                .error(R.drawable.ic_baseline_error_24)
+                .apply(RequestOptions().transform(RoundedCorners(context.resources.getInteger(R.integer.rounded_corner_radius))))
+            )
             .placeholder(spinner(context))
             .dontAnimate()
             .optionalFitCenter()
+            .apply(RequestOptions().transform(RoundedCorners(context.resources.getInteger(R.integer.rounded_corner_radius))))
             .into(holder.binding.imageViewMain)
     }
 

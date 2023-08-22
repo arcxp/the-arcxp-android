@@ -1,101 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/top_margin_from_view"
+    android:background="@color/background"
+    android:clickable="true"
+    android:focusable="true"
     android:orientation="vertical"
-    android:background="@color/white"
-    android:clickable="true">
+    android:paddingBottom="@dimen/top_margin_from_view">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_end"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/content_edge_space_percentage_end" />
 
-        <TextView
-            android:id="@+id/continue_reading_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/paywall_large_font_margin"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="17sp"
-            android:text="@string/continue_reading_tv"
-            android:layout_marginStart="@dimen/paywall_margins"
-            android:layout_marginEnd="@dimen/paywall_margins"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_start"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/content_edge_space_percentage_start" />
 
-        <TextView
-            android:id="@+id/have_account_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="17sp"
-            android:text="@string/have_account_tv"
-            app:layout_constraintEnd_toStartOf="@+id/sign_in"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="@dimen/paywall_margins"
-            app:layout_constraintTop_toBottomOf="@+id/continue_reading_tv"
-            tools:text="register here" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="@dimen/content_edge_space_percentage_top" />
 
-        <TextView
-            android:id="@+id/sign_in"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:text="@string/signIn_tv"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="@dimen/paywall_margins"
-            app:layout_constraintStart_toEndOf="@+id/have_account_tv"
-            app:layout_constraintTop_toBottomOf="@+id/continue_reading_tv"
-            tools:text="sign in" />
+    <TextView
+        android:id="@+id/continue_reading"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_larger"
+        android:text="@string/continue_reading"
+        android:textAlignment="center"
+        android:textColor="@color/text"
+        android:textSize="@dimen/text_size"
+        app:layout_constraintEnd_toEndOf="@id/guideline_end"
+        app:layout_constraintStart_toStartOf="@id/guideline_start"
+        app:layout_constraintTop_toTopOf="@id/guideline_top" />
 
-        <TextView
-            android:id="@+id/get_story_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/paywall_large_font_margin"
-            android:layout_marginStart="@dimen/paywall_large_font_margin"
-            android:layout_marginEnd="@dimen/paywall_large_font_margin"
-            android:textAlignment="center"
-            android:text="@string/get_story_tv"
-            android:textColor="@color/black"
-            android:textSize="40sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/have_account_tv" />
+    <TextView
+        android:id="@+id/have_account"
+        style="@style/AppTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_large"
+        android:text="@string/have_account"
+        app:layout_constraintBottom_toBottomOf="@id/paywall_sign_in_button"
+        app:layout_constraintEnd_toStartOf="@id/paywall_sign_in_button"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/continue_reading" />
 
-        <Button
-            android:id="@+id/subscribe_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/paywall_large_font_margin"
-            android:backgroundTint="#ECBA04"
-            android:text="@string/create_account"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:textSize="18dp"
-            android:padding="20dp"
-            app:layout_constraintEnd_toEndOf="@+id/get_story_tv"
-            app:layout_constraintStart_toStartOf="@+id/get_story_tv"
-            app:layout_constraintTop_toBottomOf="@+id/get_story_tv" />
+    <TextView
+        android:id="@+id/paywall_sign_in_button"
+        style="@style/AppTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_in"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/have_account"
+        app:layout_constraintTop_toBottomOf="@id/continue_reading" />
 
-        <ImageView
-            android:id="@+id/exit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/close_button_margin"
-            android:layout_marginTop="@dimen/close_button_margin"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_clear_24_black" />
+    <TextView
+        android:id="@+id/get_story"
+        style="@style/AppTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/get_every_story"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_size_xlarge"
+        app:layout_constraintEnd_toEndOf="@id/guideline_end"
+        app:layout_constraintStart_toStartOf="@id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@id/have_account" />
+
+    <Button
+        android:id="@+id/subscribe_btn"
+        style="@style/Button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_larger"
+        android:backgroundTint="@color/paywall_button"
+        android:text="@string/create_account"
+        android:textColor="@color/text"
+        app:layout_constraintEnd_toEndOf="@id/guideline_end"
+        app:layout_constraintStart_toStartOf="@id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@id/get_story" />
+
+    <ImageView
+        android:id="@+id/exit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/close_button_margin"
+        android:layout_marginEnd="@dimen/close_button_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_clear_24"
+        app:tint="@color/primaryDark" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

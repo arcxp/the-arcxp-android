@@ -64,7 +64,7 @@ class CreateAccountFragment : Fragment() {
                 }
         }
 
-        binding.signIn.setOnClickListener {
+        binding.createAccountSignInButton.setOnClickListener {
             (requireActivity() as MainActivity).navigateToSignIn()
         }
     }

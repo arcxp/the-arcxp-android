@@ -1,10 +1,7 @@
 package com.arcxp.thearcxp.viewmodel
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import com.arc.arcvideo.ArcMediaClient
 import com.arc.arcvideo.ArcMediaPlayer
 import com.arc.arcvideo.ArcMediaPlayerConfig
@@ -12,15 +9,18 @@ import com.arc.arcvideo.ArcVideoStreamCallback
 import com.arc.arcvideo.model.ArcVideoResponse
 import com.arc.arcvideo.model.ArcVideoSDKErrorType
 import com.arc.arcvideo.model.ArcVideoStream
+import com.arc.arcvideo.model.VideoVO
 import com.arcxp.commerce.ArcXPCommerceSDK
 import com.arcxp.commerce.ArcXPPageviewEvaluationResult
 import com.arcxp.commerce.apimanagers.ArcXPIdentityListener
+import com.arcxp.commerce.extendedModels.ArcXPProfileManage
 import com.arcxp.commerce.models.ArcXPAuth
 import com.arcxp.commerce.models.ArcXPIdentity
-import com.arcxp.commerce.models.ArcXPProfileManage
 import com.arcxp.commerce.models.ArcXPUser
 import com.arcxp.commerce.util.ArcXPError
 import com.arcxp.content.sdk.ArcXPContentSDK
+import com.arcxp.content.sdk.extendedModels.ArcXPCollection
+import com.arcxp.content.sdk.extendedModels.ArcXPStory
 import com.arcxp.content.sdk.models.*
 import com.arcxp.content.sdk.util.Either
 import com.arcxp.content.sdk.util.Failure
@@ -31,6 +31,9 @@ import com.arcxp.thearcxp.tabfragment.SectionFragment
 import com.arcxp.thearcxp.tabfragment.WebSectionFragment
 import com.arcxp.thearcxp.utils.getNameToUseFromSection
 import com.facebook.login.widget.LoginButton
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import com.arcxp.commerce.util.Either as EitherCommerce
 
 /**
@@ -60,20 +63,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val openLastArticleEvent: LiveData<Pair<String, String>> = _openLastArticleEvent
 
     //Event observed by MainActivity to open Article by id
-    private val _openArticleEvent = MutableLiveData<String>()
-    val openArticleEvent: LiveData<String> = _openArticleEvent
+    private val _openArticleEvent = Channel<String>()
+    val openArticleEvent = _openArticleEvent.receiveAsFlow()
 
     //Event observed by MainActivity to open Video by id
-    private val _openVideoEvent = MutableLiveData<String>()
-    val openVideoEvent: LiveData<String> = _openVideoEvent
+    private val _openVideoEvent = Channel<String>()
+    val openVideoEvent = _openVideoEvent.receiveAsFlow()
 
     //Event observed by MainActivity to lock rotation
     private val _sensorLockEvent = MutableLiveData<Boolean>()
     val sensorLockEvent: LiveData<Boolean> = _sensorLockEvent
 
     //Event observed by PlayVideoFragment to request video by id from Video Center
-    private val _videoResultEvent = MutableLiveData<Either<ArcXPContentError, ArcVideoStream>>()
-    val videoResultEvent: LiveData<Either<ArcXPContentError, ArcVideoStream>> = _videoResultEvent
+    private val _videoResultEvent = Channel<Either<ArcXPContentError, ArcVideoStream>>()
+    val videoResultEvent = _videoResultEvent.receiveAsFlow()
 
     var sections = HashMap<String, ArcXPSection>()
     var sectionsIndexMap = HashMap<Int, String>()
@@ -277,24 +280,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             override fun onVideoStream(videos: List<ArcVideoStream>?) {
                 if (videos?.isNotEmpty() == true) {
-                    _videoResultEvent.postValue(Success(success = videos[0]))
+                    viewModelScope.launch {
+                        _videoResultEvent.trySend(Success(success = videos[0]))
+                    }
                 }
             }
+
+            override fun onLiveVideos(videos: List<VideoVO>?) {}
 
             override fun onError(
                 type: ArcVideoSDKErrorType,
                 message: String,
                 value: Any?
             ) {
-                _videoResultEvent.postValue(
-                    Failure(
+                viewModelScope.launch {
+                    _videoResultEvent.trySend(Failure(
                         failure = ArcXPContentError(
                             ArcXPContentSDKErrorType.SERVER_ERROR,
                             message,
                             value
                         )
-                    )
-                )
+                    ))
+                }
             }
 
         })
@@ -318,16 +325,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //Public function to request Article by id from sdk
     fun openArticle(id: String) {
-        _openArticleEvent.postValue(id)
+        viewModelScope.launch {
+            _openArticleEvent.send(id)
+        }
     }
 
     //Public function to request Video by id from sdk
     fun openVideo(id: String) {
-        _openVideoEvent.postValue(id)
+        viewModelScope.launch {
+            _openVideoEvent.send(id)
+        }
     }
 
     //Public function to request rotation Lock
-    fun setPortrait(rotationOn: Boolean){
+    fun setPortrait(rotationOn: Boolean) {
         _sensorLockEvent.postValue(rotationOn)
     }
 

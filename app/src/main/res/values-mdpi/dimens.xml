@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="top_section_image_height">250dp</dimen>
+    <dimen name="top_section_padding">8dp</dimen>
+    <integer name="article_video_height">250</integer>
+
+    <dimen name="article_title_text_size">28sp</dimen>
+    <dimen name="article_subtitle_text_size">18sp</dimen>
+    <dimen name="article_body_text_size">16sp</dimen>
+    <dimen name="article_credits_text_size">18sp</dimen>
+
+    <dimen name="section_thumbnail_height">110dp</dimen>
+</resources>

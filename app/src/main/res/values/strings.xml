@@ -26,6 +26,8 @@
     <string name="your_account_has_been_created">Your account has been created.</string>
     <string name="success">Success</string>
     <string name="password">Password</string>
+    <string name="password_hint">Password Entry</string>
+    <string name="password_success">Success! A password reset email link has been sent to:<![CDATA[<br/>%1$s]]></string>
     <string name="email">Email</string>
     <string name="email_address">Email address</string>
     <string name="last_name">Last Name</string>
@@ -34,13 +36,12 @@
     <string name="privacy_policy">Privacy Policy</string>
     <string name="terms_of_service">Terms of Service</string>
     <string name="new_password">New Password</string>
-    <string name="hint">**********</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="password_no_match">Password does not match</string>
     <string name="update_password">Update Password</string>
     <string name="enter_email">Enter the email address associated with your account. We will send you a password reset link.</string>
     <string name="send_password">Send Password Reset Email</string>
-    <string name="incorrect_info">The information you provided is incorrect.\nPlese try again.</string>
+    <string name="incorrect_info">The information you provided is incorrect.\nPlease try again.</string>
     <string name="remember_me">Remember me</string>
     <string name="no_account">Don\'t have an account?</string>
 
@@ -56,6 +57,7 @@
     <string name="searchtag">search</string>
     <string name="video">Video</string>
     <string name="login">Login</string>
+    <string name="logout">Logout</string>
     <string name="register_account">Register Account</string>
     <string name="register">Register</string>
     <string name="forgot_password">Forgot Password</string>
@@ -63,26 +65,26 @@
     <string name="signup_successful">Signup Successful</string>
     <string name="change_password">Change Password</string>
     <string name="web_section">Web Section</string>
-    <string name="login_with_google">LoginWithGoogle</string>
     <string name="paywall">Paywall</string>
-    <string name="fb_signin">   Sign In with Facebook</string>
-    <string name="google_signin">   Sign In with Google</string>
+    <string name="fb_signin">Sign in with Facebook</string>
+    <string name="google_signin">Sign in with Google</string>
+    <string name="back_to_sign_in">Back to Sign In</string>
     <string name="search_results">Search Results</string>
-
+    <string name="search">Search</string>
     <string name="search_hint">Search Term</string>
 
     <string name="no_search_results">No results found</string>
-    <string name="continue_reading_tv">Create Account to continue reading.</string>
-    <string name="have_account_tv">Already have an account?</string>
-    <string name="signIn_tv">Sign in</string>
-    <string name="get_story_tv">Get every story</string>
-    <string name="tv_8"><![CDATA[You can <b>cancel anytime.</b>]]></string>
+    <string name="continue_reading">Create Account to continue reading.</string>
+    <string name="have_account">Already have an account?</string>
+    <string name="get_every_story">Get every story</string>
+    <string name="cancel_anytime"><![CDATA[You can <b>cancel anytime.</b>]]></string>
     <string name="account">Account</string>
     <string name="hometag">home</string>
     <string name="accounttag">account</string>
     <string name="videotag">video</string>
     <string name="share_message">Share not implemented yet</string>
     <string name="video_load_error">Could not load video.</string>
+    <string name="error">Error</string>
     <string name="device_type">mobile</string>
     <string name="glide_manager">com.bumptech.glide.manager</string>
     <string name="bullet">●</string>
@@ -92,4 +94,23 @@
     <string name="configure">Configure Widget</string>
     <string name="app_widget_description">Widget for ArcXP</string>
 
+    <string name="settings_button_content_description">Settings Menu</string>
+    <string name="volume_button_content_description">Toggle Mute</string>
+    <string name="cc_button_content_description">Toggle Closed Captioning</string>
+    <string name="pip_button_content_description">Toggle Picture in Picture Mode</string>
+    <string name="fullscreen_button_content_description">Toggle Full Screen</string>
+    <string name="share_button_content_description">Share</string>
+    <string name="overflow_menu_button_content_description">Toggle Additional Settings Menu</string>
+    <string name="prev_button_content_description">Previous</string>
+    <string name="next_button_content_description">Next</string>
+    <string name="fast_forward_button_content_description">Fast Forward</string>
+    <string name="rewind_button_content_description">Rewind</string>
+    <string name="play_pause_button_content_description">Play / Pause</string>
+    <string name="back_button_content_description">Back</string>
+    <string name="pagination_toast_message_video">Loading more videos</string>
+    <string name="pagination_toast_message_section_list">Loading more stories</string>
+
+    <string name="arc_logo_content_description">Arc XP Logo</string>
+    <string name="password_masked_hint">**********</string>
+    <string name="user_name">%1$s %2$s</string>
 </resources>

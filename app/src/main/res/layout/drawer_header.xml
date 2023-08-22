@@ -3,14 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/black">
+    android:background="@color/menuBackground">
 
     <ImageButton
         android:id="@+id/closeButton"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/button_icon_size"
+        android:layout_height="@dimen/button_icon_size"
+        android:background="@android:color/transparent"
         android:src="@drawable/ic_baseline_clear_24"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="@dimen/space_small"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -19,8 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_name"
-        android:textSize="20sp"
-        android:textColor="@color/white"
+        android:textSize="@dimen/text_size"
+        android:textColor="@color/text_menu"
         android:fontFamily="@font/old_english_five"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

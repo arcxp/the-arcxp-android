@@ -36,28 +36,38 @@ class ForgotPasswordFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         commerceManager = ArcXPCommerceSDK.commerceManager()
 
-        binding.resetEmailBtn.setOnClickListener {
+        binding.resetEmailButton.setOnClickListener {
             if (success) {
                 success = false
                 (activity as MainActivity).supportFragmentManager.popBackStack()
             } else {
                 showSpinner(true)
                 commerceManager.requestResetPassword(
-                    binding.resetEmailEt.text.toString(),
+                    binding.resetEmailEdit.text.toString(),
                     object : ArcXPIdentityListener() {
                         override fun onPasswordResetNonceSuccess(response: ArcXPRequestPasswordReset?) {
                             showSpinner(false)
-                            binding.messageTv.text =
+                            binding.forgotPasswordMessage.text =
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                     Html.fromHtml(
-                                        "Success! A password reset email link has been sent to:<br><b>${binding.resetEmailEt.text}",
+                                        getString(
+                                            R.string.password_success,
+                                            binding.resetEmailEdit.text
+                                        ),
                                         Build.VERSION.SDK_INT
                                     )
                                 } else {
-                                    Html.fromHtml("Success! A password reset email link has been sent to:<br><b>${binding.resetEmailEt.text}")
+                                    Html.fromHtml(
+                                        getString(
+                                            R.string.password_success,
+                                            binding.resetEmailEdit.text
+                                        )
+                                    )
+
                                 }
-                            binding.resetEmail.visibility = GONE
-                            binding.resetEmailBtn.text = "Back to Sign In"
+                            binding.resetEmailEdit.visibility = GONE
+                            binding.resetEmailLabel.visibility = GONE
+                            binding.resetEmailButton.text = getString(R.string.back_to_sign_in)
                             success = true
                         }
 

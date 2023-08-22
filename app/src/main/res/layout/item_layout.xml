@@ -2,83 +2,73 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cardView"
+    android:id="@+id/section_list_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/item_layout_card_margin"
-    android:padding="@dimen/item_layout_padding_large"
-    app:cardBackgroundColor="@color/item_layout_bg_color"
+    app:cardBackgroundColor="@color/background"
     app:cardElevation="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/item_layout_top_margin"
         android:orientation="vertical">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="@dimen/item_layout_guideline_percentage" />
 
         <TextView
             android:id="@+id/title"
+            style="@style/SectionTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:paddingBottom="@dimen/item_layout_padding"
-            android:textColor="@color/item_layout_text_color"
-            android:textSize="@dimen/item_layout_title_text_size"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/description"
-            app:layout_constraintEnd_toStartOf="@id/iv_imageView"
+            app:layout_constraintEnd_toStartOf="@id/guideline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            tools:text="Main Title" />
+            tools:text="Main Title Main Title Main Title MainTitle Main Title Main Title Main Title Main Title Main Title Main Title Main Title" />
 
         <ImageView
-            android:id="@+id/iv_imageView"
+            android:id="@+id/section_thumbnail"
+            style="@style/SectionThumbnail"
             android:layout_width="0dp"
-            android:layout_height="@dimen/item_layout_image_height"
-            android:paddingStart="@dimen/item_layout_padding"
-            android:paddingEnd="0dp"
-            android:paddingBottom="@dimen/item_layout_padding"
             android:src="@mipmap/ic_launcher_round"
-            app:layout_constraintBottom_toTopOf="@id/description"
+            app:layout_constraintBottom_toBottomOf="@id/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/guideline"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/play_icon"
+            style="@style/VideoPlayIcon"
+            app:layout_constraintBottom_toBottomOf="@id/divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/guideline"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/description"
-            android:layout_width="match_parent"
+            style="@style/SectionDescription"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:paddingVertical="@dimen/item_layout_padding_small"
-            android:textColor="@color/item_layout_text_color"
-            android:textSize="@dimen/item_layout_desc_text_size"
-            app:layout_constraintBottom_toTopOf="@id/author"
+            app:layout_constraintEnd_toStartOf="@id/guideline"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_imageView"
-            tools:text="This is the body of the article" />
+            app:layout_constraintTop_toBottomOf="@id/title"
+            tools:text="This is the body of the articleThis is the body of the articleThis is the body of the articleThis is the body of the articleThis is the body of the articleThis is the body of the articleThis is the body of the articleThis is the body of the articleThis is the body of the articleThis is the body of the articleThis is the body of the articleThis is the body of the articleThis is the body of the article This is the body of the article This is the body of the article This is the body of the article" />
 
         <TextView
-            android:id="@+id/id_tv"
+            android:id="@+id/section_hero_article_id"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone" />
 
         <TextView
             android:id="@+id/author"
+            style="@style/SectionCredits"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/item_layout_padding"
-            android:textColor="@color/item_layout_text_color"
-            android:textSize="@dimen/item_layout_author_text_size"
-            app:layout_constraintBottom_toBottomOf="@id/divider"
             app:layout_constraintEnd_toStartOf="@id/bullet"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/description"
@@ -86,40 +76,30 @@
 
         <TextView
             android:id="@+id/bullet"
+            style="@style/SectionCreditsBullet"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:paddingHorizontal="@dimen/item_layout_padding_small"
-            android:paddingBottom="@dimen/item_layout_padding"
-            android:text="@string/bullet"
-            android:textColor="@color/item_layout_text_color"
-            android:textSize="@dimen/item_layout_author_text_size"
-            app:layout_constraintBottom_toBottomOf="@id/divider"
+            android:layout_height="wrap_content"
             app:layout_constraintEnd_toStartOf="@id/date"
             app:layout_constraintStart_toEndOf="@id/author"
-            app:layout_constraintTop_toBottomOf="@id/description" />
+            app:layout_constraintTop_toTopOf="@id/author" />
 
         <TextView
             android:id="@+id/date"
+            style="@style/SectionCredits"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/item_layout_padding"
-            android:textColor="@color/item_layout_text_color"
-            android:textSize="@dimen/item_layout_date_text_size"
-            app:layout_constraintBottom_toBottomOf="@id/divider"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guideline"
             app:layout_constraintStart_toEndOf="@id/bullet"
-            app:layout_constraintTop_toBottomOf="@id/description"
-            tools:text="Published At" />
+            app:layout_constraintTop_toTopOf="@id/author"
+            tools:text="Mar 99, 2025" />
 
         <View
             android:id="@+id/divider"
+            style="@style/Divider"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider"
-            android:backgroundTint="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/author" />
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

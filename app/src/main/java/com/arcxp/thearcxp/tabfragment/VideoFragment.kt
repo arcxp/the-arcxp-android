@@ -10,20 +10,21 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.arcxp.content.sdk.models.ArcXPCollection
+import com.arcxp.content.sdk.extendedModels.*
 import com.arcxp.content.sdk.models.ArcXPContentError
 import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.R
+import com.arcxp.thearcxp.databinding.FirstItemLayoutBinding
 import com.arcxp.thearcxp.databinding.FragmentVideoBinding
-import com.arcxp.thearcxp.databinding.VideoFirstItemLayoutBinding
-import com.arcxp.thearcxp.databinding.VideoItemLayoutBinding
-import com.arcxp.thearcxp.utils.imageUrl
+import com.arcxp.thearcxp.databinding.ItemLayoutBinding
 import com.arcxp.thearcxp.utils.spinner
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 
 private const val FIRST_ITEM = 0
@@ -64,7 +65,11 @@ class VideoFragment : BaseFragment() {
                 if (canRequestNextPagination) {
                     if ((binding.recycler.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition() == items.size - 1) {
                         loadData()
-                        Toast.makeText(requireContext(), "Loading more videos", Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.pagination_toast_message_video),
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                     }
                 }
@@ -82,7 +87,7 @@ class VideoFragment : BaseFragment() {
         if (error.message != getString(R.string.empty_collection)) {
             showSnackBar(
                 error = error,
-                view = binding.videoViewFragment,
+                view = binding.recycler,
                 viewId = R.id.video_view_fragment
             )
         } else {
@@ -124,145 +129,223 @@ class VideoFragment : BaseFragment() {
     inner class VideoRecyclerAdapter(private val items: Map<Int, ArcXPCollection>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        inner class FirstViewHolder(val binding: VideoFirstItemLayoutBinding) :
+        inner class FirstViewHolder(val binding: FirstItemLayoutBinding) :
             RecyclerView.ViewHolder(binding.root) {
             var itemId: String? = null
             fun bind(
-                id: String,
-                title: String,
-                image: String?,
-                author: String?,
-                date: String
+                item: ArcXPCollection
             ) {
-                itemId = id
-                binding.idTv.text = id
-                binding.title1.text = title
-                binding.author.text = author
-                binding.date.text = date
+                itemId = item.id
+                binding.sectionHeroArticleId.text = item.id
+                binding.sectionListHeroTitle.text = item.title()
                 binding.playIcon.visibility = GONE
-                Glide.with(itemView.context).load(image)
-                    .error(R.drawable.ic_baseline_error_24_black)
-//                    .placeholder(spinner(itemView.context)) //TODO this is making hero image not visible
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            binding.playIcon.visibility = VISIBLE
-                            return false
-                        }
+                if (item.thumbnail().isEmpty()) {
+                    binding.sectionListHeroImage.visibility = GONE
+                } else {
+                    Glide.with(itemView.context).load(item.imageUrl())
+                        .error(
+                            Glide.with(itemView.context).load(item.fallback())
+                                .error(R.drawable.ic_baseline_error_24)
+                                .apply(
+                                    RequestOptions().transform(
+                                        RoundedCorners(
+                                            itemView.resources.getInteger(
+                                                R.integer.rounded_corner_radius
+                                            )
+                                        )
+                                    )
+                                )
+                                .listener(object : RequestListener<Drawable> {
+                                    override fun onResourceReady(
+                                        resource: Drawable?,
+                                        model: Any?,
+                                        target: Target<Drawable>?,
+                                        dataSource: DataSource?,
+                                        isFirstResource: Boolean
+                                    ): Boolean {
+                                        binding.playIcon.visibility = VISIBLE
+                                        return false
+                                    }
 
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ) = false
+                                    override fun onLoadFailed(
+                                        e: GlideException?,
+                                        model: Any?,
+                                        target: Target<Drawable>?,
+                                        isFirstResource: Boolean
+                                    ) = false
 
-                    })
-                    .fitCenter()
-                    .into(binding.ivImageView1)
-                if (author == null || author.isNullOrBlank()) {
+                                })
+                        )
+                        .fitCenter()
+                        .apply(
+                            RequestOptions().transform(
+                                RoundedCorners(
+                                    itemView.resources.getInteger(
+                                        R.integer.rounded_corner_radius
+                                    )
+                                )
+                            )
+                        )
+                        .listener(object : RequestListener<Drawable> {
+                            override fun onResourceReady(
+                                resource: Drawable?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                dataSource: DataSource?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                binding.playIcon.visibility = VISIBLE
+                                return false
+                            }
+
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                isFirstResource: Boolean
+                            ) = false
+
+                        })
+                        .into(binding.sectionListHeroImage)
+                }
+                if (item.author().isEmpty()) {
                     binding.author.visibility = GONE
                     binding.bullet.visibility = GONE
+                } else {
+                    binding.author.text = item.author()
+                }
+                if (item.date().isEmpty()) {
+                    binding.bullet.visibility = GONE
+                    binding.date.visibility = GONE
+                } else {
+                    binding.date.text = item.date()
                 }
             }
         }
 
-        inner class RemainingViewHolder(val binding: VideoItemLayoutBinding) :
+        inner class RemainingViewHolder(val binding: ItemLayoutBinding) :
             RecyclerView.ViewHolder(binding.root) {
             var itemId: String? = null
 
             fun bind(
-                id: String,
-                title: String,
-                image: String?,
-                author: String?,
-                date: String
+                item: ArcXPCollection
             ) {
-                itemId = id
-                binding.title.text = title
+                itemId = item.id
+                binding.title.text = item.title()
                 binding.playIcon.visibility = GONE
-                Glide.with(itemView.context).load(image)
-                    .error(R.drawable.ic_baseline_error_24_black)
-                    .placeholder(spinner(requireContext()))
-                    .fitCenter()
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            binding.playIcon.visibility = VISIBLE
-                            return false
-                        }
+                if (item.thumbnail().isNullOrEmpty()) {
+                    binding.sectionThumbnail.visibility = GONE
+                } else {
+                    Glide.with(itemView.context).load(item.thumbnail())
+                        .error(
+                            Glide.with(itemView.context).load(item.fallback())
+                                .error(R.drawable.ic_baseline_error_24)
+                                .apply(
+                                    RequestOptions().transform(
+                                        RoundedCorners(
+                                            itemView.resources.getInteger(
+                                                R.integer.rounded_corner_radius_thumbnail
+                                            )
+                                        )
+                                    )
+                                )
+                                .listener(object : RequestListener<Drawable> {
+                                    override fun onResourceReady(
+                                        resource: Drawable?,
+                                        model: Any?,
+                                        target: Target<Drawable>?,
+                                        dataSource: DataSource?,
+                                        isFirstResource: Boolean
+                                    ): Boolean {
+                                        binding.playIcon.visibility = VISIBLE
+                                        return false
+                                    }
 
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ) = false
-                    })
-                    .into(binding.videoImage)
+                                    override fun onLoadFailed(
+                                        e: GlideException?,
+                                        model: Any?,
+                                        target: Target<Drawable>?,
+                                        isFirstResource: Boolean
+                                    ) = false
+                                })
+                        )
+                        .placeholder(spinner(requireContext()))
+                        .fitCenter()
+                        .apply(
+                            RequestOptions().transform(
+                                RoundedCorners(
+                                    itemView.resources.getInteger(
+                                        R.integer.rounded_corner_radius_thumbnail
+                                    )
+                                )
+                            )
+                        )
+                        .listener(object : RequestListener<Drawable> {
+                            override fun onResourceReady(
+                                resource: Drawable?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                dataSource: DataSource?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                binding.playIcon.visibility = VISIBLE
+                                return false
+                            }
 
-                binding.author.text = author
-                binding.date.text = date
-                if (author == null || author.isNullOrBlank()) {
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                isFirstResource: Boolean
+                            ) = false
+                        })
+                        .into(binding.sectionThumbnail)
+                }
+                if (item.author().isEmpty()) {
                     binding.author.visibility = GONE
                     binding.bullet.visibility = GONE
+                } else {
+                    binding.author.text = item.author()
+                }
+                if (item.date().isEmpty()) {
+                    binding.bullet.visibility = GONE
+                    binding.date.visibility = GONE
+                } else {
+                    binding.date.text = item.date()
                 }
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             return if (viewType == FIRST_ITEM) {
-                val view =
-                    VideoFirstItemLayoutBinding.inflate(
+                FirstViewHolder(
+                    FirstItemLayoutBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
                         false
                     )
-                FirstViewHolder(view)
+                )
             } else {
-                val view =
-                    VideoItemLayoutBinding.inflate(
+                RemainingViewHolder(
+                    ItemLayoutBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
                         false
                     )
-                RemainingViewHolder(view)
+                )
             }
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             val item = items[position]
             item?.let {
-                val author = if (it.credits?.by?.isNotEmpty() == true)
-                    "By ${it.credits!!.by!![0].name}" else ""
-                val dateString = it.publishedDate?.toLocaleString()?.split(":")
-                val date = if (dateString?.isNotEmpty() == true)
-                    dateString[0].slice(0..dateString[0].length - 3) else ""
                 if (getItemViewType(position) == FIRST_ITEM) {
                     (holder as FirstViewHolder).bind(
-                        id = it.id,
-                        title = it.headlines.basic ?: "",
-                        image = it.imageUrl(),
-                        author = author,
-                        date = date
+                        item = it
                     )
                 } else {
                     (holder as RemainingViewHolder).bind(
-                        id = it.id,
-                        title = it.headlines.basic ?: "",
-                        image = it.imageUrl(),
-                        author = author,
-                        date = date
+                        item = it
                     )
                 }
                 holder.itemView.setOnClickListener {

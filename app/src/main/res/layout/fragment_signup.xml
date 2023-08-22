@@ -1,157 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white">
+    android:background="@color/background">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_end"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="@dimen/content_edge_space_percentage_end" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_start"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="@dimen/content_edge_space_percentage_start" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_top"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="@dimen/content_edge_space_percentage_top" />
 
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/header"
+            android:id="@+id/sign_up_title"
+            style="@style/Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/create_account"
-            style="@style/SignUpHeaderTextView"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toTopOf="@id/guideline_top" />
 
         <TextView
-            android:id="@+id/nametv"
+            android:id="@+id/name_label"
+            style="@style/AppTextViewStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/name"
-            style="@style/SignUpTextView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/header"/>
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_title" />
 
         <EditText
-            android:id="@+id/firstNameET"
-            android:layout_width="match_parent"
+            android:id="@+id/first_name_edit"
+            style="@style/AppEditTextStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="@string/first_name"
-            style="@style/SignUpEditText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nametv"/>
+            app:layout_constraintEnd_toEndOf="@id/guideline_end"
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@id/name_label" />
 
         <EditText
-            android:id="@+id/lastNameET"
-            android:layout_width="match_parent"
+            android:id="@+id/last_name_edit"
+            style="@style/SignUpLastNameEditText"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="@string/last_name"
-            style="@style/SignUpEditText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/firstNameET"/>
+            app:layout_constraintEnd_toEndOf="@id/guideline_end"
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@id/first_name_edit" />
 
         <TextView
-            android:id="@+id/emailtv"
+            android:id="@+id/email_label"
+            style="@style/AppTextViewStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/email_address"
-            style="@style/SignUpTextView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lastNameET"/>
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/last_name_edit" />
 
         <EditText
-            android:id="@+id/emailEt"
-            android:layout_width="match_parent"
+            android:id="@+id/email_edit"
+            style="@style/AppEditTextStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="@string/email"
-            style="@style/SignUpEditText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/emailtv"/>
+            app:layout_constraintEnd_toEndOf="@id/guideline_end"
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@id/email_label" />
 
         <TextView
-            android:id="@+id/passwordtv"
+            android:id="@+id/password_label"
+            style="@style/AppTextViewStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/password"
-            style="@style/SignUpTextView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/emailEt"/>
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/email_edit" />
 
         <EditText
-            android:id="@+id/passwordEt"
-            android:layout_width="match_parent"
+            android:id="@+id/password_edit"
+            style="@style/AppEditTextStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:passwordToggleEnabled="true"
-            android:hint="@string/password"
-            style="@style/SignUpEditText"
+            android:hint="@string/password_hint"
             android:inputType="textPassword"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passwordtv"/>
+            app:layout_constraintEnd_toEndOf="@id/guideline_end"
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/password_label"
+            app:passwordToggleEnabled="true" />
 
 
         <TextView
             android:id="@+id/signUpButton"
-            android:layout_width="match_parent"
+            style="@style/ButtonCreateAccount"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:text="@string/create_account"
-            android:textStyle="bold"
-            android:textSize="18sp"
             android:gravity="center"
-            android:background="@drawable/rounded_rectangle_db"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passwordEt"
-            android:clickable="true"/>
+            android:text="@string/create_account"
+            app:layout_constraintEnd_toEndOf="@id/guideline_end"
+            app:layout_constraintStart_toStartOf="@id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@id/password_edit" />
 
         <TextView
-            android:id="@+id/termsTv"
+            android:id="@+id/create_account_terms"
+            style="@style/TermsTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/terms_string"
-            style="@style/TermsTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/signUpButton"/>
+            app:layout_constraintTop_toBottomOf="@id/signUpButton" />
 
         <LinearLayout
             style="@style/HaveAccountLayout"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/termsTv"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/already_have_account"
-                android:textSize="15sp"
-                android:textColor="@color/black"
-                />
+            app:layout_constraintTop_toBottomOf="@id/create_account_terms">
 
             <TextView
-                android:id="@+id/sign_in"
+                style="@style/AppTextViewStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="@dimen/space"
+                android:text="@string/already_have_account"
+                android:textSize="@dimen/text_size_small" />
+
+            <TextView
+                android:id="@+id/sign_up_sign_in_button"
+                style="@style/AppTextViewStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sign_in"
-                android:textStyle="bold"
-                android:textSize="15sp"
-                android:textColor="@color/blue"
-                android:layout_marginStart="5dp"
-                android:clickable="true"
-                />
+                android:textColor="@color/highlighted_text"
+                android:textSize="@dimen/text_size_small" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

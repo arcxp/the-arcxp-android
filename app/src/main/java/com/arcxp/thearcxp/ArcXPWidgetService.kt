@@ -10,13 +10,13 @@ import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.arcxp.content.sdk.ArcXPContentSDK
-import com.arcxp.content.sdk.models.ArcXPCollection
+import com.arcxp.content.sdk.extendedModels.ArcXPCollection
+import com.arcxp.content.sdk.extendedModels.thumbnail
 import com.arcxp.content.sdk.models.ArcXPContentError
 import com.arcxp.content.sdk.util.Either
 import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.ArcXPWidget.Companion.ARTICLE_ID_KEY
 import com.arcxp.thearcxp.utils.TAG
-import com.arcxp.thearcxp.utils.imageUrl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -33,7 +33,7 @@ class ArcXPWidgetService : RemoteViewsService() {
     ) : RemoteViewsFactory {
 
         private val headlinesBasics = mutableListOf<String>()
-        private var imgUrl = mutableListOf<String>()
+        private val items = mutableListOf<ArcXPCollection>()
         private val widgetArticleId = mutableListOf<String>()
         private var sectionId = ""
 
@@ -64,8 +64,8 @@ class ArcXPWidgetService : RemoteViewsService() {
                         entry.value.headlines.basic?.let { headlinesBasics.add(it) }
                         entry.value.id.let { widgetArticleId.add(it) }
 
-                        if (entry.value.imageUrl().isNotEmpty()) {
-                            imgUrl.add(entry.value.imageUrl())
+                        if (entry.value.thumbnail().isNotEmpty()) {
+                            items.add(entry.value)
                         }
                     }
                     AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetId, R.id.widgetListView)
@@ -82,18 +82,18 @@ class ArcXPWidgetService : RemoteViewsService() {
         override fun getViewAt(position: Int): RemoteViews {
             val views = RemoteViews(context.packageName, R.layout.widgetrow)
             if(position < headlinesBasics.size && headlinesBasics[position].isNotEmpty()) {
-                views.setTextViewText(R.id.tvHeadline, headlinesBasics[position])
+                views.setTextViewText(R.id.widget_headline, headlinesBasics[position])
             }
 
-            if(position < imgUrl.size && imgUrl[position].isNotEmpty()) {
+            if(position < items.size && items[position].thumbnail().isNotEmpty()) {
                 var image: Bitmap? = null
                 try {
-                    val `in` = java.net.URL(imgUrl[position]).openStream()
+                    val `in` = java.net.URL(items[position].thumbnail()).openStream()
                     image = BitmapFactory.decodeStream(`in`)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-                views.setImageViewBitmap(R.id.imgArticle, image)
+                views.setImageViewBitmap(R.id.widget_thumbnail, image)
             }
 
             val appWidgetId = intent.extras?.getInt(

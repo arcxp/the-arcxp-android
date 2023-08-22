@@ -42,18 +42,17 @@ class SignUpFragment : Fragment() {
                 vm.commerceErrors().observe(viewLifecycleOwner) {
                     showSpinner(false)
                     requireActivity().showErrorDialog(
-                        title = "Error",
                         message = it.localizedMessage
                     )
                 }
 
                 showSpinner(true)
                 vm.signUp(
-                    username = binding.emailEt.text.toString(),
-                    firstname = binding.firstNameET.text.toString(),
-                    lastname = binding.lastNameET.text.toString(),
-                    email = binding.emailEt.text.toString(),
-                    password = binding.passwordEt.text.toString()
+                    username = binding.emailEdit.text.toString(),
+                    firstname = binding.firstNameEdit.text.toString(),
+                    lastname = binding.lastNameEdit.text.toString(),
+                    email = binding.emailEdit.text.toString(),
+                    password = binding.passwordEdit.text.toString()
                 ).observe(viewLifecycleOwner) {
                     showSpinner(false)
                     requireActivity().supportFragmentManager.popBackStack()
@@ -66,22 +65,20 @@ class SignUpFragment : Fragment() {
                 requireActivity().showAlertDialog(
                     message = "Please enter all values.",
                     posBtnTxt = "OK",
-                    posAction = {
-
-                    }
+                    posAction = {}
                 )
             }
         }
 
-        binding.signIn.setOnClickListener {
+        binding.signUpSignInButton.setOnClickListener {
             (requireActivity() as MainActivity).navigateToSignIn()
         }
     }
 
     private fun checkInputs(): Boolean {
-        return binding.emailEt.text.isNotBlank() &&
-                binding.firstNameET.text.isNotBlank() && binding.lastNameET.text.isNotBlank()
-                && binding.passwordEt.text.isNotBlank()
+        return binding.emailEdit.text.isNotBlank() &&
+                binding.firstNameEdit.text.isNotBlank() && binding.lastNameEdit.text.isNotBlank()
+                && binding.passwordEdit.text.isNotBlank()
     }
 
     private fun showSpinner(visible: Boolean) {

@@ -1,17 +1,15 @@
 package com.arcxp.thearcxp.tabfragment
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
-import androidx.fragment.app.Fragment
-import com.arcxp.commerce.ArcXPCommerceManager
 import com.arcxp.commerce.ArcXPCommerceSDK
 import com.arcxp.commerce.apimanagers.ArcXPIdentityListener
 import com.arcxp.commerce.models.ArcXPAuth
@@ -25,10 +23,11 @@ import com.arcxp.thearcxp.account.CreateAccountFragment
 import com.arcxp.thearcxp.databinding.FragmentLoginBinding
 import com.arcxp.thearcxp.utils.showErrorDialog
 
+
 class LoginFragment : BaseFragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private lateinit var commerceManager: ArcXPCommerceManager
+    private val commerceManager = ArcXPCommerceSDK.commerceManager()
     private val forgotPassword = ForgotPasswordFragment()
 
     override fun onCreateView(
@@ -44,44 +43,43 @@ class LoginFragment : BaseFragment() {
 
         showSpinner(false)
 
-        binding.newFacebookBtn.text = "   ${binding.facebookBtn.text}"
-        commerceManager = ArcXPCommerceSDK.commerceManager()
+        binding.loginNewFacebookBtn.text = "${binding.loginFacebookBtn.text}"
 
-        binding.newFacebookBtn.setOnClickListener {
-            binding.facebookBtn.performClick()
+        binding.loginNewFacebookBtn.setOnClickListener {
+            binding.loginFacebookBtn.performClick()
         }
 
-        binding.checkBox.setOnCheckedChangeListener { _, isChecked ->
+        binding.loginRememberMeCheckbox.setOnCheckedChangeListener { _, isChecked ->
             vm.rememberUser(isChecked)
         }
 
         //client must add 3rd party keys in local property to have access to login buttons
         if (getString(R.string.google_key).isBlank()) {
-            binding.newGoogleBtn.visibility = GONE
+            binding.loginNewGoogleBtn.visibility = GONE
         }
 
         if (getString(R.string.facebook_app_id).isBlank()) {
-            binding.newFacebookBtn.visibility = GONE
+            binding.loginNewFacebookBtn.visibility = GONE
         }
 
-        binding.newGoogleBtn.setOnClickListener {
+        binding.loginNewGoogleBtn.setOnClickListener {
             vm.loginWithGoogle(activity as MainActivity, viewLifecycleOwner)
                 .observe(viewLifecycleOwner) {
-                    (activity as MainActivity).supportFragmentManager.popBackStack()
+                    parentFragmentManager.popBackStack()
                     vm.restoreContentEvent()
                 }
         }
 
-        binding.facebookBtn.setOnClickListener {
-            binding.facebookBtn.fragment = this
-            vm.loginWithFacebook(binding.facebookBtn, viewLifecycleOwner)
+        binding.loginFacebookBtn.setOnClickListener {
+            binding.loginFacebookBtn.fragment = this
+            vm.loginWithFacebook(binding.loginFacebookBtn, viewLifecycleOwner)
                 .observe(viewLifecycleOwner) {
-                    (activity as MainActivity).supportFragmentManager.popBackStack()
+                    parentFragmentManager.popBackStack()
                     vm.restoreContentEvent()
                 }
         }
 
-        binding.registerAccount.setOnClickListener {
+        binding.loginRegisterAccountButton.setOnClickListener {
             (activity as MainActivity).openFragment(
                 CreateAccountFragment(),
                 true,
@@ -89,37 +87,37 @@ class LoginFragment : BaseFragment() {
             )
         }
 
-        binding.emailEt.doOnTextChanged { _, _, _, _ ->
+        binding.loginEmailEdit.doOnTextChanged { _, _, _, _ ->
             resetFields()
         }
 
-        binding.passwordEt.doOnTextChanged { _, _, _, _ ->
+        binding.loginPasswordEdit.doOnTextChanged { _, _, _, _ ->
             resetFields()
         }
 
-        binding.forgotPassword.setOnClickListener {
+        binding.loginForgotPasswordButton.setOnClickListener {
             (activity as MainActivity).openFragment(
                 forgotPassword,
                 true,
                 getString(R.string.forgot_password)
-            )
+            ) //TODO send this through view model
         }
 
-        binding.signInBtn.setOnClickListener {
-            showSpinner(true)
+        binding.loginButton.setOnClickListener {
+            showSpinner(visible = true)
             vm.login(
-                binding.emailEt.text.toString(),
-                binding.passwordEt.text.toString(), viewLifecycleOwner
+                binding.loginEmailEdit.text.toString(),
+                binding.loginPasswordEdit.text.toString(), viewLifecycleOwner
             ).observe(viewLifecycleOwner) {
                 when (it) {
                     is Success -> {
-                        showSpinner(false)
+                        showSpinner(visible = false)
                         (activity as MainActivity).supportFragmentManager.popBackStack()
                         vm.restoreContentEvent()
-                        binding.emailEt.text.clear()
-                        binding.passwordEt.text.clear()
+                        binding.loginEmailEdit.text.clear()
+                        binding.loginPasswordEdit.text.clear()
                     }
-                    is Failure -> showError(it.l!!)
+                    is Failure -> showError(error = it.l)
                 }
             }
 
@@ -142,23 +140,29 @@ class LoginFragment : BaseFragment() {
 
     private fun showError(error: ArcXPError) {
         showSpinner(false)
-        binding.email.setBackgroundResource(R.drawable.error_outline)
-        binding.password.setBackgroundResource(R.drawable.error_outline)
-        binding.emailTv.setTextColor(resources.getColor(R.color.red))
-        binding.emailEt.setTextColor(resources.getColor(R.color.red))
-        binding.passwordTv.setTextColor(resources.getColor(R.color.red))
-        binding.passwordEt.setTextColor(resources.getColor(R.color.red))
+        val errorColor = ContextCompat.getColor(requireContext(), R.color.error)
+        binding.loginEmailLabel.setTextColor(errorColor)
+        binding.loginEmailEdit.setTextColor(errorColor)
+        binding.loginEmailEdit.isSelected = true
+        binding.loginPasswordEdit.isSelected = true
+        binding.loginPasswordLabel.setTextColor(errorColor)
+        binding.loginPasswordEdit.setTextColor(errorColor)
         binding.errorMessage.visibility = VISIBLE
-        requireActivity().showErrorDialog(error.type?.name!!, error.localizedMessage)
+        requireActivity().showErrorDialog(
+            title = error.type?.name ?: getString(R.string.error),
+            message = error.localizedMessage
+        )
     }
 
     private fun resetFields() {
-        binding.email.setBackgroundResource(R.drawable.outline_shape)
-        binding.password.setBackgroundResource(R.drawable.outline_shape)
-        binding.emailTv.setTextColor(Color.BLACK)
-        binding.emailEt.setTextColor(Color.BLACK)
-        binding.passwordTv.setTextColor(Color.BLACK)
-        binding.passwordEt.setTextColor(Color.BLACK)
+        val normalTextColor = ContextCompat.getColor(requireContext(), R.color.text)
+        val editTextColor = ContextCompat.getColor(requireContext(), R.color.edit_text)
+        binding.loginEmailEdit.isSelected = false
+        binding.loginPasswordEdit.isSelected = false
+        binding.loginEmailEdit.setTextColor(editTextColor)
+        binding.loginEmailLabel.setTextColor(normalTextColor)
+        binding.loginPasswordEdit.setTextColor(editTextColor)
+        binding.loginPasswordLabel.setTextColor(normalTextColor)
         binding.errorMessage.visibility = GONE
     }
 

@@ -16,6 +16,7 @@ import android.widget.SearchView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.size
 import androidx.drawerlayout.widget.DrawerLayout
@@ -29,6 +30,7 @@ import com.arcxp.thearcxp.account.CreateAccountFragment
 import com.arcxp.thearcxp.databinding.ActivityMainBinding
 import com.arcxp.thearcxp.tabfragment.*
 import com.arcxp.thearcxp.utils.AnsTypes
+import com.arcxp.thearcxp.utils.collectOneTimeEvent
 import com.arcxp.thearcxp.utils.getNameToUseFromSection
 import com.arcxp.thearcxp.viewmodel.MainViewModel
 import com.arcxp.thearcxp.viewmodel.MainViewModel.FragmentView.*
@@ -112,13 +114,10 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        vm.sectionEvent.observe(this) {
-            binding.bottomNavigationView.selectedItemId = R.id.home
-        }
-
         vm.getSectionList(this)
-        vm.openArticleEvent.observe(this, this::openArticle)
-        vm.openVideoEvent.observe(this, this::openVideo)
+        collectOneTimeEvent(flow = vm.openArticleEvent, collect = ::openArticle)
+        collectOneTimeEvent(flow = vm.openVideoEvent, collect = ::openVideo)
+
         vm.sensorLockEvent.observe(this, this::sensorLock)
 
         supportFragmentManager.addOnBackStackChangedListener {
@@ -146,7 +145,7 @@ class MainActivity : AppCompatActivity() {
         val hView = View.inflate(this, R.layout.drawer_header, null)
         val closeButton = hView.findViewById<ImageButton>(R.id.closeButton)
         closeButton.setOnClickListener {
-            drawer.closeDrawer(Gravity.LEFT)
+            drawer.closeDrawer(GravityCompat.START)
         }
         val hv = navigationView.getHeaderView(0)
         navigationView.removeHeaderView(hv)
@@ -168,6 +167,7 @@ class MainActivity : AppCompatActivity() {
             val section = vm.sections[it.title]
             if (section != null) {
                 vm.sectionSelected(section)
+                binding.bottomNavigationView.selectedItemId = R.id.home
                 drawer.close()
                 true
             } else {
@@ -339,11 +339,11 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    private fun openArticleFromWidget () {
+    private fun openArticleFromWidget() {
         val extras = intent.extras
         if (extras != null) {
             val articleId = extras.getString(WIDGET_ARTICLE_ID_KEY)
-            if(articleId != null) {
+            if (articleId != null) {
                 this.openArticle(articleId)
             }
         }

@@ -6,6 +6,5 @@
 
     <fragment
         android:id="@+id/contentFragment"
-        android:name="com.arcxp.thearcxp.tabfragment.ContentFragment"
         android:label="ContentFragment" />
 </navigation>

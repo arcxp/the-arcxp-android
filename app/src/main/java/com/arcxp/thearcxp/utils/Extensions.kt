@@ -3,10 +3,16 @@ package com.arcxp.thearcxp.utils
 import android.content.Context
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import com.arcxp.content.sdk.models.ArcXPSection
+import com.arcxp.thearcxp.R
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 fun Context.showErrorDialog(
-    title: String = "Error",
+    title: String = getString(R.string.error),
     message: String? = null,
     posBtnTxt: String? = null,
     posAction: (() -> Unit)? = null
@@ -57,4 +63,21 @@ fun ArcXPSection.getNameToUseFromSection() =
         Log.e(TAG, "Nav Title was null! defaulting to Section Name: ${this.name}")
         this.name
     }
+
+fun <T> FragmentActivity.collectOneTimeEvent(flow: Flow<T>, collect: suspend (T) -> Unit) {
+    lifecycleScope.launchWhenCreated {
+        launch {
+            flow.collect(collector = collect)
+        }
+    }
+}
+
+fun <T> Fragment.collectOneTimeEvent(flow: Flow<T>, collect: suspend (T) -> Unit) {
+    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+        launch {
+            flow.collect(collector = collect)
+        }
+    }
+}
+
 

@@ -16,12 +16,14 @@ import com.arc.arcvideo.model.TrackingType.*
 import com.arc.arcvideo.model.TrackingTypeData
 import com.arcxp.commerce.ArcXPCommerceSDK
 import com.arcxp.content.sdk.models.ArcXPContentError
+import com.arcxp.content.sdk.util.Either
 import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentPlayvideoBinding
 import com.arcxp.thearcxp.utils.AnsTypes
 import com.arcxp.thearcxp.utils.Paywall
+import com.arcxp.thearcxp.utils.collectOneTimeEvent
 
 class PlayVideoFragment : BaseFragment(), Paywall.PaywallListener, ArcKeyListener {
 
@@ -37,7 +39,10 @@ class PlayVideoFragment : BaseFragment(), Paywall.PaywallListener, ArcKeyListene
     private var videoHasStartedPlayback = false
 
     //Keep track of if we are in PIP so the video player can be shut down properly
-    private var isInPip: Boolean = false
+    private var isInPip = false
+
+    //flag to indicate the paywall is being shown
+    private var showPaywall = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -71,6 +76,7 @@ class PlayVideoFragment : BaseFragment(), Paywall.PaywallListener, ArcKeyListene
                     deviceType = getString(R.string.device_type)
                 ).observe(viewLifecycleOwner) {
                     if (!it.show) {
+                        showPaywall = true
                         paywall.show(parentFragmentManager, getString(R.string.paywall))
                     }
                 }
@@ -78,13 +84,14 @@ class PlayVideoFragment : BaseFragment(), Paywall.PaywallListener, ArcKeyListene
         } else {
             restartVideo()
         }
-        vm.videoResultEvent.observe(viewLifecycleOwner) {
-            when (it) {
-                is Success -> playVideo(it.success)
-                is Failure -> onError(it.failure)
-            }
-        }
+        collectOneTimeEvent(flow = vm.videoResultEvent, collect = ::handleVideo)
     }
+
+    private fun handleVideo(result: Either<ArcXPContentError, ArcVideoStream>) =
+        when (result) {
+            is Success -> playVideo(result.success)
+            is Failure -> onError(result.failure)
+        }
 
     private fun loadVideo(id: String) {
         vm.createVideoPlayer()
@@ -103,11 +110,13 @@ class PlayVideoFragment : BaseFragment(), Paywall.PaywallListener, ArcKeyListene
     }
 
     private fun playVideo(arcVideoStream: ArcVideoStream) {
-        vm.arcMediaPlayer?.initMediaWithShareURL(video = arcVideoStream, "a url string")
-        vm.arcMediaPlayer?.setFullscreenKeyListener(listener = this)
-        vm.arcMediaPlayer?.setFullscreen(full = true)
-        vm.arcMediaPlayer?.displayVideo()
-        vm.arcMediaPlayer?.pause()
+        if (!showPaywall) {
+            vm.arcMediaPlayer?.initMediaWithShareURL(video = arcVideoStream, "a url string")
+            vm.arcMediaPlayer?.setFullscreenKeyListener(listener = this)
+            vm.arcMediaPlayer?.setFullscreen(full = true)
+            vm.arcMediaPlayer?.displayVideo()
+            vm.arcMediaPlayer?.pause()
+        }
     }
 
     //There are a lot of places in the code that need to shut
@@ -118,7 +127,7 @@ class PlayVideoFragment : BaseFragment(), Paywall.PaywallListener, ArcKeyListene
         }
         vm.disposeVideoPlayer()
         dismissSnackBar()
-       parentFragmentManager.popBackStack()
+        parentFragmentManager.popBackStack()
     }
 
     //When the user clicks the close button on the PIP window

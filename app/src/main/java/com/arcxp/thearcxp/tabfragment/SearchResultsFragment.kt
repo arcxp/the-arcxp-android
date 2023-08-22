@@ -12,21 +12,22 @@ import androidx.activity.OnBackPressedCallback
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.arcxp.content.sdk.ArcXPContentSDK
-import com.arcxp.content.sdk.models.ArcXPContentElement
+import com.arcxp.content.sdk.extendedModels.*
 import com.arcxp.content.sdk.models.ArcXPContentError
 import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentSearchresultsBinding
-import com.arcxp.thearcxp.databinding.SearchItemLayoutBinding
+import com.arcxp.thearcxp.databinding.ItemLayoutBinding
 import com.arcxp.thearcxp.utils.AnsTypes
-import com.arcxp.thearcxp.utils.imageUrl
 import com.arcxp.thearcxp.utils.spinner
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 
 class SearchResultsFragment : BaseFragment() {
@@ -180,76 +181,90 @@ class SearchResultsFragment : BaseFragment() {
     ) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        inner class SearchViewHolder(val binding: SearchItemLayoutBinding) :
+        inner class SearchViewHolder(val binding: ItemLayoutBinding) :
             RecyclerView.ViewHolder(binding.root) {
             var itemId: String? = null
             fun bind(
                 item: ArcXPContentElement
             ) {
                 itemId = item._id
-                binding.title.text = if (item.headlines != null) {
-                    item.headlines?.basic
-                } else {
-                    getString(R.string.no_title)
-                }
-                binding.description.text = if (item.content != null) {
-                    item.content
-                } else {
-                    ""
-                }
-                binding.author.text = if (item.credits != null
-                    && item.credits?.by != null && item.credits?.by?.isNotEmpty()!!
-                ) {
-                    item.credits?.by?.get(0)?.name!!
-                } else {
-                    ""
-                }
-                binding.date.text = if (item.publish_date != null) {
-                    item.publish_date.toString().slice(0..item.publish_date.toString().length - 3)
-                } else {
-                    ""
-                }
+                binding.title.text = item.title()
+                binding.description.text = item.description()
                 binding.playIcon.visibility = GONE
-                Glide.with(itemView.context).load(item.imageUrl())
-                    .error(R.drawable.ic_baseline_error_24_black)
-                    .placeholder(spinner(requireContext()))
-                    .fitCenter()
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            if (item.type == AnsTypes.VIDEO.type) {
-                                binding.playIcon.visibility = VISIBLE
-                            }
-                            return false
-                        }
+                if (item.thumbnail().isNotEmpty()) {
+                    Glide.with(itemView.context).load(item.thumbnail())
+                        .error(Glide.with(itemView)
+                            .load(item.fallback())
+                            .error(R.drawable.ic_baseline_error_24)
+                            .listener(object : RequestListener<Drawable> {
+                                override fun onResourceReady(
+                                    resource: Drawable?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    dataSource: DataSource?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    if (item.type == AnsTypes.VIDEO.type) {
+                                        binding.playIcon.visibility = VISIBLE
+                                    }
+                                    return false
+                                }
 
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ) = false
-                    })
-                    .into(binding.videoImage)
+                                override fun onLoadFailed(
+                                    e: GlideException?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    isFirstResource: Boolean
+                                ) = false
+                            })
+                            .apply(RequestOptions().transform(RoundedCorners(binding.root.resources.getInteger(R.integer.rounded_corner_radius))))
+                        )
+                        .placeholder(spinner(requireContext()))
+                        .fitCenter()
+                        .listener(object : RequestListener<Drawable> {
+                            override fun onResourceReady(
+                                resource: Drawable?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                dataSource: DataSource?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                if (item.type == AnsTypes.VIDEO.type) {
+                                    binding.playIcon.visibility = VISIBLE
+                                }
+                                return false
+                            }
+
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                isFirstResource: Boolean
+                            ) = false
+                        })
+                        .apply(RequestOptions().transform(RoundedCorners(binding.root.resources.getInteger(R.integer.rounded_corner_radius))))
+                        .into(binding.sectionThumbnail)
+                } else {
+                    binding.sectionThumbnail.visibility = GONE
+                }
                 if (binding.author.text.toString().isEmpty()) {
                     binding.author.visibility = GONE
                     binding.bullet.visibility = GONE
+                } else {
+                    binding.author.text = item.author()
                 }
                 if (item.publish_date == null) {
                     binding.bullet.visibility = GONE
                     binding.date.visibility = GONE
+                } else {
+                    binding.date.text = item.date()
                 }
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             val view =
-                SearchItemLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ItemLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             return SearchViewHolder(view)
         }
 
@@ -257,9 +272,9 @@ class SearchResultsFragment : BaseFragment() {
             (holder as SearchViewHolder).bind(results[position]!!)
             holder.itemView.setOnClickListener {
                 if (results[position]!!.type == AnsTypes.VIDEO.type) {
-                    openVideo(results[position]!!._id!!)
+                    openVideo(results[position]!!._id)
                 } else {
-                    openStory(results[position]!!._id!!)
+                    openStory(results[position]!!._id)
                 }
             }
         }

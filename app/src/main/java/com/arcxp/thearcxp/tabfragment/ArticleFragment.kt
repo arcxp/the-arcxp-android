@@ -15,7 +15,9 @@ import com.arc.arcvideo.ArcVideoStreamCallback
 import com.arc.arcvideo.model.ArcVideoResponse
 import com.arc.arcvideo.model.ArcVideoSDKErrorType
 import com.arc.arcvideo.model.ArcVideoStream
+import com.arc.arcvideo.model.VideoVO
 import com.arcxp.commerce.ArcXPCommerceSDK
+import com.arcxp.content.sdk.extendedModels.*
 import com.arcxp.content.sdk.models.*
 import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
@@ -24,6 +26,9 @@ import com.arcxp.thearcxp.databinding.FragmentArticleBinding
 import com.arcxp.thearcxp.utils.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.FitCenter
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -106,10 +111,10 @@ class ArticleFragment : BaseFragment() {
      * and build a view for it.  Dynamically attach each view to the layout.
      */
     private fun displayStory(storyResponse: ArcXPStory) {
-        binding.storyTitleTv.text = storyResponse.headlines?.basic
-        if (storyResponse.subheadlines?.basic?.isNotEmpty() == true) {
-            binding.storySubtitleTv.text = storyResponse.subheadlines?.basic
-            binding.storySubtitleTv.visibility = VISIBLE
+        binding.storyTitle.text = storyResponse.title()
+        if (storyResponse.subheadlines().isNotEmpty()) {
+            binding.storySubtitle.text = storyResponse.subheadlines()
+            binding.storySubtitle.visibility = VISIBLE
         }
         val containsGalleries = containGalleries(storyResponse = storyResponse)
 
@@ -118,25 +123,28 @@ class ArticleFragment : BaseFragment() {
             val gallery = storyResponse.content_elements?.find { it is Gallery }
             gallery?.let { gallery(gallery = it as Gallery) }
         } else {
-            val topImage = storyResponse.imageUrl()
-            if (topImage.isNotBlank()) {
+
+            if (storyResponse.imageUrl().isNotEmpty()) {
                 Glide.with(this)
-                    .load(topImage)
+                    .load(storyResponse.imageUrl())
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .dontAnimate()
-                    .error(R.drawable.ic_baseline_error_24_black)
-                    .placeholder(spinner(this.requireContext()))
-                    .into(binding.storyImageIv)
+                    .error(Glide.with(this)
+                        .load(storyResponse.fallback())
+                        .error(R.drawable.ic_baseline_error_24)
+                        .apply(RequestOptions().transform(RoundedCorners(requireContext().resources.getInteger(R.integer.rounded_corner_radius)))))
+                    .placeholder(spinner(requireContext()))
+                    .apply(RequestOptions().transform(FitCenter(), RoundedCorners(requireContext().resources.getInteger(R.integer.rounded_corner_radius))))
+                    .into(binding.storyTopImage)
             }
         }
 
         storyResponse.credits?.by?.let {
-            if (it.isNotEmpty()) {
-                binding.storyDateTv.visibility = VISIBLE
-                binding.storyAuthorTv.visibility = VISIBLE
-                val authorText = "By ${storyResponse.credits?.by?.get(0)?.name}"
-                binding.storyAuthorTv.text = authorText
-                binding.storyDateTv.text = storyResponse.publish_date?.toLocaleString()
+            if (storyResponse.author().isNotEmpty()) {
+                binding.storyDate.visibility = VISIBLE
+                binding.storyAuthor.visibility = VISIBLE
+                binding.storyAuthor.text = "By ${storyResponse.author()}"
+                binding.storyDate.text = storyResponse.date()
             }
         }
         var skipNextGallerySinceAlreadyDisplayed = containsGalleries
@@ -164,7 +172,7 @@ class ArticleFragment : BaseFragment() {
                 }
                 is Image -> {
                     val imageAndCaption = createImageView(
-                        url = it.imageUrl(),
+                        item = it,
                         caption = it.caption.toString(),
                         activity = requireActivity()
                     )
@@ -178,7 +186,6 @@ class ArticleFragment : BaseFragment() {
                         val player = ArcMediaPlayer.createPlayer(requireActivity())
                         binding.innerLayout.addView(
                             createVideoView(
-                                content = it,
                                 activity = requireActivity(),
                                 arcMediaPlayer = player
                             )
@@ -198,6 +205,8 @@ class ArticleFragment : BaseFragment() {
                                         player.pause()
                                     }
                                 }
+
+                                override fun onLiveVideos(videos: List<VideoVO>?) {}
 
                                 override fun onError(
                                     type: ArcVideoSDKErrorType,
@@ -253,20 +262,14 @@ class ArticleFragment : BaseFragment() {
      * @param gallery
      */
     private fun gallery(gallery: Gallery) {
-        val imageUrls = ArrayList<String?>()
-        val titles = ArrayList<String?>()
-        val captions = ArrayList<String?>()
+        val images = ArrayList<Image>()
         gallery.content_elements?.forEach {
             it as Image
-            imageUrls.add(it.url)
-            titles.add(it.subtitle)
-            captions.add(it.caption)
+            images.add(it)
         }
         val viewPager = createGalleryView(
-            images = imageUrls,
-            context = requireContext(),
-            captions = captions,
-            titles = titles
+            images = images,
+            context = requireContext()
         )
 
         val tabLayout = TabLayout(requireContext())

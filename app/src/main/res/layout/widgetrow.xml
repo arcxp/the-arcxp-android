@@ -4,77 +4,59 @@
     android:id="@+id/widget_item"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical"
-    android:padding="0dp">
+    android:background="@color/background"
+    android:orientation="horizontal"
+    android:padding="@dimen/space">
+
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="7dp"
-        android:layout_marginRight="0dp"
-        android:orientation="horizontal"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/widget_headline"
+            style="@style/TextViewWidget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Headline" />
+
+        <TextView
+            android:id="@+id/widget_description"
+            style="@style/TextViewWidget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Story description..." />
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tvHeadline"
+                android:id="@+id/widget_author"
+                style="@style/TextViewWidget"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                tools:text="Headline" />
+                tools:text="by Author" />
 
             <TextView
-                android:id="@+id/tvStoryDesc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:textColor="@color/black"
-                tools:text="Story description..." />
-
-            <LinearLayout
+                android:id="@+id/widget_text"
+                style="@style/TextViewWidget"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tvAuthor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    tools:text="by Author" />
-
-                <TextView
-                    android:id="@+id/tvPostTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:padding="2dp"
-                    android:textColor="@color/black"
-                    tools:text="2022-06-06" />
-
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                tools:text="2022-06-06" />
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/imgArticle"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:scaleType="centerCrop"
-            android:visibility="visible"
-            tools:srcCompat="@tools:sample/backgrounds/scenic" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/widget_thumbnail"
+        android:layout_width="@dimen/widget_image_size"
+        android:layout_height="@dimen/widget_image_size"
+        android:scaleType="centerCrop"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
 </LinearLayout>
+

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="top_image_height">500dp</dimen>
+
 
     <dimen name="search_item_image_width">200dp</dimen>
     <dimen name="search_item_image_height">120dp</dimen>
@@ -10,8 +10,6 @@
 
     <dimen name="gallery_item_container_height">600dp</dimen>
     <dimen name="gallery_tab_size">9dp</dimen>
-    <dimen name="section_top_margin">10dp</dimen>
 
-    <dimen name="item_layout_image_height">120dp</dimen>
-    <item name="item_layout_guideline_percentage" format="float" type="dimen">0.75</item>
+
 </resources>

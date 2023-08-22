@@ -4,7 +4,6 @@ import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -12,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.arcxp.content.sdk.ArcXPContentSDK
 import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.databinding.ArcXPWidgetConfigureBinding
@@ -70,7 +70,7 @@ class ArcXPWidgetConfigureActivity : Activity() {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val view = super.getView(position, convertView, parent)
                 val text = view.findViewById<View>(android.R.id.text1) as TextView
-                text.setTextColor(Color.BLACK)
+                text.setTextColor(ContextCompat.getColor(context, R.color.text))
                 return view
             }
         }

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="top_image_height">250dp</dimen>
+    <dimen name="top_section_image_height">250dp</dimen>
+    <dimen name="top_section_padding">10dp</dimen>
 
-    <dimen name="app_sdk_margin">30dp</dimen>
     <integer name="collection_page_size">20</integer>
+
+    <integer name="article_video_height">580</integer>
+    <integer name="article_top_image_height">580</integer>
 
     <dimen name="search_item_image_width">120dp</dimen>
     <dimen name="search_item_image_height">70dp</dimen>
@@ -11,17 +14,17 @@
     <dimen name="video_item_image_width">120dp</dimen>
     <dimen name="video_item_image_height">70dp</dimen>
 
+    <integer name="gallery_tab_padding">1</integer>
     <dimen name="gallery_item_container_height">250dp</dimen>
     <dimen name="gallery_tab_size">5dp</dimen>
+
     <dimen name="top_margin_from_view">100dp</dimen>
-    <dimen name="paywall_margins">24dp</dimen>
-    <dimen name="paywall_large_font_margin">40dp</dimen>
     <dimen name="close_button_margin">16dp</dimen>
+    <dimen name="button_icon_size">20dp</dimen>
     <dimen name="extra_close_button_margin">4dp</dimen>
 
-    <dimen name="search_results_margin">16dp</dimen>
+    <dimen name="results_margin">16dp</dimen>
     <dimen name="search_results_margin_start">5dp</dimen>
-    <dimen name="section_top_margin">0dp</dimen>
 
     <dimen name="recycler_view_margin">16dp</dimen>
     <dimen name="recycler_margin">20dp</dimen>
@@ -33,17 +36,66 @@
     <dimen name="icon_height_large">60dp</dimen>
 
     <dimen name="widget_margin">0dp</dimen>
+    <dimen name="widget_image_size">75dp</dimen>
 
-    <dimen name="item_layout_padding">8dp</dimen>
-    <dimen name="item_layout_padding_small">5dp</dimen>
-    <dimen name="item_layout_padding_large">10dp</dimen>
-    <dimen name="item_layout_padding_xlarge">20dp</dimen>
+    <dimen name="section_hero_text_size">20sp</dimen>
+    <dimen name="section_hero_description_text_size">15sp</dimen>
+    <dimen name="section_credits_hero_text_size">13sp</dimen>
+
+    <dimen name="section_text_size">14sp</dimen>
+    <dimen name="section_description_text_size">12sp</dimen>
+    <dimen name="section_credits_text_size">13sp</dimen>
+
+    <dimen name="section_thumbnail_height">100dp</dimen>
+    <dimen name="section_divider_size">1dp</dimen>
+    <dimen name="section_credits_padding">8dp</dimen>
+
+    <dimen name="padding_small">5dp</dimen>
+    <dimen name="padding_large">10dp</dimen>
+    <dimen name="padding_xlarge">20dp</dimen>
+
     <dimen name="item_layout_top_margin">10dp</dimen>
     <dimen name="item_layout_card_margin">2dp</dimen>
+
     <dimen name="item_layout_author_text_size">13sp</dimen>
     <dimen name="item_layout_title_text_size">20sp</dimen>
     <dimen name="item_layout_desc_text_size">15sp</dimen>
     <dimen name="item_layout_date_text_size">12sp</dimen>
-    <dimen name="item_layout_image_height">75dp</dimen>
+
+    <integer name="rounded_corner_radius">30</integer>
+    <integer name="rounded_corner_radius_thumbnail">20</integer>
+
+    <dimen name="bottom_navigation_height">75dp</dimen>
+
+    <dimen name="article_title_text_size">28sp</dimen>
+    <dimen name="article_subtitle_text_size">22sp</dimen>
+    <dimen name="article_body_text_size">16sp</dimen>
+    <dimen name="article_credits_text_size">16sp</dimen>
+
+    <dimen name="space_xsmall">4dp</dimen>
+    <dimen name="space_small">10dp</dimen>
+    <dimen name="space">16dp</dimen>
+    <dimen name="space_medium">20dp</dimen>
+    <dimen name="space_large">24dp</dimen>
+    <dimen name="space_larger">30dp</dimen>
+    <dimen name="space_xlarge">50dp</dimen>
+    <dimen name="minimum_clickable_height">48dp</dimen>
+
+    <dimen name="change_password_title_text_size">32sp</dimen>
+    
+    <dimen name="text_size_xlarge">40sp</dimen>
+    <dimen name="text_size_large">35sp</dimen>
+    <dimen name="text_size">20sp</dimen>
+    <dimen name="text_size_small">16sp</dimen>
+    <dimen name="text_size_extra_small">12sp</dimen>
+
+    <dimen name="app_title_text_view_width">400dp</dimen>
+
     <item name="item_layout_guideline_percentage" format="float" type="dimen">0.65</item>
+    <item name="login_layout_guideline_percentage" format="float" type="dimen">0.25</item>
+    <item name="change_password_edit_guideline_percentage" format="float" type="dimen">0.45</item>
+
+    <item name="content_edge_space_percentage_start" format="float" type="dimen">0.05</item>
+    <item name="content_edge_space_percentage_end" format="float" type="dimen">0.95</item>
+    <item name="content_edge_space_percentage_top" format="float" type="dimen">0.03</item>
 </resources>

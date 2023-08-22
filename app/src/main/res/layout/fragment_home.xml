@@ -4,18 +4,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawerLayout"
-    android:background="@color/white"
+    android:background="@color/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
-        android:background="@color/black"
+        app:tabTextAppearance="@style/AppTextViewStyle"
+        android:background="@color/menuBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:theme="@style/TabLayout"
+        app:tabTextColor="@color/text_muted"
+        app:tabIndicatorColor="@color/primaryAccent"
+        app:tabSelectedTextColor="@color/text_menu"
         app:tabMode="scrollable"/>
 
     <androidx.viewpager.widget.ViewPager

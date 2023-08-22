@@ -6,6 +6,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import com.arcxp.commerce.apimanagers.ArcXPIdentityListener
 import com.arcxp.commerce.models.ArcXPIdentity
@@ -31,25 +32,25 @@ class ChangePasswordFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.newPasswordEt.doOnTextChanged { _, _, _, _ ->
-            if (binding.confirmPasswordEt.text.isNotEmpty()) {
+        binding.newPasswordEdit.doOnTextChanged { _, _, _, _ ->
+            if (binding.confirmPasswordEdit.text.isNotEmpty()) {
                 match()
             } else {
-                binding.updatePasswordBtn.isEnabled = false
-                binding.newPassword.setBackgroundResource(R.drawable.outline_shape)
-                binding.confirmPassword.setBackgroundResource(R.drawable.outline_shape)
-                binding.errorMessageTv.visibility = GONE
+                binding.updatePasswordButton.isEnabled = false
+                binding.newPasswordLabel.setBackgroundResource(R.drawable.outline_shape)
+                binding.confirmPasswordLabel.setBackgroundResource(R.drawable.outline_shape)
+                binding.changePasswordErrorMessage.visibility = GONE
             }
         }
 
-        binding.confirmPasswordEt.doOnTextChanged { _, _, _, _ ->
+        binding.confirmPasswordEdit.doOnTextChanged { _, _, _, _ ->
             match()
         }
 
-        binding.updatePasswordBtn.setOnClickListener {
+        binding.updatePasswordButton.setOnClickListener {
             vm.updatePassword(
-                binding.newPasswordEt.text.toString(),
-                binding.oldPasswordEt.text.toString(),
+                binding.newPasswordEdit.text.toString(),
+                binding.oldPasswordEdit.text.toString(),
                 object : ArcXPIdentityListener() {
                     override fun onPasswordChangeSuccess(it: ArcXPIdentity) {
                         (activity as MainActivity).supportFragmentManager.popBackStack()
@@ -63,17 +64,29 @@ class ChangePasswordFragment : BaseFragment() {
     }
 
     private fun match(): Boolean {
-        if (binding.confirmPasswordEt.text.toString() != binding.newPasswordEt.text.toString()) {
-            binding.updatePasswordBtn.isEnabled = false
-            binding.newPassword.setBackgroundResource(R.drawable.error_outline)
-            binding.confirmPassword.setBackgroundResource(R.drawable.error_outline)
-            binding.errorMessageTv.visibility = VISIBLE
+        if (binding.confirmPasswordEdit.text.toString() != binding.newPasswordEdit.text.toString()) {
+            val errorColor = ContextCompat.getColor(requireContext(), R.color.error)
+            binding.updatePasswordButton.isEnabled = false
+            binding.confirmPasswordEdit.isSelected = true
+            binding.newPasswordEdit.isSelected = true
+            binding.newPasswordLabel.setTextColor(errorColor)
+            binding.confirmPasswordLabel.setTextColor(errorColor)
+            binding.newPasswordEdit.setTextColor(errorColor)
+            binding.confirmPasswordEdit.setTextColor(errorColor)
+            binding.changePasswordErrorMessage.visibility = VISIBLE
             return false
         } else {
-            binding.updatePasswordBtn.isEnabled = true
-            binding.newPassword.setBackgroundResource(R.drawable.outline_shape)
-            binding.confirmPassword.setBackgroundResource(R.drawable.outline_shape)
-            binding.errorMessageTv.visibility = GONE
+
+            val normalTextColor = ContextCompat.getColor(requireContext(), R.color.text)
+            val editTextColor = ContextCompat.getColor(requireContext(), R.color.edit_text)
+            binding.updatePasswordButton.isEnabled = true
+            binding.newPasswordLabel.setTextColor(normalTextColor)
+            binding.confirmPasswordLabel.setTextColor(normalTextColor)
+            binding.newPasswordEdit.setTextColor(editTextColor)
+            binding.confirmPasswordEdit.setTextColor(editTextColor)
+            binding.confirmPasswordEdit.isSelected = false
+            binding.newPasswordEdit.isSelected = false
+            binding.changePasswordErrorMessage.visibility = GONE
         }
         return true
     }
@@ -84,10 +97,10 @@ class ChangePasswordFragment : BaseFragment() {
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        binding.updatePasswordBtn.isEnabled = false
-        binding.confirmPasswordEt.text.clear()
-        binding.newPasswordEt.text.clear()
-        binding.oldPasswordEt.text.clear()
+        binding.updatePasswordButton.isEnabled = false
+        binding.confirmPasswordEdit.text.clear()
+        binding.newPasswordEdit.text.clear()
+        binding.oldPasswordEdit.text.clear()
     }
 
     override fun onDestroyView() {

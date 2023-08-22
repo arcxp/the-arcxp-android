@@ -48,20 +48,16 @@ class WebSectionFragment : BaseSectionFragment() {
             binding.webView.reload()
             binding.webView.postDelayed({ binding.pullToRefreshView.isRefreshing = false }, 10_000)
         }
-        onWebViewReady(binding.root, binding.webView)
-        return binding.root
-    }
-
-    private fun onWebViewReady(view: View, webView: WebView) {
         binding.webView.webChromeClient = createWebChromeClient()
         binding.webView.webViewClient = WebViewClient()
         binding.webView.settings.javaScriptEnabled = true
         binding.webView.settings.allowContentAccess = true
-        binding.webView.settings.setAppCacheEnabled(true)
         binding.webView.settings.domStorageEnabled = true
         binding.webView.settings.loadWithOverviewMode = true
         binding.webView.settings.useWideViewPort = true
         binding.webView.loadUrl(getUrl())
+
+        return binding.root
     }
 
     private fun createWebChromeClient(): WebChromeClient {
@@ -74,7 +70,13 @@ class WebSectionFragment : BaseSectionFragment() {
 
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
                 super.onProgressChanged(view, newProgress)
-                onProgressChanged(newProgress)
+                binding.progressBar.progress = newProgress
+                if (newProgress == 100) {
+                    binding.progressBar.visibility = View.GONE
+                    binding.pullToRefreshView.isRefreshing = false
+                } else {
+                    binding.progressBar.visibility = View.VISIBLE
+                }
             }
 
             override fun onShowCustomView(view: View, callback: CustomViewCallback) {
@@ -107,17 +109,8 @@ class WebSectionFragment : BaseSectionFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.webView.destroy()
         _binding = null
-    }
-
-    fun onProgressChanged(newProgress: Int) {
-        binding.progressBar.progress = newProgress
-        if (newProgress == 100) {
-            binding.progressBar.visibility = View.GONE
-            binding.pullToRefreshView.isRefreshing = false
-        } else {
-            binding.progressBar.visibility = View.VISIBLE
-        }
     }
 
     companion object {

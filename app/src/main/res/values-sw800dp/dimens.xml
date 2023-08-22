@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="top_section_image_height">440dp</dimen>
+    <integer name="article_video_height">750</integer>
+
+    <dimen name="section_hero_text_size">32sp</dimen>
+    <dimen name="section_hero_description_text_size">26sp</dimen>
+    <dimen name="section_credits_hero_text_size">18sp</dimen>
+
+    <dimen name="section_text_size">24sp</dimen>
+    <dimen name="section_description_text_size">20sp</dimen>
+    <dimen name="section_credits_text_size">16sp</dimen>
+
+    <dimen name="section_thumbnail_height">150dp</dimen>
+
+    <dimen name="padding_small">10dp</dimen>
+    <dimen name="padding_large">20dp</dimen>
+    <dimen name="padding_xlarge">30dp</dimen>
+
+    <dimen name="space_xsmall">8dp</dimen>
+    <dimen name="space_small">16dp</dimen>
+    <dimen name="space">20dp</dimen>
+    <dimen name="space_medium">24dp</dimen>
+    <dimen name="space_large">30dp</dimen>
+    <dimen name="space_larger">40dp</dimen>
+    <dimen name="space_xlarge">70dp</dimen>
+
+    <dimen name="change_password_title_text_size">32sp</dimen>
+
+    <dimen name="text_size_xlarge">40sp</dimen>
+    <dimen name="text_size_large">35sp</dimen>
+    <dimen name="text_size">24sp</dimen>
+    <dimen name="text_size_small">20sp</dimen>
+    <dimen name="text_size_extra_small">16sp</dimen>
+
+
+    <item name="item_layout_guideline_percentage" format="float" type="dimen">0.75</item>
+</resources>

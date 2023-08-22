@@ -8,17 +8,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.arcxp.content.sdk.models.ArcXPCollection
+import com.arcxp.content.sdk.extendedModels.ArcXPCollection
 import com.arcxp.content.sdk.models.ArcXPContentError
 import com.arcxp.content.sdk.models.ArcXPSection
 import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentSectionBinding
-import com.arcxp.thearcxp.utils.RecyclerAdapter
-import com.arcxp.thearcxp.utils.getNameToUseFromSection
-import com.arcxp.thearcxp.utils.imageUrl
-import com.arcxp.thearcxp.utils.spinner
+import com.arcxp.thearcxp.utils.*
 
 
 class SectionFragment : BaseSectionFragment() {
@@ -27,12 +24,7 @@ class SectionFragment : BaseSectionFragment() {
     private val binding get() = _binding!!
     private var sectionName: String? = null
     private var path: String? = null
-    private val titles = mutableMapOf<Int, String>()
-    private val details = mutableMapOf<Int, String>()
-    private val images = mutableMapOf<Int, String>()
-    private val ids = mutableMapOf<Int, String>()
-    private val authors = mutableMapOf<Int, String>()
-    private val dates = mutableMapOf<Int, String>()
+    private val items = mutableMapOf<Int, ArcXPCollection>()
 
     private var canRequestNextPagination = true
     private var lastLoaded = 0
@@ -62,9 +54,9 @@ class SectionFragment : BaseSectionFragment() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (canRequestNextPagination) {
-                    if ((binding.recycler.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition() == ids.size - 1) {
+                    if ((binding.recycler.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition() == items.size - 1) {
                         loadData()
-                        Toast.makeText(requireContext(), "Loading more stories", Toast.LENGTH_SHORT)
+                        Toast.makeText(requireContext(), getString(R.string.pagination_toast_message_section_list), Toast.LENGTH_SHORT)
                             .show()
                     }
                 }
@@ -122,37 +114,16 @@ class SectionFragment : BaseSectionFragment() {
 
     private fun addToMap(
         index: Int,
-        id: String,
-        title: String,
-        description: String,
-        image: String,
-        author: String,
-        date: String
+        collection: ArcXPCollection
     ) {
-        ids[index] = id
-        titles[index] = title
-        details[index] = description
-        images[index] = image
-        authors[index] = author
-        dates[index] = date
+        items[index] = collection
     }
 
     private fun onGetCollectionSuccess(response: Map<Int, ArcXPCollection>) {
         response.forEach {
-            val date = it.value.publishedDate?.toLocaleString()?.split(":")
             addToMap(
                 index = it.key,
-                id = it.value.id,
-                title = it.value.headlines.basic ?: "",
-                description = it.value.description?.basic ?: "",
-                image = it.value.imageUrl(),
-                author = if (it.value.credits?.by.isNullOrEmpty()) {
-                    ""
-                } else {
-                    "By ${it.value.credits?.by!![0].name}"
-                },
-                date = date?.let { ourDate -> ourDate[0].slice(0..ourDate[0].length - 3) }
-                    ?: ""
+                collection = it.value
             )
         }
 
@@ -166,13 +137,8 @@ class SectionFragment : BaseSectionFragment() {
     private fun initializeAdapter() {
         binding.recycler.recycledViewPool.setMaxRecycledViews(1, 0)
         binding.recycler.layoutManager = LinearLayoutManager(requireContext())
-        binding.recycler.adapter = RecyclerAdapter(
-            ids = ids,
-            titles = titles,
-            details = details,
-            images = images,
-            authors = authors,
-            dates = dates,
+        binding.recycler.adapter = SectionRecyclerAdapter(
+            items = items,
             vm = vm
         )
     }

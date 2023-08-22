@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="top_section_image_height">180dp</dimen>
+    <integer name="article_video_height">580</integer>
+
+    <dimen name="section_hero_text_size">16sp</dimen>
+    <dimen name="section_hero_description_text_size">14sp</dimen>
+    <dimen name="section_credits_hero_text_size">11sp</dimen>
+
+    <dimen name="section_text_size">12sp</dimen>
+    <dimen name="section_description_text_size">11sp</dimen>
+    <dimen name="section_credits_text_size">11sp</dimen>
+
+    <dimen name="section_thumbnail_height">100dp</dimen>
+
+    <dimen name="padding_small">10dp</dimen>
+    <dimen name="padding_large">15dp</dimen>
+    <dimen name="padding_xlarge">30dp</dimen>
+</resources>

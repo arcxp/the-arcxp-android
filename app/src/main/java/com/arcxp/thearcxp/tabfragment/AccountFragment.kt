@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import com.arc.arcvideo.ArcXPVideoSDK
 import com.arcxp.commerce.ArcXPCommerceSDK
 import com.arcxp.commerce.apimanagers.ArcXPIdentityListener
-import com.arcxp.commerce.models.ArcXPProfileManage
+import com.arcxp.commerce.extendedModels.ArcXPProfileManage
 import com.arcxp.commerce.util.ArcXPError
 import com.arcxp.content.sdk.ArcXPContentSDK
 import com.arcxp.content.sdk.models.ArcXPContentError
@@ -58,15 +58,15 @@ class AccountFragment : BaseFragment() {
                 if (ArcXPCommerceSDK.commerceManager().sessionIsActive()) {
                     vm.logout(object : ArcXPIdentityListener() {
                         override fun onLogoutSuccess() {
-                            binding.usernameTv.visibility = GONE
-                            binding.loginTv.text = "Login"
-                            binding.createAccountTv.text = "Create Account"
+                            binding.userName.visibility = GONE
+                            binding.loginText.text = getString(R.string.login)
+                            binding.createAccountText.text = getString(R.string.create_account)
                         }
 
                         override fun onLogoutError(error: ArcXPError) {
                             requireActivity().showErrorDialog(
-                                error.type?.name!!,
-                                error.localizedMessage
+                                title = error.type?.name ?: getString(R.string.error),
+                                message = error.localizedMessage
                             )
                         }
                     })
@@ -121,13 +121,13 @@ class AccountFragment : BaseFragment() {
             openFragment(
                 WebSectionFragment().withUrlAndName(
                     getString(R.string.pp_url),
-                    "Privacy Policy"
+                    getString(R.string.privacy_policy)
                 ), getString(R.string.web_section)
             )
         }
     }
 
-    private fun getUserData(){
+    private fun getUserData() {
         vm.getUserProfile(object : ArcXPIdentityListener() {
             override fun onFetchProfileSuccess(profileResponse: ArcXPProfileManage) {
                 showProfile(profileResponse)
@@ -135,18 +135,19 @@ class AccountFragment : BaseFragment() {
 
             override fun onProfileError(error: ArcXPError) {
                 requireActivity().showErrorDialog(
-                    error.type?.name!!,
-                    error.localizedMessage
+                    title = error.type?.name ?: getString(R.string.error),
+                    message = error.localizedMessage
                 )
             }
         })
     }
-    
+
     private fun showProfile(arcXPProfileManage: ArcXPProfileManage) {
-        binding.loginTv.text = "Logout"
-        binding.createAccountTv.text = "Change Password"
-        binding.usernameTv.text = "${arcXPProfileManage.firstName} ${arcXPProfileManage.lastName}"
-        binding.usernameTv.visibility = VISIBLE
+        binding.loginText.text = getString(R.string.logout)
+        binding.createAccountText.text = getString(R.string.change_password)
+        binding.userName.text =
+            getString(R.string.user_name, arcXPProfileManage.firstName, arcXPProfileManage.lastName)
+        binding.userName.visibility = VISIBLE
     }
 
     private fun onError(error: ArcXPContentError) {

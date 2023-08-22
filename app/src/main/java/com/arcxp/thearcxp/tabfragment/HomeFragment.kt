@@ -63,7 +63,7 @@ class HomeFragment : BaseFragment() {
         )
     }
 
-    private inner class SectionsAdapter() :
+    private inner class SectionsAdapter :
         FragmentPagerAdapter(childFragmentManager) {
         override fun getPageTitle(position: Int): CharSequence {
             return vm.sectionsIndexMap[position].toString()

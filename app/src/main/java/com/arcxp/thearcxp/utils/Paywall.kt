@@ -29,8 +29,8 @@ class Paywall : DialogFragment() {
             val inflater = requireActivity().layoutInflater
             val paywallView = inflater.inflate(R.layout.fragment_paywall, null)
             val subscribe = paywallView.findViewById<Button>(R.id.subscribe_btn)
-            val signIn = paywallView.findViewById<TextView>(R.id.sign_in)
-            val exit = paywallView.findViewById<ImageView>(R.id.exit)
+            val signIn = paywallView.findViewById<TextView>(R.id.paywall_sign_in_button)
+            val exit = paywallView.findViewById<ImageView>(R.id.exit_button)
             bottomSheetDialog.setContentView(paywallView)
             bottomSheetDialog.setCanceledOnTouchOutside(false)
             exit.setOnClickListener {

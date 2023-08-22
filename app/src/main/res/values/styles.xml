@@ -1,5 +1,14 @@
 <resources>
 
+    <style name="AppTitleTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/old_english_five</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_width">@dimen/app_title_text_view_width</item>
+        <item name="android:layout_height">?android:attr/actionBarSize</item>
+        <item name="android:textColor">@color/app_title_color</item>
+        <item name="android:textSize">@dimen/text_size</item>
+    </style>
+
     <style name="Widget.TheArcXP.AppWidget.Container" parent="android:Widget">
         <item name="android:id">@android:id/background</item>
         <item name="android:background">?android:attr/colorBackground</item>
@@ -8,5 +17,391 @@
     <style name="Widget.TheArcXP.AppWidget.InnerView" parent="android:Widget">
         <item name="android:background">?android:attr/colorBackground</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="SplashScreenText">
+        <item name="android:text">@string/app_name</item>
+        <item name="android:textSize">@dimen/text_size_xlarge</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:fontFamily">@font/old_english_five</item>
+        <item name="android:textColor">@color/splash_screen_text</item>
+    </style>
+
+    <style name="TabStyle" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">15sp</item>
+        <item name="tabTextColor">@color/text_menu</item>
+        <item name="android:typeface">serif</item>
+        <item name="tabBackground">@android:attr/selectableItemBackground</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TabLayout" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">@color/white</item>
+        <item name="tabIndicatorHeight">0dp</item>
+        <item name="tabPaddingStart">12dp</item>
+        <item name="tabPaddingEnd">12dp</item>
+        <item name="tabTextColor">@color/text_menu</item>
+        <item name="tabBackground">?attr/selectableItemBackground</item>
+        <item name="tabTextAppearance">@style/TabStyle</item>
+        <item name="tabSelectedTextColor">?android:textColorPrimary</item>
+    </style>
+
+    <style name="MenuItemStyle" parent="AppTextViewStyle">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textColor">@color/text_menu</item>
+    </style>
+
+    <style name="AppEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/rounded_rectangle</item>
+        <item name="android:textColor">@color/edit_text</item>
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:textColorHint">@color/edit_text_hint</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:padding">@dimen/space_small</item>
+        <item name="android:minHeight">@dimen/minimum_clickable_height</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="SignUpLastNameEditText" parent="AppEditTextStyle">
+        <item name="android:layout_marginTop">@dimen/space</item>
+    </style>
+
+    <style name="ForgotPasswordEditText" parent="AppEditTextStyle">
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <style name="ForgotPasswordText" parent="AppTextViewStyle">
+        <item name="android:padding">0dp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="AppTextViewStyle">
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">sans-serif-light</item>
+    </style>
+    <style name="TextViewWidget" parent="AppTextViewStyle">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:padding">@dimen/space_xsmall</item>
+    </style>
+
+    <style name="TextViewAccount" parent="AppTextViewStyle">
+        <item name="android:padding">0dp</item>
+        <item name="android:layout_marginStart">@dimen/space_small</item>
+        <item name="android:layout_alignParentStart">true</item>
+    </style>
+
+    <style name="AccountArrow">
+        <item name="android:layout_marginEnd">@dimen/space_small</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:src">@drawable/ic_chevron_right_24</item>
+    </style>
+
+    <style name="SignInEditText" parent="AppEditTextStyle">
+        <item name="android:background">@drawable/error_outline_edit_text</item>
+        <item name="android:layout_margin">10dp</item>
+    </style>
+
+    <style name="SignInText" parent="AppTextViewStyle">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minHeight">@dimen/minimum_clickable_height</item>
+    </style>
+
+    <style name="TermsTextView" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:layout_marginStart">20dp</item>
+        <item name="android:layout_marginEnd">20dp</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="VideoTitle" parent="AppTextViewStyle">
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginEnd">20dp</item>
+        <item name="android:paddingTop">0dp</item>
+    </style>
+
+    <style name="AccountSubsections" parent="AppTextViewStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/space_large</item>
+        <item name="android:layout_marginTop">@dimen/space_small</item>
+        <item name="android:textSize">@dimen/text_size_small</item>
+    </style>
+
+    <style name="AccountSections" parent="AppTextViewStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/space_small</item>
+        <item name="android:layout_marginTop">@dimen/space_small</item>
+        <item name="android:gravity">start</item>
+        <item name="android:textColor">@color/primaryAccent</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <style name="VideoSubtext" parent="AppTextViewStyle">
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:paddingStart">5dp</item>
+        <item name="android:paddingEnd">5dp</item>
+    </style>
+
+    <style name="VideoDescription" parent="AppTextViewStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:maxLines">3</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:layout_marginEnd">5dp</item>
+        <item name="android:minHeight">70dp</item>
+    </style>
+
+
+    <style name="VideoPlayIcon">
+        <item name="android:layout_height">@dimen/icon_height</item>
+        <item name="android:layout_width">@dimen/icon_width</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:src">@android:drawable/ic_media_play</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="VideoPlayIconLarge" parent="VideoPlayIcon">
+        <item name="android:layout_height">@dimen/icon_height_large</item>
+        <item name="android:layout_width">@dimen/icon_width_large</item>
+    </style>
+
+    <style name="Button" parent="AppTextViewStyle">
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:gravity">center</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:drawablePadding">@dimen/space_small</item>
+        <item name="android:background">@drawable/rounded_rectangle_db</item>
+        <item name="android:minHeight">@dimen/minimum_clickable_height</item>
+    </style>
+    <style name="ButtonCreateAccount" parent="Button">
+        <item name="android:paddingTop">@dimen/space_small</item>
+        <item name="android:paddingBottom">@dimen/space_small</item>
+        <item name="android:layout_marginTop">@dimen/space</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:gravity">start</item>
+    </style>
+
+    <style name="ButtonIcon">
+        <item name="android:layout_width">@dimen/button_icon_size</item>
+        <item name="android:layout_height">@dimen/button_icon_size</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_marginStart">@dimen/space</item>
+    </style>
+    <style name="ButtonCreateAccountText" parent="AppTextViewStyle">
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:layout_marginStart">@dimen/space_medium</item>
+    </style>
+    <style name="ButtonCreateAccountTextGoogle" parent="ButtonCreateAccountText">
+        <item name="android:textColor">@color/google_sign_in_button_text</item>
+    </style>
+
+    <style name="FacebookSignInButton" parent="Button">
+        <item name="android:textAlignment">textStart</item>
+        <item name="android:layout_marginTop">@dimen/space_small</item>
+        <item name="android:textSize">@dimen/text_size_small</item>
+    </style>
+
+    <style name="GoogleSignInButton" parent="Button">
+        <item name="android:textAlignment">textStart</item>
+        <item name="android:layout_marginTop">@dimen/space_small</item>
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textColor">@color/button_text_dark</item>.
+    </style>
+    <style name="GoogleSignUpButton" parent="GoogleSignInButton">
+        <item name="android:gravity">start</item>
+        <item name="android:background">@drawable/rounded_rectangle_gl</item>
+        <item name="android:layout_marginTop">@dimen/space</item>
+        <item name="android:paddingTop">@dimen/space_small</item>
+        <item name="android:paddingBottom">@dimen/space_small</item>
+    </style>
+
+    <style name="SignInErrorText">
+        <item name="android:layout_marginTop">@dimen/space</item>
+        <item name="android:textColor">@color/error</item>
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="HaveAccountLayout">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginStart">20dp</item>
+        <item name="android:layout_marginEnd">20dp</item>
+    </style>
+
+    <style name="SectionTitle" parent="AppTextViewStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingTop">@dimen/item_layout_padding</item>
+        <item name="android:paddingBottom">@dimen/item_layout_padding</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/section_text_size</item>
+        <item name="android:textColor">@color/section_text_color</item>
+    </style>
+
+    <style name="SectionThumbnail">
+        <item name="android:layout_height">@dimen/section_thumbnail_height</item>
+        <item name="marginHorizontal">@dimen/item_layout_card_margin</item>
+        <item name="android:paddingTop">@dimen/padding_small</item>
+        <item name="android:paddingBottom">@dimen/padding_small</item>
+    </style>
+
+    <style name="SectionDescription" parent="AppTextViewStyle">
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">3</item>
+        <item name="android:paddingTop">@dimen/padding_small</item>
+        <item name="android:paddingBottom">@dimen/padding_small</item>
+        <item name="android:textColor">@color/section_summary_color</item>
+        <item name="android:textSize">@dimen/section_description_text_size</item>
+    </style>
+
+    <style name="SectionCredits" parent="AppTextViewStyle">
+        <item name="android:textColor">@color/section_credits_color</item>
+        <item name="android:textSize">@dimen/section_description_text_size</item>
+        <item name="android:paddingTop">@dimen/item_layout_padding</item>
+        <item name="android:paddingBottom">@dimen/item_layout_padding</item>
+    </style>
+
+    <style name="SectionCreditsBullet" parent="SectionCredits">
+        <item name="android:paddingStart">@dimen/padding_small</item>
+        <item name="android:paddingEnd">@dimen/padding_small</item>
+        <item name="android:text">@string/bullet</item>
+    </style>
+
+    <style name="Divider">
+        <item name="android:background">?android:attr/listDivider</item>
+        <item name="android:backgroundTint">@color/section_divider_color</item>
+        <item name="android:layout_height">@dimen/section_divider_size</item>
+    </style>
+
+    <style name="HeroCardView">
+        <item name="android:layout_margin">@dimen/item_layout_card_margin</item>
+        <item name="cardBackgroundColor">@color/background</item>
+        <item name="cardElevation">0dp</item>
+    </style>
+
+    <style name="HeroImage">
+        <item name="android:layout_height">@dimen/top_section_image_height</item>
+        <item name="android:layout_gravity">end</item>
+        <item name="android:paddingTop">@dimen/top_section_padding</item>
+        <item name="android:src">@mipmap/ic_launcher_round</item>
+    </style>
+
+    <style name="HeroTitle" parent="AppTextViewStyle">
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:textColor">@color/section_text_color</item>
+        <item name="android:paddingTop">@dimen/padding_small</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/section_hero_text_size</item>
+    </style>
+
+    <style name="HeroDescription" parent="AppTextViewStyle">
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:textColor">@color/section_summary_color</item>
+        <item name="android:paddingTop">@dimen/padding_small</item>
+        <item name="android:paddingBottom">@dimen/padding_small</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/section_hero_description_text_size</item>
+    </style>
+
+    <style name="HeroCredits" parent="AppTextViewStyle">
+        <item name="android:textColor">@color/section_credits_color</item>
+        <item name="android:textSize">@dimen/section_credits_hero_text_size</item>
+    </style>
+
+    <style name="HeroBullet" parent="HeroCredits">
+        <item name="android:paddingStart">@dimen/padding_small</item>
+        <item name="android:paddingEnd">@dimen/padding_small</item>
+        <item name="android:text">@string/bullet</item>
+    </style>
+
+    <style name="AppBarBackButton">
+        <item name="android:padding">10dp</item>
+        <item name="android:layout_marginStart">5dp</item>
+    </style>
+
+    <style name="AppBarShareButton">
+        <item name="android:layout_marginEnd">15dp</item>
+    </style>
+
+    <style name="ArticleTitleText" parent="AppTextViewStyle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">@dimen/article_title_text_size</item>
+    </style>
+
+    <style name="ArticleSubTitleText" parent="AppTextViewStyle">
+        <item name="android:textColor">@color/text_muted</item>
+        <item name="android:textSize">@dimen/article_subtitle_text_size</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="ArticleTopImage">
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+
+    <style name="ArticleAuthorText" parent="AppTextViewStyle">
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:textSize">@dimen/article_credits_text_size</item>
+    </style>
+
+    <style name="ArticleBodyText" parent="AppTextViewStyle">
+        <item name="android:textColor">@color/text_muted</item>
+        <item name="android:textSize">@dimen/article_body_text_size</item>
+    </style>
+
+    <style name="ArticleDate" parent="AppTextViewStyle">
+        <item name="android:textColor">@color/text_muted</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:textSize">@dimen/article_credits_text_size</item>
+    </style>
+
+    <style name="Title" parent="AppTextViewStyle">
+        <item name="android:paddingBottom">@dimen/padding_small</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">@dimen/text_size_large</item>
+    </style>
+
+    <style name="ChangePasswordTitle" parent="Title">
+        <item name="android:paddingBottom">@dimen/padding_large</item>
     </style>
 </resources>
