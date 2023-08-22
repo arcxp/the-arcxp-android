@@ -76,10 +76,9 @@ class ForgotPasswordFragment : BaseFragment() {
 
     private fun onError(error: ArcXPContentError) {
         showSnackBar(
-            ArcXPContentError(error.type!!, error.localizedMessage),
-            binding.root,
-            R.id.loginCL,
-            true
+            error = error,
+            view = binding.root,
+            viewId = R.id.loginCL
         )
     }
 

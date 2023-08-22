@@ -84,5 +84,12 @@
     <string name="share_message">Share not implemented yet</string>
     <string name="video_load_error">Could not load video.</string>
     <string name="device_type">mobile</string>
+    <string name="glide_manager">com.bumptech.glide.manager</string>
+    <string name="bullet">●</string>
+    <string name="no_title">No title</string>
+    <string name="loading_results">Loading results</string>
+
+    <string name="configure">Configure Widget</string>
+    <string name="app_widget_description">Widget for ArcXP</string>
 
 </resources>

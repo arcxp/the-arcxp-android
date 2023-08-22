@@ -1,39 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="2dp"
-    android:padding="10dp"
+    android:padding="@dimen/item_layout_padding_large"
     android:background="@color/white">
 
     <FrameLayout
         android:id="@+id/iv_imageView"
         android:layout_height="@dimen/video_item_image_height"
         android:layout_width="@dimen/video_item_image_width"
-        android:scaleType="fitCenter"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="10dp">
+        android:paddingBottom="@dimen/item_layout_padding"
+        android:layout_marginEnd="@dimen/item_layout_padding_large"
+        android:layout_marginTop="@dimen/item_layout_padding_large">
 
         <ImageView
             android:id="@+id/videoImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="10dp"
-            android:scaleType="centerCrop"
+            android:layout_marginEnd="@dimen/item_layout_padding_large"
             android:src="@mipmap/ic_launcher_round" />
 
         <ImageView
             android:id="@+id/play_icon"
-            android:layout_height="40dp"
-            android:layout_width="40dp"
+            android:layout_height="@dimen/icon_height"
+            android:layout_width="@dimen/icon_width"
             android:layout_gravity="center"
+            android:visibility="invisible"
             android:src="@android:drawable/ic_media_play" />
     </FrameLayout>
 
@@ -42,35 +39,26 @@
         style="@style/VideoTitle"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
         android:layout_toStartOf="@id/iv_imageView"
-        android:paddingTop="0dp"
         tools:text="Main Title" />
 
     <TextView
         android:id="@+id/author"
         style="@style/VideoSubtext"
         android:layout_below="@id/title"
-        android:layout_marginStart="10dp"
-        android:layout_marginBottom="10dp"
         tools:text="By author" />
 
     <TextView
         android:id="@+id/bullet"
         style="@style/VideoSubtext"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
         android:layout_below="@id/title"
-        android:layout_marginBottom="10dp"
         android:layout_toEndOf="@id/author"
-        android:text="●" />
+        android:text="@string/bullet" />
 
     <TextView
         android:id="@+id/date"
         style="@style/VideoSubtext"
         android:layout_below="@id/title"
-        android:layout_marginBottom="10dp"
         android:layout_toEndOf="@id/bullet"
         tools:text="Published At" />
 

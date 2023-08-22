@@ -1,24 +1,30 @@
 package com.arcxp.thearcxp.tabfragment
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.arcxp.content.sdk.models.ArcXPCollection
 import com.arcxp.content.sdk.models.ArcXPContentError
-import com.arcxp.content.sdk.models.ArcXPContentSDKErrorType
 import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
-import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentVideoBinding
 import com.arcxp.thearcxp.databinding.VideoFirstItemLayoutBinding
 import com.arcxp.thearcxp.databinding.VideoItemLayoutBinding
+import com.arcxp.thearcxp.utils.imageUrl
 import com.arcxp.thearcxp.utils.spinner
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 
 private const val FIRST_ITEM = 0
 private const val NOT_FIRST_ITEM = 1
@@ -73,12 +79,11 @@ class VideoFragment : BaseFragment() {
 
     private fun onError(error: ArcXPContentError) {
         //to ignore inevitable empty list error at end of collections
-        if (error.localizedMessage.toString() != getString(R.string.empty_collection)) {
+        if (error.message != getString(R.string.empty_collection)) {
             showSnackBar(
-                ArcXPContentError(error.type!!, error.localizedMessage),
-                binding.videoViewFragment,
-                R.id.video_view_fragment,
-                true
+                error = error,
+                view = binding.videoViewFragment,
+                viewId = R.id.video_view_fragment
             )
         } else {
             canRequestNextPagination = false
@@ -91,10 +96,10 @@ class VideoFragment : BaseFragment() {
 
         binding.recycler.adapter?.notifyItemRangeChanged(
             lastLoaded + 1,
-            response.keys.last()
+            response.keys.size
         )
         lastLoaded = response.keys.last()
-        binding.spin.visibility = View.GONE
+        binding.spin.visibility = GONE
     }
 
 
@@ -110,13 +115,13 @@ class VideoFragment : BaseFragment() {
                     onGetVideosSuccess(response = it.success)
                 }
                 is Failure -> {
-                    onError(it.failure)
+                    onError(error = it.failure)
                 }
             }
         }
     }
 
-    inner class VideoRecyclerAdapter(val items: Map<Int, ArcXPCollection>) :
+    inner class VideoRecyclerAdapter(private val items: Map<Int, ArcXPCollection>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         inner class FirstViewHolder(val binding: VideoFirstItemLayoutBinding) :
@@ -134,12 +139,35 @@ class VideoFragment : BaseFragment() {
                 binding.title1.text = title
                 binding.author.text = author
                 binding.date.text = date
+                binding.playIcon.visibility = GONE
                 Glide.with(itemView.context).load(image)
-                    .error(requireContext().resources.getDrawable(R.mipmap.ic_launcher)).fitCenter()
+                    .error(R.drawable.ic_baseline_error_24_black)
+//                    .placeholder(spinner(itemView.context)) //TODO this is making hero image not visible
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            binding.playIcon.visibility = VISIBLE
+                            return false
+                        }
+
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ) = false
+
+                    })
+                    .fitCenter()
                     .into(binding.ivImageView1)
                 if (author == null || author.isNullOrBlank()) {
-                    binding.author.visibility = View.GONE
-                    binding.bullet.visibility = View.GONE
+                    binding.author.visibility = GONE
+                    binding.bullet.visibility = GONE
                 }
             }
         }
@@ -157,14 +185,37 @@ class VideoFragment : BaseFragment() {
             ) {
                 itemId = id
                 binding.title.text = title
+                binding.playIcon.visibility = GONE
                 Glide.with(itemView.context).load(image)
-                    .error(requireContext().resources.getDrawable(R.mipmap.ic_launcher)).fitCenter()
+                    .error(R.drawable.ic_baseline_error_24_black)
+                    .placeholder(spinner(requireContext()))
+                    .fitCenter()
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            binding.playIcon.visibility = VISIBLE
+                            return false
+                        }
+
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ) = false
+                    })
                     .into(binding.videoImage)
+
                 binding.author.text = author
                 binding.date.text = date
                 if (author == null || author.isNullOrBlank()) {
-                    binding.author.visibility = View.GONE
-                    binding.bullet.visibility = View.GONE
+                    binding.author.visibility = GONE
+                    binding.bullet.visibility = GONE
                 }
             }
         }
@@ -191,41 +242,32 @@ class VideoFragment : BaseFragment() {
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             val item = items[position]
-            val author = if (item!!.credits?.by == null || item.credits?.by?.isEmpty() == true) {
-                ""
-            } else {
-                "By ${item.credits?.by!![0].name.toString()}"
-            }
-            val datestr = item.publishedDate!!.toLocaleString().split(":")
-            val date = datestr[0].slice(0..datestr[0].length - 3)
-            if (getItemViewType(position) == FIRST_ITEM) {
-                (holder as FirstViewHolder).bind(
-                    item.id,
-                    item.headlines.basic ?: "",
-                    item.promoItem?.basic?.url ?: "",
-                    author,
-                    date
-                )
-            } else {
-                (holder as RemainingViewHolder).bind(
-                    item.id,
-                    item.headlines.basic ?: "",
-                    item.promoItem?.basic?.url ?: "",
-                    author,
-                    date
-                )
-            }
-            holder.itemView.setOnClickListener {
-                val videoId = item.id
-
-                if (videoId != null) {
-                    (activity as MainActivity).openVideo(videoId)
-                } else onError(
-                    ArcXPContentError(
-                        ArcXPContentSDKErrorType.INIT_ERROR,
-                        getString(R.string.video_id_not_found)
+            item?.let {
+                val author = if (it.credits?.by?.isNotEmpty() == true)
+                    "By ${it.credits!!.by!![0].name}" else ""
+                val dateString = it.publishedDate?.toLocaleString()?.split(":")
+                val date = if (dateString?.isNotEmpty() == true)
+                    dateString[0].slice(0..dateString[0].length - 3) else ""
+                if (getItemViewType(position) == FIRST_ITEM) {
+                    (holder as FirstViewHolder).bind(
+                        id = it.id,
+                        title = it.headlines.basic ?: "",
+                        image = it.imageUrl(),
+                        author = author,
+                        date = date
                     )
-                )
+                } else {
+                    (holder as RemainingViewHolder).bind(
+                        id = it.id,
+                        title = it.headlines.basic ?: "",
+                        image = it.imageUrl(),
+                        author = author,
+                        date = date
+                    )
+                }
+                holder.itemView.setOnClickListener {
+                    vm.openVideo(id = item.id)
+                }
             }
         }
 

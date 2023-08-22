@@ -151,10 +151,9 @@ class AccountFragment : BaseFragment() {
 
     private fun onError(error: ArcXPContentError) {
         showSnackBar(
-            ArcXPContentError(error.type!!, error.localizedMessage),
-            binding.root,
-            R.id.account_frag,
-            true
+            error = error,
+            view = binding.root,
+            viewId = R.id.account_frag
         )
     }
 

@@ -164,10 +164,9 @@ class LoginFragment : BaseFragment() {
 
     private fun onError(error: ArcXPContentError) {
         showSnackBar(
-            ArcXPContentError(error.type!!, error.localizedMessage),
-            binding.loginFragment,
-            R.id.loginCL,
-            true
+            error = error,
+            view = binding.loginFragment,
+            viewId = R.id.loginCL
         )
     }
 

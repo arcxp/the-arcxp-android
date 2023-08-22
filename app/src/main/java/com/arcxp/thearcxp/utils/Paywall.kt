@@ -9,7 +9,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
-import com.arcxp.thearcxp.account.CreateAccountFragment
 import com.arcxp.thearcxp.viewmodel.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
@@ -21,8 +20,7 @@ class Paywall : DialogFragment() {
 
     //Listener to indicate if the dialog was cancelled or if the registration process
     //was invoked.  This way the calling fragment can know how to respond.
-    var cancelListener: OnPaywallCancelledListener? = null
-    var cancel = true
+    private var paywallListener: PaywallListener? = null
     private val vm: MainViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): BottomSheetDialog {
@@ -36,24 +34,19 @@ class Paywall : DialogFragment() {
             bottomSheetDialog.setContentView(paywallView)
             bottomSheetDialog.setCanceledOnTouchOutside(false)
             exit.setOnClickListener {
-                cancel = false
                 vm.disposeVideoPlayer()
                 dismiss()
             }
             subscribe.setOnClickListener {
-                cancel = false
                 dismiss()
                 //triggerPaywall
-                (activity as MainActivity).openFragment(
-                    CreateAccountFragment(), true,
-                    tag = getString(R.string.create_account)
-                )
+                (requireActivity() as MainActivity).navigateToCreateAccount()
             }
             signIn.setOnClickListener {
-                cancel = false
                 dismiss()
                 (requireActivity() as MainActivity).navigateToSignIn()
             }
+            paywallListener?.onPaywallShow()
             bottomSheetDialog
         } ?: throw IllegalStateException("Activity cannot be null")
     }
@@ -61,18 +54,16 @@ class Paywall : DialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        if (cancelListener != null && cancel) {
-            cancelListener?.onPaywallCancel()
-        }
-        requireFragmentManager().popBackStack()
+        paywallListener?.onPaywallCancel()
+        parentFragmentManager.popBackStack()
     }
 
-    fun setOnPaywallCancelledListener(listener: OnPaywallCancelledListener) {
-        cancelListener = listener
+    fun setOnPaywallCancelledListener(listener: PaywallListener) {
+        paywallListener = listener
     }
 
-    interface OnPaywallCancelledListener {
+    interface PaywallListener {
+        fun onPaywallShow()
         fun onPaywallCancel()
     }
-
 }

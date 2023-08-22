@@ -24,6 +24,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.arcxp.content.sdk.models.ArcXPSection
 import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
+import com.arcxp.thearcxp.ArcXPWidget.Companion.WIDGET_ARTICLE_ID_KEY
+import com.arcxp.thearcxp.account.CreateAccountFragment
 import com.arcxp.thearcxp.databinding.ActivityMainBinding
 import com.arcxp.thearcxp.tabfragment.*
 import com.arcxp.thearcxp.utils.AnsTypes
@@ -39,13 +41,12 @@ import com.google.android.material.navigation.NavigationView
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
-
     private lateinit var drawer: DrawerLayout
     private lateinit var toolbar: Toolbar
 
     private lateinit var navigationView: NavigationView
 
-    lateinit var vm: MainViewModel
+    private lateinit var vm: MainViewModel
 
     private var isFragmentTransactionSafe = true
 
@@ -105,7 +106,7 @@ class MainActivity : AppCompatActivity() {
             when (it) {
                 is Success -> setupDrawer(it.success)
                 is Failure -> {
-                    //TODO section list error?
+                    //error message handled by home fragment
                 }
             }
 
@@ -116,12 +117,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         vm.getSectionList(this)
+        vm.openArticleEvent.observe(this, this::openArticle)
+        vm.openVideoEvent.observe(this, this::openVideo)
+        vm.sensorLockEvent.observe(this, this::sensorLock)
 
         supportFragmentManager.addOnBackStackChangedListener {
             checkFragments()
         }
 
         init()
+
+        // if opening from the widget
+        openArticleFromWidget()
     }
 
     private fun returnToViewFromPaywall(item: Pair<String, String>) {
@@ -176,7 +183,7 @@ class MainActivity : AppCompatActivity() {
             VIDEO -> setCurrentFragment(VideoFragment(), VIDEO)
             ACCOUNT -> setCurrentFragment(AccountFragment(), ACCOUNT)
         }
-        binding.bottomNavigationView.setOnNavigationItemSelectedListener {
+        binding.bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> setCurrentFragment(HomeFragment(), HOME)
                 R.id.video -> setCurrentFragment(VideoFragment(), VIDEO)
@@ -210,7 +217,6 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.login),
             getString(R.string.create_account),
             getString(R.string.forgot_password),
-            getString(R.string.paywall),
             getString(R.string.web_section)
         )
         val unlockDrawer = setOf(
@@ -222,7 +228,9 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.login),
             getString(R.string.create_account),
             getString(R.string.forgot_password),
-            getString(R.string.web_section)
+            getString(R.string.web_section),
+            getString(R.string.paywall),
+            getString(R.string.glide_manager)
         )
         val current = supportFragmentManager.fragments.last()
         if (noShowBottomNavBar.contains(current.tag)) {
@@ -230,16 +238,8 @@ class MainActivity : AppCompatActivity() {
         } else {
             binding.bottomNavigationView.visibility = VISIBLE
         }
-        if (getString(R.string.playvideo) == current.tag) {
-            unlockPortrait()
-        } else {
-            lockPortrait()
-        }
-        if (unlockDrawer.contains(current.tag)) {
-            unlockDrawer()
-        } else {
-            lockDrawer()
-        }
+        sensorLock(rotationOn = getString(R.string.playvideo) == current.tag)
+        unlockDrawer(unlock = unlockDrawer.contains(current.tag))
     }
 
     fun openFragment(
@@ -278,7 +278,12 @@ class MainActivity : AppCompatActivity() {
         openFragment(LoginFragment(), true, getString(R.string.sign_in))
     }
 
-    fun openArticle(id: String) {
+    fun navigateToCreateAccount() {
+        supportFragmentManager.popBackStack()
+        openFragment(CreateAccountFragment(), true, getString(R.string.create_account))
+    }
+
+    private fun openArticle(id: String) {
         val fragment = ArticleFragment.newInstance(id = id)
         supportFragmentManager
             .beginTransaction()
@@ -287,7 +292,7 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    fun openVideo(id: String) {
+    private fun openVideo(id: String) {
         val fragment = PlayVideoFragment.newInstance(id = id)
         supportFragmentManager
             .beginTransaction()
@@ -317,7 +322,6 @@ class MainActivity : AppCompatActivity() {
 
         searchView.setOnSearchClickListener {
             binding.appTitleTextView.visibility = GONE
-            false
         }
 
         searchView.setOnQueryTextListener(
@@ -335,24 +339,27 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    private fun openArticleFromWidget () {
+        val extras = intent.extras
+        if (extras != null) {
+            val articleId = extras.getString(WIDGET_ARTICLE_ID_KEY)
+            if(articleId != null) {
+                this.openArticle(articleId)
+            }
+        }
+    }
+
     fun clearSearch() {
         searchView.setQuery("", false)
         searchView.isIconified = true
     }
 
-    fun lockDrawer() {
-        binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+    private fun unlockDrawer(unlock: Boolean) {
+        binding.drawerLayout.setDrawerLockMode(if (unlock) DrawerLayout.LOCK_MODE_UNLOCKED else DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
 
-    fun unlockDrawer() {
-        binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-    }
-
-    fun lockPortrait() {
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-    }
-
-    fun unlockPortrait() {
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+    private fun sensorLock(rotationOn: Boolean) {
+        requestedOrientation =
+            if (rotationOn) ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 }

@@ -1,8 +1,11 @@
 package com.arcxp.thearcxp.tabfragment
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -11,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.arcxp.content.sdk.ArcXPContentSDK
 import com.arcxp.content.sdk.models.ArcXPContentElement
 import com.arcxp.content.sdk.models.ArcXPContentError
-import com.arcxp.content.sdk.util.Either
 import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.MainActivity
@@ -19,8 +21,13 @@ import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentSearchresultsBinding
 import com.arcxp.thearcxp.databinding.SearchItemLayoutBinding
 import com.arcxp.thearcxp.utils.AnsTypes
+import com.arcxp.thearcxp.utils.imageUrl
 import com.arcxp.thearcxp.utils.spinner
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 
 class SearchResultsFragment : BaseFragment() {
 
@@ -41,8 +48,7 @@ class SearchResultsFragment : BaseFragment() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (this@SearchResultsFragment.isVisible) {
-                        (requireActivity() as MainActivity).clearSearch()
-                        requireActivity().supportFragmentManager.popBackStack()
+                        exit()
                     }
                 }
             })
@@ -56,16 +62,12 @@ class SearchResultsFragment : BaseFragment() {
         return binding.root
     }
 
-    //@ExperimentalPagerApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        query = arguments?.getString("query")
+        query = arguments?.getString(QUERY_KEY)
 
-        binding.backButton.setOnClickListener {
-            (requireActivity() as MainActivity).clearSearch()
-            requireActivity().supportFragmentManager.popBackStack()
-        }
+        binding.backButton.setOnClickListener { exit() }
 
         createList()
 
@@ -75,7 +77,7 @@ class SearchResultsFragment : BaseFragment() {
         }
     }
 
-    fun createList() {
+    private fun createList() {
         binding.recycler.recycledViewPool.setMaxRecycledViews(1, 0)
         binding.recycler.layoutManager = LinearLayoutManager(requireContext())
         binding.recycler.adapter = SearchRecyclerAdapter(results)
@@ -86,7 +88,11 @@ class SearchResultsFragment : BaseFragment() {
                 if (canRequestNextPagination) {
                     if ((binding.recycler.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition() == results.size - 1) {
                         loadData()
-                        Toast.makeText(requireContext(), "Loading results stories", Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.loading_results),
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                     }
                 }
@@ -98,8 +104,8 @@ class SearchResultsFragment : BaseFragment() {
         binding.spin.setImageDrawable(spinner(requireContext()))
         var from = 0
         if (lastLoaded > 0) from = lastLoaded + 1
-        ArcXPContentSDK.contentManager().searchByKeyword(
-            query!!,
+        ArcXPContentSDK.contentManager().search(
+            searchTerm = query!!,
             from = from,
             size = requireContext().resources.getInteger(R.integer.collection_page_size)
         ).observe(viewLifecycleOwner) {
@@ -108,12 +114,12 @@ class SearchResultsFragment : BaseFragment() {
                     onGetCollectionSuccess(response = it.success)
                 }
                 is Failure -> {
-                    onError(it.failure)
-                    binding.recycler.visibility = View.GONE
-                    binding.noResults.visibility = View.VISIBLE
+                    onError(error = it.failure)
+                    binding.recycler.visibility = GONE
+                    binding.noResults.visibility = VISIBLE
                 }
             }
-            binding.spin.visibility = View.GONE
+            binding.spin.visibility = GONE
         }
     }
 
@@ -130,41 +136,42 @@ class SearchResultsFragment : BaseFragment() {
 
         if (response.isNotEmpty()) {
 
-            binding.recycler.visibility = View.VISIBLE
-            binding.noResults.visibility = View.GONE
+            binding.recycler.visibility = VISIBLE
+            binding.noResults.visibility = GONE
 
             binding.recycler.adapter?.notifyItemRangeChanged(
                 lastLoaded + 1,
-                response.keys.last()
+                response.keys.size
             )
             lastLoaded = response.keys.last()
         }
 
         if (results.isEmpty()) {
-            binding.recycler.visibility = View.GONE
-            binding.noResults.visibility = View.VISIBLE
+            binding.recycler.visibility = GONE
+            binding.noResults.visibility = VISIBLE
         } else {
-            binding.recycler.visibility = View.VISIBLE
-            binding.noResults.visibility = View.GONE
+            binding.recycler.visibility = VISIBLE
+            binding.noResults.visibility = GONE
         }
 
-        binding.spin.visibility = View.GONE
+        binding.spin.visibility = GONE
     }
 
     private fun openStory(id: String) {
-        (activity as MainActivity).openArticle(id)
+        exit()
+        vm.openArticle(id)
     }
 
     private fun openVideo(id: String) {
-        (activity as MainActivity).openVideo(id)
+        exit()
+        vm.openVideo(id)
     }
 
     private fun onError(error: ArcXPContentError) {
         showSnackBar(
-            ArcXPContentError(error.type!!, error.localizedMessage),
-            binding.root,
-            R.id.collection_view_fragment,
-            true
+            error = error,
+            view = binding.root,
+            viewId = R.id.collection_view_fragment
         )
     }
 
@@ -183,7 +190,7 @@ class SearchResultsFragment : BaseFragment() {
                 binding.title.text = if (item.headlines != null) {
                     item.headlines?.basic
                 } else {
-                    "No title"
+                    getString(R.string.no_title)
                 }
                 binding.description.text = if (item.content != null) {
                     item.content
@@ -202,20 +209,40 @@ class SearchResultsFragment : BaseFragment() {
                 } else {
                     ""
                 }
-                Glide.with(itemView.context).load(item.promoItem?.basic?.url)
-                    .error(requireContext().resources.getDrawable(R.mipmap.ic_launcher)).fitCenter()
-                    .into(binding.videoImage)
+                binding.playIcon.visibility = GONE
+                Glide.with(itemView.context).load(item.imageUrl())
+                    .error(R.drawable.ic_baseline_error_24_black)
+                    .placeholder(spinner(requireContext()))
+                    .fitCenter()
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            if (item.type == AnsTypes.VIDEO.type) {
+                                binding.playIcon.visibility = VISIBLE
+                            }
+                            return false
+                        }
 
-                if (item.type != null &&  item.type == AnsTypes.VIDEO.type) {
-                    binding.playIcon.visibility = View.VISIBLE
-                }
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ) = false
+                    })
+                    .into(binding.videoImage)
                 if (binding.author.text.toString().isEmpty()) {
-                    binding.author.visibility = View.GONE
-                    binding.bullet.visibility = View.GONE
+                    binding.author.visibility = GONE
+                    binding.bullet.visibility = GONE
                 }
                 if (item.publish_date == null) {
-                    binding.bullet.visibility = View.GONE
-                    binding.date.visibility = View.GONE
+                    binding.bullet.visibility = GONE
+                    binding.date.visibility = GONE
                 }
             }
         }
@@ -229,7 +256,7 @@ class SearchResultsFragment : BaseFragment() {
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             (holder as SearchViewHolder).bind(results[position]!!)
             holder.itemView.setOnClickListener {
-                if (results[position]!!.type.equals("video")) {
+                if (results[position]!!.type == AnsTypes.VIDEO.type) {
                     openVideo(results[position]!!._id!!)
                 } else {
                     openStory(results[position]!!._id!!)
@@ -242,12 +269,20 @@ class SearchResultsFragment : BaseFragment() {
         }
     }
 
+    private fun exit() {
+        (requireActivity() as MainActivity).clearSearch()
+        parentFragmentManager.popBackStack()
+    }
+
     companion object {
+
+        private const val QUERY_KEY = "query"
+
         @JvmStatic
         fun create(query: String): SearchResultsFragment {
             val frag = SearchResultsFragment()
             val args = Bundle()
-            args.putString("query", query)
+            args.putString(QUERY_KEY, query)
             frag.arguments = args
             return frag
         }

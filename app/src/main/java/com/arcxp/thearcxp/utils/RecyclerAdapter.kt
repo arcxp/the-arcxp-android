@@ -4,9 +4,10 @@ import android.view.LayoutInflater
 import android.view.View.GONE
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.arcxp.content.sdk.models.ArcXPContentCallback
+import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FirstItemLayoutBinding
 import com.arcxp.thearcxp.databinding.ItemLayoutBinding
+import com.arcxp.thearcxp.viewmodel.MainViewModel
 import com.bumptech.glide.Glide
 
 private const val FIRST_ITEM = 0
@@ -19,11 +20,11 @@ class RecyclerAdapter(
     private val images: Map<Int, String>,
     private val authors: Map<Int, String>,
     private val dates: Map<Int, String>,
-    private var listener: ArcXPContentCallback
+    private val vm: MainViewModel
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    class FirstViewHolder(val binding: FirstItemLayoutBinding) :
+    inner class FirstViewHolder(val binding: FirstItemLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(
             id: String,
@@ -31,8 +32,7 @@ class RecyclerAdapter(
             details: String,
             image: String,
             author: String,
-            date: String,
-            listener: ArcXPContentCallback
+            date: String
         ) {
             binding.idTv.text = id
             binding.title1.text = title
@@ -40,6 +40,7 @@ class RecyclerAdapter(
             binding.author.text = author
             binding.date.text = date
             Glide.with(itemView.context).load(image)
+                .error(R.drawable.ic_baseline_error_24_black)
                 .placeholder(spinner(itemView.context))
                 .centerInside()
                 .into(binding.ivImageView1)
@@ -52,12 +53,12 @@ class RecyclerAdapter(
                 binding.bullet.visibility = GONE
             }
             itemView.setOnClickListener {
-                listener.onClickResponse(binding.idTv.text.toString())
+                vm.openArticle(id = binding.idTv.text.toString())
             }
         }
     }
 
-    class RemainingViewHolder(val binding: ItemLayoutBinding) :
+    inner class RemainingViewHolder(val binding: ItemLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(
             id: String,
@@ -65,12 +66,12 @@ class RecyclerAdapter(
             details: String,
             image: String,
             author: String,
-            date: String,
-            listener: ArcXPContentCallback
+            date: String
         ) {
             binding.idTv.text = id
             binding.title.text = title
             Glide.with(itemView.context).load(image)
+                .error(R.drawable.ic_baseline_error_24_black)
                 .placeholder(spinner(itemView.context))
                 .fitCenter()
                 .into(binding.ivImageView)
@@ -88,20 +89,28 @@ class RecyclerAdapter(
                 binding.date.text = date
             }
             itemView.setOnClickListener {
-                listener.onClickResponse(binding.idTv.text.toString())
+                vm.openArticle(id = binding.idTv.text.toString())
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        if (viewType == FIRST_ITEM) {
-            val view =
-                FirstItemLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return FirstViewHolder(view)
+        return if (viewType == FIRST_ITEM) {
+            FirstViewHolder(
+                binding = FirstItemLayoutBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
         } else {
-            val view =
-                ItemLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return RemainingViewHolder(view)
+            RemainingViewHolder(
+                binding = ItemLayoutBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
         }
     }
 
@@ -113,8 +122,7 @@ class RecyclerAdapter(
                 details = details[position] ?: "",
                 image = images[position] ?: "",
                 author = authors[position] ?: "",
-                date = dates[position] ?: "",
-                listener = listener
+                date = dates[position] ?: ""
             )
         } else {
             (holder as RemainingViewHolder).bind(
@@ -123,8 +131,7 @@ class RecyclerAdapter(
                 details = details[position] ?: "",
                 image = images[position] ?: "",
                 author = authors[position] ?: "",
-                date = dates[position] ?: "",
-                listener = listener
+                date = dates[position] ?: ""
             )
         }
     }

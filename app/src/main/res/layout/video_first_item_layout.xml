@@ -1,43 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?><RelativeLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:padding="10dp"
-            android:paddingBottom="20dp"
-            android:background="@color/white">
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/item_layout_card_margin"
+    android:background="@color/white"
+    android:padding="@dimen/item_layout_padding_large"
+    android:paddingBottom="@dimen/item_layout_padding_xlarge">
 
     <FrameLayout
-        android:id="@+id/imageframe"
+        android:id="@+id/image_frame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="end"
         android:paddingTop="0dp"
-        android:paddingBottom="8dp"
-        android:layout_gravity="end">
+        android:paddingBottom="@dimen/item_layout_padding">
 
         <ImageView
             android:id="@+id/iv_imageView_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scaleType="centerCrop"
             android:src="@mipmap/ic_launcher_round" />
 
         <ImageView
             android:id="@+id/play_icon"
-            android:layout_height="60dp"
-            android:layout_width="60dp"
+            android:layout_width="@dimen/icon_width_large"
+            android:layout_height="@dimen/icon_height_large"
             android:layout_gravity="center"
-            android:src="@android:drawable/ic_media_play" />
+            android:src="@android:drawable/ic_media_play"
+            android:visibility="gone" />
 
     </FrameLayout>
 
     <TextView
         android:id="@+id/title_1"
         style="@style/VideoTitle"
-        android:layout_below="@id/imageframe"
-        android:paddingTop="0dp"
+        android:layout_below="@id/image_frame"
         tools:text="Main Heading" />
 
     <TextView
@@ -50,40 +48,35 @@
     <TextView
         android:id="@+id/author"
         style="@style/VideoSubtext"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
         android:layout_below="@id/id_tv"
-        tools:text="By author"
-        />
+        android:paddingTop="@dimen/item_layout_padding"
+        android:paddingBottom="@dimen/item_layout_padding"
+        tools:text="By author" />
 
     <TextView
         android:id="@+id/bullet"
         style="@style/VideoSubtext"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:layout_toEndOf="@id/author"
         android:layout_below="@id/id_tv"
-        android:text="●"
-        />
+        android:layout_toEndOf="@id/author"
+        android:paddingTop="@dimen/item_layout_padding_small"
+        android:paddingBottom="@dimen/item_layout_padding_small"
+        android:text="@string/bullet" />
 
     <TextView
         android:id="@+id/date"
         style="@style/VideoSubtext"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
         android:layout_below="@id/id_tv"
         android:layout_toEndOf="@id/bullet"
-        tools:text="Published At"
-        />
+        android:paddingTop="@dimen/item_layout_padding"
+        android:paddingBottom="@dimen/item_layout_padding"
+        tools:text="Published At" />
 
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignParentBottom="true"
-        android:backgroundTint="@color/black"
-        android:background="?android:attr/listDivider" />
+        android:background="?android:attr/listDivider"
+        android:backgroundTint="@color/black" />
 
 </RelativeLayout>

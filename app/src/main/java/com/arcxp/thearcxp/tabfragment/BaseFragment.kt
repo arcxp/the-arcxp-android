@@ -21,22 +21,22 @@ import com.google.android.material.snackbar.Snackbar
 open class BaseFragment : Fragment() {
     val vm: MainViewModel by activityViewModels()
 
-    private var snackbarError: Snackbar? = null
+    private var snackBarError: Snackbar? = null
 
     fun dismissSnackBar() {
-        snackbarError?.dismiss()
+        snackBarError?.dismiss()
     }
 
     fun showSnackBar(
         error: ArcXPContentError,
         view: View,
         viewId: Int,
-        dismissible: Boolean,
+        dismissible: Boolean = true,
         onDismiss: () -> Unit = {}
     ) {
         val message = SpannableStringBuilder()
-            .bold { append("${error.type!!.name}:\n") }
-            .append(error.localizedMessage)
+            .bold { append("${error.type.name}:\n") }
+            .append(error.message)
         val snackBar =
             Snackbar.make(view, message, Snackbar.LENGTH_INDEFINITE)
         if (dismissible) {
@@ -69,7 +69,7 @@ open class BaseFragment : Fragment() {
             frameLayoutParams.width = FrameLayout.LayoutParams.MATCH_PARENT
         }
         snackBar.view.elevation = 150F
-        this.snackbarError = snackBar
+        this.snackBarError = snackBar
         snackBar.show()
     }
 }

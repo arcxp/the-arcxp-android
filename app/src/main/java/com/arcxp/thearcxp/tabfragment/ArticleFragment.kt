@@ -11,10 +11,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import com.arc.arcvideo.ArcMediaPlayer
+import com.arc.arcvideo.ArcVideoStreamCallback
+import com.arc.arcvideo.model.ArcVideoResponse
+import com.arc.arcvideo.model.ArcVideoSDKErrorType
+import com.arc.arcvideo.model.ArcVideoStream
 import com.arcxp.commerce.ArcXPCommerceSDK
-import com.arcxp.content.sdk.ArcXPContentSDK
-import com.arcxp.content.sdk.models.ArcXPContentElement
-import com.arcxp.content.sdk.models.ArcXPContentError
+import com.arcxp.content.sdk.models.*
 import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
 import com.arcxp.thearcxp.R
@@ -96,14 +98,14 @@ class ArticleFragment : BaseFragment() {
         }
     }
 
-    private fun containGalleries(storyResponse: ArcXPContentElement) =
-        storyResponse.content_elements?.any { it.type == AnsTypes.GALLERY.type }
+    private fun containGalleries(storyResponse: ArcXPStory) =
+        storyResponse.content_elements?.any { it is Gallery } ?: false
 
     /**
      * Display the story contents.  Loop through each element in the response
      * and build a view for it.  Dynamically attach each view to the layout.
      */
-    private fun displayStory(storyResponse: ArcXPContentElement) {
+    private fun displayStory(storyResponse: ArcXPStory) {
         binding.storyTitleTv.text = storyResponse.headlines?.basic
         if (storyResponse.subheadlines?.basic?.isNotEmpty() == true) {
             binding.storySubtitleTv.text = storyResponse.subheadlines?.basic
@@ -112,17 +114,17 @@ class ArticleFragment : BaseFragment() {
         val containsGalleries = containGalleries(storyResponse = storyResponse)
 
         //if article contains a gallery, show first at top, else should show promo image
-        if (containsGalleries == true) {
-            val gallery = storyResponse.content_elements?.find { it.type == AnsTypes.GALLERY.type }
-            gallery?.let { gallery(gallery = it) }
+        if (containsGalleries) {
+            val gallery = storyResponse.content_elements?.find { it is Gallery }
+            gallery?.let { gallery(gallery = it as Gallery) }
         } else {
-            val topImage =
-                "${ArcXPContentSDK.arcxpContentConfig().baseUrl}${storyResponse.promoItem?.basic?.additional_properties?.thumbnailResizeUrl}"
+            val topImage = storyResponse.imageUrl()
             if (topImage.isNotBlank()) {
                 Glide.with(this)
                     .load(topImage)
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .dontAnimate()
+                    .error(R.drawable.ic_baseline_error_24_black)
                     .placeholder(spinner(this.requireContext()))
                     .into(binding.storyImageIv)
             }
@@ -140,8 +142,8 @@ class ArticleFragment : BaseFragment() {
         var skipNextGallerySinceAlreadyDisplayed = containsGalleries
         //Building out story from content_elements
         storyResponse.content_elements?.forEach { it ->
-            when (it.type) {
-                AnsTypes.TEXT.type -> {
+            when (it) {
+                is Text -> {
                     if (!it.content.isNullOrEmpty()) {
                         val textView = createTextView(it.content ?: "", requireContext())
                         textView.setLinkTextColor(Color.BLUE)
@@ -151,7 +153,7 @@ class ArticleFragment : BaseFragment() {
                         textView.movementMethod = LinkMovementMethod.getInstance()
                     }
                 }
-                AnsTypes.LINK.type -> {
+                is InterstitialLink -> {
                     val textView =
                         createTextView(
                             "[ <a href=${it.url} target=_blank>${it.content}</a> ]",
@@ -160,11 +162,9 @@ class ArticleFragment : BaseFragment() {
                     binding.innerLayout.addView(textView)
                     textView.movementMethod = LinkMovementMethod.getInstance()
                 }
-                AnsTypes.IMAGE.type -> {
+                is Image -> {
                     val imageAndCaption = createImageView(
-                        url = "${
-                            ArcXPContentSDK.arcxpContentConfig().baseUrl
-                        }${it.additional_properties?.thumbnailResizeUrl}",
+                        url = it.imageUrl(),
                         caption = it.caption.toString(),
                         activity = requireActivity()
                     )
@@ -173,18 +173,50 @@ class ArticleFragment : BaseFragment() {
                         binding.innerLayout.addView((imageAndCaption.second))
                     }
                 }
-                AnsTypes.VIDEO.type -> {
-                    val player = ArcMediaPlayer.createPlayer(requireActivity())
-                    binding.innerLayout.addView(
-                        createVideoView(
-                            content = it,
-                            activity = requireActivity(),
-                            arcMediaPlayer = player
+                is Video -> {
+                    if (it._id != null) {
+                        val player = ArcMediaPlayer.createPlayer(requireActivity())
+                        binding.innerLayout.addView(
+                            createVideoView(
+                                content = it,
+                                activity = requireActivity(),
+                                arcMediaPlayer = player
+                            )
                         )
-                    )
-                    arcMediaPlayers.add(player)
+                        arcMediaPlayers.add(player)
+
+                        vm.videoClient.findByUuid(
+                            uuid = it._id!!,
+                            listener = object : ArcVideoStreamCallback {
+                                override fun onVideoResponse(arcVideoResponse: ArcVideoResponse?) {
+                                }
+
+                                override fun onVideoStream(videos: List<ArcVideoStream>?) {
+                                    if (videos?.isNotEmpty() == true) {
+                                        player.initMedia(videos[0])
+                                        player.displayVideo()
+                                        player.pause()
+                                    }
+                                }
+
+                                override fun onError(
+                                    type: ArcVideoSDKErrorType,
+                                    message: String,
+                                    value: Any?
+                                ) {
+                                    onError(
+                                        ArcXPContentError(
+                                            ArcXPContentSDKErrorType.SERVER_ERROR,
+                                            message,
+                                            value
+                                        )
+                                    )
+                                }
+
+                            })
+                    }
                 }
-                AnsTypes.GALLERY.type -> {
+                is Gallery -> {
                     //if we have a gallery, it is already shown at top, so no need to show it twice
                     if (skipNextGallerySinceAlreadyDisplayed == true) {
                         skipNextGallerySinceAlreadyDisplayed = false
@@ -193,6 +225,22 @@ class ArticleFragment : BaseFragment() {
                     }
                 }
 
+                // We don't use these types in this News App but you may need these fields for something.
+                is Code -> {}
+                is Correction -> {}
+                is CustomEmbed -> {}
+                is Divider -> {}
+                is ElementGroup -> {}
+                is Endorsement -> {}
+                is Header -> {}
+                is LinkList -> {}
+                is NumericRating -> {}
+                is OembedResponse -> {}
+                is Quote -> {}
+                is RawHTML -> {}
+                is StoryList -> {}
+                is Table -> {}
+                is StoryElement.UnknownStoryElement -> {}
             }
         }
 
@@ -204,11 +252,12 @@ class ArticleFragment : BaseFragment() {
      *
      * @param gallery
      */
-    private fun gallery(gallery: ArcXPContentElement) {
+    private fun gallery(gallery: Gallery) {
         val imageUrls = ArrayList<String?>()
         val titles = ArrayList<String?>()
         val captions = ArrayList<String?>()
         gallery.content_elements?.forEach {
+            it as Image
             imageUrls.add(it.url)
             titles.add(it.subtitle)
             captions.add(it.caption)
@@ -229,17 +278,17 @@ class ArticleFragment : BaseFragment() {
 
         TabLayoutMediator(tabLayout, viewPager) { tab, _ -> // Styling each tab here
             tab.setIcon(R.drawable.gallery_tab_layout_indicator_selector)
-            val paddingSize = requireContext().resources.getInteger(R.integer.gallery_tab_padding)
+            val paddingSize =
+                requireContext().resources.getInteger(R.integer.gallery_tab_padding)
             tab.view.setPadding(paddingSize, 0, paddingSize, 0)
         }.attach()
     }
 
     private fun onError(error: ArcXPContentError) {
         showSnackBar(
-            ArcXPContentError(error.type!!, error.localizedMessage),
-            binding.root,
-            R.id.loginCL,
-            true
+            error = error,
+            view = binding.root,
+            viewId = R.id.loginCL
         )
     }
 

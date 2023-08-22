@@ -13,4 +13,6 @@
     <color name="grey">#646464</color>
     <color name="gallery_tab_selected">#676767</color>
     <color name="gallery_tab_not_selected">#C1C0C0</color>
+    <color name="item_layout_text_color">@color/black</color>
+    <color name="item_layout_bg_color">@color/white</color>
 </resources>

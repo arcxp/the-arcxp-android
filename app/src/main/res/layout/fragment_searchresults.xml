@@ -15,10 +15,10 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
-        layout="@layout/item_layout"
+        android:layout="@layout/search_item_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="20dp"
+        android:paddingBottom="@dimen/item_layout_padding_xlarge"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBar"/>
@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/no_search_results"
-        android:textSize="18sp"
+        android:textSize="@dimen/item_layout_title_text_size"
         android:textColor="@color/black"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="@string/search_results"
-            android:textSize="20dp"/>
+            android:textSize="@dimen/item_layout_title_text_size"/>
 
         <ImageView
             android:id="@+id/back_button"
@@ -56,20 +56,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginStart="5dp"
-            android:padding="10dp"
+            android:layout_marginStart="@dimen/search_results_margin_start"
+            android:padding="@dimen/item_layout_padding_large"
             android:src="@drawable/ic_arrow_left_24"/>
 
     </RelativeLayout>
 
-    <ProgressBar
-        android:id="@+id/section_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:elevation="10dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBar" />
 
     <View
         android:id="@+id/bottom"

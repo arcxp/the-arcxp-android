@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.GalleryViewItemBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -28,6 +29,7 @@ class GalleryAdapter(
         Glide.with(context)
             .load(images[position])
             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            .error(R.drawable.ic_baseline_error_24_black)
             .placeholder(spinner(context))
             .dontAnimate()
             .optionalFitCenter()

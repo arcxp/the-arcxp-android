@@ -17,11 +17,9 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager2.widget.ViewPager2
 import com.arc.arcvideo.ArcMediaPlayer
 import com.arc.arcvideo.ArcMediaPlayerConfig
-import com.arc.arcvideo.model.ArcVideoStream
 import com.arc.arcvideo.views.ArcVideoFrame
-import com.arcxp.content.sdk.models.ArcXPContentElement
-import com.arcxp.content.sdk.util.MoshiController.fromJson
-import com.arcxp.content.sdk.util.MoshiController.toJson
+import com.arcxp.content.sdk.ArcXPContentSDK
+import com.arcxp.content.sdk.models.*
 import com.arcxp.thearcxp.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -34,6 +32,7 @@ fun createImageView(url: String, caption: String?, activity: Activity): Pair<Ima
     Glide.with(activity)
         .load(url)
         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+        .error(R.drawable.ic_baseline_error_24_black)
         .placeholder(spinner(activity.applicationContext))
         .dontAnimate()
         .into(imageView)
@@ -53,7 +52,7 @@ fun styleCaption(caption: TextView) {
 }
 
 fun createVideoView(
-    content: ArcXPContentElement,
+    content: Video,
     activity: Activity,
     arcMediaPlayer: ArcMediaPlayer
 ): ArcVideoFrame {
@@ -70,21 +69,11 @@ fun createVideoView(
     layoutParams.setMargins(10, 20, 10, 20)
     videoView.layoutParams = layoutParams
 
-
     arcMediaPlayerConfigBuilder.setVideoFrame(videoFrame = videoView)
     arcMediaPlayerConfigBuilder.setActivity(activity = activity)
     arcMediaPlayerConfigBuilder.setMaxBitRate(rate = Int.MAX_VALUE)
     arcMediaPlayerConfigBuilder.setShouldShowFullScreenButton(shouldShowFullScreenButton = true)
     arcMediaPlayer.configureMediaPlayer(arcMediaPlayerConfigBuilder.build())
-    arcMediaPlayer.initMedia(
-        fromJson(
-            toJson(content)!!,
-            ArcVideoStream::class.java
-        )
-    )
-    arcMediaPlayer.displayVideo()
-    arcMediaPlayer.pause()
-
     videoView.clearFocus()
     return videoView
 }
@@ -129,3 +118,50 @@ fun spinner(context: Context): CircularProgressDrawable {
     circularProgressDrawable.start()
     return circularProgressDrawable
 }
+
+private const val thumbnailResizeUrlKey = "thumbnailResizeUrl"
+
+fun ArcXPContentElement.imageUrl() =
+    when (this.type) {
+        AnsTypes.VIDEO.type -> {
+            this.promoItem?.basic?.url ?: ""
+        }
+        else -> {
+            (this.promoItem?.basic?.additional_properties?.get(thumbnailResizeUrlKey) as? String
+                ?: this.promoItem?.lead_art?.additional_properties?.get(thumbnailResizeUrlKey) as? String
+                ?: this.promoItem?.lead_art?.promo_items?.basic?.additional_properties?.get(
+                    thumbnailResizeUrlKey
+                ) as? String)
+                ?.let { createFullImageUrl(url = it) }
+                ?: ""
+        }
+    }
+
+fun ArcXPStory.imageUrl() =
+    (this.promoItem?.basic?.additional_properties?.get(thumbnailResizeUrlKey) as? String
+        ?: this.promoItem?.lead_art?.additional_properties?.get(thumbnailResizeUrlKey) as? String
+        ?: this.promoItem?.lead_art?.promo_items?.basic?.additional_properties?.get(
+            thumbnailResizeUrlKey
+        ) as? String)
+        ?.let { createFullImageUrl(url = it) }
+        ?: ""
+
+
+fun Image.imageUrl() =
+    (this.additional_properties?.get(thumbnailResizeUrlKey) as? String)
+        ?.let { createFullImageUrl(url = it) }
+        ?: ""
+
+
+fun ArcXPCollection.imageUrl() =
+    this.promoItem?.basic?.url ?: (this.promoItem?.basic?.additional_properties?.get(
+        thumbnailResizeUrlKey
+    ) as? String
+        ?: this.promoItem?.lead_art?.additional_properties?.get(thumbnailResizeUrlKey) as? String
+        ?: this.promoItem?.lead_art?.promo_items?.basic?.additional_properties?.get(
+            thumbnailResizeUrlKey
+        ) as? String)
+        ?.let { createFullImageUrl(url = it) }
+    ?: ""
+
+private fun createFullImageUrl(url: String) = "${ArcXPContentSDK.arcxpContentConfig().baseUrl}$url"

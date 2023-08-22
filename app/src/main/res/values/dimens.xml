@@ -20,8 +20,30 @@
     <dimen name="extra_close_button_margin">4dp</dimen>
 
     <dimen name="search_results_margin">16dp</dimen>
+    <dimen name="search_results_margin_start">5dp</dimen>
     <dimen name="section_top_margin">0dp</dimen>
 
     <dimen name="recycler_view_margin">16dp</dimen>
     <dimen name="recycler_margin">20dp</dimen>
+
+    <dimen name="icon_width">40dp</dimen>
+    <dimen name="icon_height">40dp</dimen>
+
+    <dimen name="icon_width_large">60dp</dimen>
+    <dimen name="icon_height_large">60dp</dimen>
+
+    <dimen name="widget_margin">0dp</dimen>
+
+    <dimen name="item_layout_padding">8dp</dimen>
+    <dimen name="item_layout_padding_small">5dp</dimen>
+    <dimen name="item_layout_padding_large">10dp</dimen>
+    <dimen name="item_layout_padding_xlarge">20dp</dimen>
+    <dimen name="item_layout_top_margin">10dp</dimen>
+    <dimen name="item_layout_card_margin">2dp</dimen>
+    <dimen name="item_layout_author_text_size">13sp</dimen>
+    <dimen name="item_layout_title_text_size">20sp</dimen>
+    <dimen name="item_layout_desc_text_size">15sp</dimen>
+    <dimen name="item_layout_date_text_size">12sp</dimen>
+    <dimen name="item_layout_image_height">75dp</dimen>
+    <item name="item_layout_guideline_percentage" format="float" type="dimen">0.65</item>
 </resources>

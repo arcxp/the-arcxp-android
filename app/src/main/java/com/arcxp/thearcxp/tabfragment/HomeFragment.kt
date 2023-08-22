@@ -57,10 +57,9 @@ class HomeFragment : BaseFragment() {
 
     private fun onError(error: ArcXPContentError) {
         showSnackBar(
-            ArcXPContentError(error.type!!, error.localizedMessage),
-            binding.collectionViewFragment,
-            R.id.collection_view_fragment,
-            true
+            error = error,
+            view = binding.collectionViewFragment,
+            viewId = R.id.collection_view_fragment
         )
     }
 

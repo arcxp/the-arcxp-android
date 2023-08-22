@@ -5,8 +5,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.arc.arcvideo.ArcMediaClient
 import com.arc.arcvideo.ArcMediaPlayer
 import com.arc.arcvideo.ArcMediaPlayerConfig
+import com.arc.arcvideo.ArcVideoStreamCallback
+import com.arc.arcvideo.model.ArcVideoResponse
+import com.arc.arcvideo.model.ArcVideoSDKErrorType
+import com.arc.arcvideo.model.ArcVideoStream
 import com.arcxp.commerce.ArcXPCommerceSDK
 import com.arcxp.commerce.ArcXPPageviewEvaluationResult
 import com.arcxp.commerce.apimanagers.ArcXPIdentityListener
@@ -54,6 +59,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _openLastArticleEvent = MutableLiveData<Pair<String, String>>()
     val openLastArticleEvent: LiveData<Pair<String, String>> = _openLastArticleEvent
 
+    //Event observed by MainActivity to open Article by id
+    private val _openArticleEvent = MutableLiveData<String>()
+    val openArticleEvent: LiveData<String> = _openArticleEvent
+
+    //Event observed by MainActivity to open Video by id
+    private val _openVideoEvent = MutableLiveData<String>()
+    val openVideoEvent: LiveData<String> = _openVideoEvent
+
+    //Event observed by MainActivity to lock rotation
+    private val _sensorLockEvent = MutableLiveData<Boolean>()
+    val sensorLockEvent: LiveData<Boolean> = _sensorLockEvent
+
+    //Event observed by PlayVideoFragment to request video by id from Video Center
+    private val _videoResultEvent = MutableLiveData<Either<ArcXPContentError, ArcVideoStream>>()
+    val videoResultEvent: LiveData<Either<ArcXPContentError, ArcVideoStream>> = _videoResultEvent
+
     var sections = HashMap<String, ArcXPSection>()
     var sectionsIndexMap = HashMap<Int, String>()
     var indexSectionMap = HashMap<String, Int>()
@@ -66,6 +87,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var currentFragmentTag: FragmentView = FragmentView.HOME
 
     var isStartup = true
+
+    val videoClient = ArcMediaClient.Companion.createClient(
+        orgName = ArcXPContentSDK.arcxpContentConfig().orgName,
+        environment = ArcXPContentSDK.arcxpContentConfig().environment
+    )
 
     //Keep the video configuration here so it does not get
     //recreated on device rotation
@@ -110,8 +136,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun restoreContentEvent() {
-        if (!contentId.first.isNullOrBlank() && !contentId.second.isNullOrBlank()) {
-            _openLastArticleEvent.postValue(Pair(contentId.first, contentId.second))
+        contentId.apply {
+            if (first.isNotBlank() and second.isNotBlank()) {
+                _openLastArticleEvent.postValue(Pair(first, second))
+            }
         }
     }
 
@@ -194,8 +222,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun createFragment(section: ArcXPSection): BaseSectionFragment {
-        return when {
-            isWebSection(section) -> createWebSection(section.id, section.name)
+        return when (section.type) {
+            "web" -> createWebSection(section.id, section.name)
             else -> SectionFragment.create(section)
         }
     }
@@ -237,20 +265,42 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //Retrieve a story based on ID
-    fun getStory(id: String): LiveData<Either<ArcXPContentError, ArcXPContentElement>> {
-        return ArcXPContentSDK.contentManager().getStory(id)
+    fun getStory(id: String): LiveData<Either<ArcXPContentError, ArcXPStory>> {
+        return ArcXPContentSDK.contentManager().getArcXPStory(id)
     }
 
     //Retrieve a video based on ID
-    fun getVideo(id: String): LiveData<Either<ArcXPContentError, ArcXPContentElement>> {
-        return ArcXPContentSDK.contentManager().getVideo(id)
+    fun loadVideo(id: String) {
+        videoClient.findByUuid(uuid = id, listener = object : ArcVideoStreamCallback {
+            override fun onVideoResponse(arcVideoResponse: ArcVideoResponse?) {
+            }
+
+            override fun onVideoStream(videos: List<ArcVideoStream>?) {
+                if (videos?.isNotEmpty() == true) {
+                    _videoResultEvent.postValue(Success(success = videos[0]))
+                }
+            }
+
+            override fun onError(
+                type: ArcVideoSDKErrorType,
+                message: String,
+                value: Any?
+            ) {
+                _videoResultEvent.postValue(
+                    Failure(
+                        failure = ArcXPContentError(
+                            ArcXPContentSDKErrorType.SERVER_ERROR,
+                            message,
+                            value
+                        )
+                    )
+                )
+            }
+
+        })
     }
 
-    fun isWebSection(section: ArcXPSection): Boolean {
-        return section.type == "web"
-    }
-
-    fun createWebSection(key: String?, name: String?) =
+    private fun createWebSection(key: String?, name: String?) =
         WebSectionFragment().withUrlAndName(key, name)
 
     //Create an instance of the video player from the Video SDK.  This is done
@@ -264,6 +314,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun disposeVideoPlayer() {
         arcMediaPlayer?.finish()
         arcMediaPlayer = null
+    }
+
+    //Public function to request Article by id from sdk
+    fun openArticle(id: String) {
+        _openArticleEvent.postValue(id)
+    }
+
+    //Public function to request Video by id from sdk
+    fun openVideo(id: String) {
+        _openVideoEvent.postValue(id)
+    }
+
+    //Public function to request rotation Lock
+    fun setPortrait(rotationOn: Boolean){
+        _sensorLockEvent.postValue(rotationOn)
     }
 
     override fun onCleared() {

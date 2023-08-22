@@ -8,18 +8,16 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.arcxp.content.sdk.ArcXPContentSDK
 import com.arcxp.content.sdk.models.ArcXPCollection
-import com.arcxp.content.sdk.models.ArcXPContentCallback
 import com.arcxp.content.sdk.models.ArcXPContentError
 import com.arcxp.content.sdk.models.ArcXPSection
 import com.arcxp.content.sdk.util.Failure
 import com.arcxp.content.sdk.util.Success
-import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.FragmentSectionBinding
 import com.arcxp.thearcxp.utils.RecyclerAdapter
 import com.arcxp.thearcxp.utils.getNameToUseFromSection
+import com.arcxp.thearcxp.utils.imageUrl
 import com.arcxp.thearcxp.utils.spinner
 
 
@@ -111,12 +109,11 @@ class SectionFragment : BaseSectionFragment() {
 
     private fun onError(error: ArcXPContentError) {
         //to ignore inevitable empty list error at end of collections
-        if (error.localizedMessage.toString() != getString(R.string.empty_collection)) {
+        if (error.message != getString(R.string.empty_collection)) {
             showSnackBar(
-                ArcXPContentError(error.type!!, error.localizedMessage),
-                binding.recycler,
-                R.id.collection_view_fragment,
-                true
+                error = error,
+                view = binding.recycler,
+                viewId = R.id.collection_view_fragment
             )
         } else {
             canRequestNextPagination = false
@@ -143,17 +140,12 @@ class SectionFragment : BaseSectionFragment() {
     private fun onGetCollectionSuccess(response: Map<Int, ArcXPCollection>) {
         response.forEach {
             val date = it.value.publishedDate?.toLocaleString()?.split(":")
-            var img = "N/A"
-            if (it.value.promoItem?.basic?.additional_properties?.thumbnailResizeUrl?.isEmpty() == false) {
-                img =
-                    "${ArcXPContentSDK.arcxpContentConfig().baseUrl}${it.value.promoItem?.basic?.additional_properties?.thumbnailResizeUrl}"
-            }
             addToMap(
                 index = it.key,
                 id = it.value.id,
                 title = it.value.headlines.basic ?: "",
                 description = it.value.description?.basic ?: "",
-                image = img,
+                image = it.value.imageUrl(),
                 author = if (it.value.credits?.by.isNullOrEmpty()) {
                     ""
                 } else {
@@ -166,7 +158,7 @@ class SectionFragment : BaseSectionFragment() {
 
         binding.recycler.adapter?.notifyItemRangeChanged(
             lastLoaded + 1,
-            response.keys.last()
+            response.keys.size
         )
         lastLoaded = response.keys.last()
     }
@@ -175,22 +167,14 @@ class SectionFragment : BaseSectionFragment() {
         binding.recycler.recycledViewPool.setMaxRecycledViews(1, 0)
         binding.recycler.layoutManager = LinearLayoutManager(requireContext())
         binding.recycler.adapter = RecyclerAdapter(
-            ids,
-            titles,
-            details,
-            images,
-            authors,
-            dates,
-            listener = object : ArcXPContentCallback {
-                override fun onClickResponse(_id: String) {
-                    openStory(_id)
-                }
-            }
+            ids = ids,
+            titles = titles,
+            details = details,
+            images = images,
+            authors = authors,
+            dates = dates,
+            vm = vm
         )
-    }
-
-    private fun openStory(id: String) {
-        (activity as MainActivity).openArticle(id)
     }
 
     companion object {

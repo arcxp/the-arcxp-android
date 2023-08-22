@@ -29,10 +29,9 @@ class SettingsFragment : BaseFragment() {
 
     private fun onError(error: ArcXPContentError) {
         showSnackBar(
-            ArcXPContentError(error.type!!, error.localizedMessage),
-            binding.settingsFragment,
-            R.id.settingsFragment,
-            true
+            error = error,
+            view = binding.settingsFragment,
+            viewId = R.id.settingsFragment
         )
     }
 
