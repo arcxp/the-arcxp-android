@@ -1,350 +1,111 @@
 package com.arcxp.thearcxp
 
-import android.annotation.SuppressLint
-import android.content.pm.ActivityInfo
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
-import android.widget.ImageButton
-import androidx.appcompat.widget.SearchView
-import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.GravityCompat
-import androidx.core.view.MenuItemCompat
-import androidx.core.view.size
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import com.arcxp.content.models.ArcXPSection
-import com.arcxp.commons.util.Failure
-import com.arcxp.commons.util.Success
-import com.arcxp.thearcxp.ArcXPWidget.Companion.WIDGET_ARTICLE_ID_KEY
-import com.arcxp.thearcxp.account.CreateAccountFragment
-import com.arcxp.thearcxp.databinding.ActivityMainBinding
+import com.arcxp.ArcXPMobileSDK
+import com.arcxp.thearcxp.account.AccountViewModel
+import com.arcxp.thearcxp.account.AccountViewModelFactory
+import com.arcxp.thearcxp.analytics.FirebaseAnalyticsManager
+import com.arcxp.thearcxp.article.ArticleViewModel
+import com.arcxp.thearcxp.push.IntentNavigationDataItem
+import com.arcxp.thearcxp.push.SettingsNavigationItem
 import com.arcxp.thearcxp.tabfragment.*
-import com.arcxp.thearcxp.utils.AnsTypes
-import com.arcxp.thearcxp.utils.collectOneTimeEvent
-import com.arcxp.thearcxp.utils.getNameToUseFromSection
+import com.arcxp.thearcxp.ui.composables.NewsApp
+import com.arcxp.thearcxp.video.VideoViewModel
 import com.arcxp.thearcxp.viewmodel.MainViewModel
-import com.arcxp.thearcxp.viewmodel.MainViewModel.FragmentView.*
+import com.arcxp.thearcxp.web.WebViewModel
+import com.arcxp.thearcxp.widget.ArcXPWidget.Companion.WIDGET_ARTICLE_ID_KEY
 import com.google.android.gms.ads.MobileAds
-import com.google.android.material.navigation.NavigationView
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.ump.*
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
+import java.util.*
 
 /**
  * The only activity in the app.
  */
-@SuppressLint("SourceLockedOrientationActivity")
+
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
 
-    private lateinit var drawer: DrawerLayout
-    private lateinit var toolbar: Toolbar
-
-    private lateinit var navigationView: NavigationView
-
-    private lateinit var vm: MainViewModel
-
-    private var isFragmentTransactionSafe = true
-
-    private lateinit var searchViewItem: MenuItem
-    private lateinit var searchView: SearchView
-
+    private lateinit var mainViewModel: MainViewModel
+    private lateinit var accountViewModel: AccountViewModel
+    private lateinit var articleViewModel: ArticleViewModel
+    private lateinit var videoViewModel: VideoViewModel
+    private lateinit var webViewModel: WebViewModel
+    private var analyticsManager: FirebaseAnalyticsManager? = null
     private lateinit var consentInformation: ConsentInformation
     private lateinit var consentForm: ConsentForm
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        openContentFromPushNotification(intent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        vm = ViewModelProvider(this).get(
-            MainViewModel::class.java
-        )
+        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
-        if (vm.isStartup) {
-            Handler(Looper.getMainLooper()).postDelayed(
-                {
-                    binding.splashscreen.visibility = GONE
-                    vm.isStartup = false
-                },
-                2000
+        //init firebase if setting is true and has google services json
+        if (resources.getBoolean(R.bool.use_firebase) && BuildConfig.HAS_GOOGLE_SERVICES) {
+            analyticsManager = FirebaseAnalyticsManager(
+                firebaseAnalytics = Firebase.analytics
             )
-        } else {
-            binding.splashscreen.visibility = GONE
+            initPushNotifications()
         }
+        articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
+        val factory = AccountViewModelFactory(application, analyticsManager)
+        accountViewModel = ViewModelProvider(this, factory)[AccountViewModel::class.java]
+        videoViewModel = ViewModelProvider(this)[VideoViewModel::class.java]
+        webViewModel = ViewModelProvider(this)[WebViewModel::class.java]
 
-        //Orientation is handled manually by the app.  The only fragment that is not
-        //locked in portrait is PlayVideoFragment.
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        mainViewModel.fetchSectionsList()
 
-        drawer = binding.drawerLayout
-        toolbar = binding.toolbar
-
-        navigationView = binding.navView
-
-        setSupportActionBar(toolbar)
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        val toggle = ActionBarDrawerToggle(
-            this,
-            drawer,
-            toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-        drawer.addDrawerListener(toggle)
-        toggle.isDrawerIndicatorEnabled = true
-        toggle.syncState()
-
-        //If returning from the paywall sign-in/registration flow then
-        //this method is used to return to the last article that was shown
-        vm.openLastArticleEvent.observe(this, this::returnToViewFromPaywall)
-
-        vm.sectionsListEvent.observe(this) {
-            when (it) {
-                is Success -> setupDrawer(it.success)
-                is Failure -> {
-                    //error message handled by home fragment
-                }
+        setContent {
+            CompositionLocalProvider(
+                LocalAccountViewModel provides accountViewModel,
+                LocalVideoViewModel provides videoViewModel,
+                LocalArticleViewModel provides articleViewModel,
+                LocalMainViewModel provides mainViewModel,
+                LocalFirebaseAnalyticsManager provides analyticsManager,
+                LocalWebViewModel provides webViewModel
+            ) {
+                NewsApp()
             }
-
-        }
-
-        vm.getSectionList(this)
-        collectOneTimeEvent(flow = vm.openArticleEvent, collect = ::openArticle)
-        collectOneTimeEvent(flow = vm.openVideoEvent, collect = ::openVideo)
-
-        vm.sensorLockEvent.observe(this, this::sensorLock)
-
-        supportFragmentManager.addOnBackStackChangedListener {
-            checkFragments()
+            openArticleFromWidget()
+            openContentFromPushNotification(intent)
         }
 
         //Isolate all ads logic
         initAds()
 
-        init()
-
-        // if opening from the widget
-        openArticleFromWidget()
-    }
-
-    private fun returnToViewFromPaywall(item: Pair<String, String>) {
-        val contentType = item.first
-        val contentId = item.second
-        when (contentType) {
-            AnsTypes.STORY.type -> openArticle(contentId)
-            AnsTypes.VIDEO.type -> openVideo(contentId)
-        }
-        vm.clearLastView()
-    }
-
-    private fun setupDrawer(sections: List<ArcXPSection>) {
-
-        val hView = View.inflate(this, R.layout.drawer_header, null)
-        val closeButton = hView.findViewById<ImageButton>(R.id.closeButton)
-        closeButton.setOnClickListener {
-            drawer.closeDrawer(GravityCompat.START)
-        }
-        val hv = navigationView.getHeaderView(0)
-        navigationView.removeHeaderView(hv)
-        navigationView.addHeaderView(hView)
-
-        navigationView.menu.clear()
-        val menu = navigationView.menu
-
-        sections.forEach {
-            menu.add(it.getNameToUseFromSection())
-
-            val menuItem = menu.getItem(menu.size - 1)
-            menuItem.setActionView(R.layout.drawer_item)
-        }
-        navigationView.invalidate()
-
-        navigationView.setNavigationItemSelectedListener {
-
-            val section = vm.sections[it.title]
-            if (section != null) {
-                vm.sectionSelected(section)
-                binding.bottomNavigationView.selectedItemId = R.id.home
-                drawer.close()
-                true
-            } else {
-                false
+        accountViewModel.openGoogleLoginEvent.observe(this) {
+            if (it) {
+                ArcXPMobileSDK.commerceManager()
+                    .loginWithGoogle(this)
+                    .observe(this)
+                    {
+                        mainViewModel.triggerNavigation(destination = SettingsNavigationItem)
+                    }
             }
-
         }
-    }
-
-    private fun init() {
-        when (vm.currentFragmentTag) {
-            HOME -> setCurrentFragment(HomeFragment(), HOME)
-            VIDEO -> setCurrentFragment(VideoFragment(), VIDEO)
-            ACCOUNT -> setCurrentFragment(AccountFragment(), ACCOUNT)
-        }
-        binding.bottomNavigationView.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.home -> setCurrentFragment(HomeFragment(), HOME)
-                R.id.video -> setCurrentFragment(VideoFragment(), VIDEO)
-                R.id.account -> setCurrentFragment(AccountFragment(), ACCOUNT)
-            }
-            true
-        }
-    }
-
-    private fun setCurrentFragment(fragment: Fragment, view: MainViewModel.FragmentView) {
-        vm.currentFragmentTag = view
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.nav_host_fragment, fragment, view.tag)
-            commit()
-        }
-    }
-
-    fun getFragmentContainerViewId() = R.id.nav_host_fragment
-
-    override fun onResumeFragments() {
-        super.onResumeFragments()
-        checkFragments()
-    }
-
-    private fun checkFragments() {
-        val noShowBottomNavBar = setOf(
-            getString(R.string.playvideo),
-            getString(R.string.article),
-            getString(R.string.sign_up),
-            getString(R.string.sign_in),
-            getString(R.string.login),
-            getString(R.string.create_account),
-            getString(R.string.forgot_password),
-            getString(R.string.web_section)
-        )
-        val unlockDrawer = setOf(
-            getString(R.string.videotag),
-            getString(R.string.hometag),
-            getString(R.string.accounttag),
-            getString(R.string.sign_up),
-            getString(R.string.sign_in),
-            getString(R.string.login),
-            getString(R.string.create_account),
-            getString(R.string.forgot_password),
-            getString(R.string.web_section),
-            getString(R.string.paywall),
-            getString(R.string.glide_manager)
-        )
-        val current = supportFragmentManager.fragments.last()
-        if (noShowBottomNavBar.contains(current.tag)) {
-            binding.bottomNavigationView.visibility = GONE
-        } else {
-            binding.bottomNavigationView.visibility = VISIBLE
-        }
-        sensorLock(rotationOn = getString(R.string.playvideo) == current.tag)
-        unlockDrawer(unlock = unlockDrawer.contains(current.tag))
-    }
-
-    fun openFragment(
-        fragment: Fragment,
-        addToBackStack: Boolean = false,
-        tag: String
-    ) {
-        if (isFinishing || !isFragmentTransactionSafe) {
-            return
-        }
-        if (getFragmentContainerViewId() == 0) {
-            return
-        }
-        val fragmentTransaction = supportFragmentManager
-            .beginTransaction()
-            .replace(getFragmentContainerViewId(), fragment, tag)
-        if (addToBackStack) {
-            fragmentTransaction.addToBackStack(fragment.javaClass.simpleName)
-        }
-        fragmentTransaction.commit()
-        checkFragments()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        isFragmentTransactionSafe = true
-    }
-
-    override fun onStop() {
-        isFragmentTransactionSafe = false
-        super.onStop()
-    }
-
-    fun navigateToSignIn() {
-        supportFragmentManager.popBackStack()
-        openFragment(LoginFragment(), true, getString(R.string.sign_in))
-    }
-
-    fun navigateToCreateAccount() {
-        supportFragmentManager.popBackStack()
-        openFragment(CreateAccountFragment(), true, getString(R.string.create_account))
-    }
-
-    private fun openArticle(id: String) {
-        val fragment = ArticleFragment.newInstance(id = id)
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.contentView, fragment, getString(R.string.article))
-            .addToBackStack(fragment.javaClass.simpleName)
-            .commit()
-    }
-
-    private fun openVideo(id: String) {
-        val fragment = PlayVideoFragment.newInstance(id = id)
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.contentView, fragment, getString(R.string.playvideo))
-            .addToBackStack(fragment.javaClass.simpleName)
-            .commit()
-    }
-
-    fun openSearchResults(query: String) {
-        val fragment = SearchResultsFragment.create(query)
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.contentView, fragment, getString(R.string.searchtag))
-            .addToBackStack(fragment.javaClass.simpleName)
-            .commit()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.options_menu, menu)
-        searchViewItem = menu.findItem(R.id.app_bar_search)
-        searchView = MenuItemCompat.getActionView(searchViewItem) as SearchView
-
-        searchView.setOnCloseListener {
-            binding.appTitleTextView.visibility = VISIBLE
-            false
-        }
-
-        searchView.setOnSearchClickListener {
-            binding.appTitleTextView.visibility = GONE
-        }
-
-        searchView.setOnQueryTextListener(
-            object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String): Boolean {
-
-                    openSearchResults(query)
-                    return false
-                }
-
-                override fun onQueryTextChange(newText: String): Boolean {
-                    return false
-                }
-            })
-        return super.onCreateOptionsMenu(menu)
     }
 
     private fun openArticleFromWidget() {
@@ -352,30 +113,50 @@ class MainActivity : AppCompatActivity() {
         if (extras != null) {
             val articleId = extras.getString(WIDGET_ARTICLE_ID_KEY)
             if (articleId != null) {
-                this.openArticle(articleId)
+                val navItem = IntentNavigationDataItem(articleId, CONTENT_TYPE_ARG_ARTICLE)
+                mainViewModel.triggerNavigation(navItem)
             }
         }
     }
 
-    fun clearSearch() {
-        searchView.setQuery("", false)
-        searchView.isIconified = true
-    }
+    private fun openContentFromPushNotification(intent: Intent?) {
 
-    private fun unlockDrawer(unlock: Boolean) {
-        binding.drawerLayout.setDrawerLockMode(if (unlock) DrawerLayout.LOCK_MODE_UNLOCKED else DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-    }
+        if (intent != null) {
+            val extras = intent.extras
 
-    private fun sensorLock(rotationOn: Boolean) {
-        requestedOrientation =
-            if (rotationOn) ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            val uuid = extras?.getString(CONTENT_UUID_ARG)
+            val contentType = extras?.getString(CONTENT_TYPE_ARG)
+
+            if (uuid != null && contentType != null) {
+                val navItem = IntentNavigationDataItem(uuid, contentType)
+                mainViewModel.triggerNavigation(navItem)
+            } else {
+                //do nothing
+            }
+        }
     }
 
     private fun initAds() {
-        if ((application as MainApplication).showAds()) {
+        if (accountViewModel.shouldWeShowAds()) {
+            MobileAds.initialize(
+                this
+            ) { }
+
+            val configuration = RequestConfiguration.Builder()
+                .setTestDeviceIds(listOf("8D8020A7397013BE250CD10E86A6C886")).build()
+            MobileAds.setRequestConfiguration(configuration)
+
             val debugSettings = ConsentDebugSettings.Builder(this)
                 .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
-                .addTestDeviceHashedId("3e2f8b7f-0d21-4822-808e-10ca1ad1abe1")
+                .addTestDeviceHashedId("3e2f8b7f-0d21-4822-808e-10ca1ad1abe1")//a
+//                .addTestDeviceHashedId("8FC9A274F9A08E13BED62AC919248847")//d
+                .addTestDeviceHashedId("2B9A25FD025DD3148569D49B34BFF8BE")//emu
+                .addTestDeviceHashedId("2215580C8E69B36249BAFE34B66DB230")//z
+                /*  for this value, check logcat with device for the following line (where ... is actual id):
+                    Use new ConsentDebugSettings.Builder().addTestDeviceHashedId("...") to set this as a debug device.
+                    note the id and add or replace a test device here
+                */
+
                 .build()
 
             val params = ConsentRequestParameters
@@ -396,15 +177,13 @@ class MainActivity : AppCompatActivity() {
                     }
                 },
                 {
-                    Log.e("ArcXP", "${it.message}")
+                    Log.e("ArcXP", it.message)
                 })
         }
-
-        //Initialize google ads
-        MobileAds.initialize(this) {}
     }
 
     //Load the ads consent form
+    //you will need a test device id hash added to initAds function
     private fun loadForm() {
         // Loads a consent form. Must be called on the main thread.
         UserMessagingPlatform.loadConsentForm(
@@ -413,16 +192,15 @@ class MainActivity : AppCompatActivity() {
                 this.consentForm = it
                 if (consentInformation.consentStatus == ConsentInformation.ConsentStatus.REQUIRED) {
                     consentForm.show(
-                        this,
-                        ConsentForm.OnConsentFormDismissedListener {
-                            if (consentInformation.consentStatus == ConsentInformation.ConsentStatus.OBTAINED) {
-                                // App can start requesting ads.
-                            }
-
-                            // Handle dismissal by reloading form.
-                            loadForm()
+                        this
+                    ) {
+                        if (consentInformation.consentStatus == ConsentInformation.ConsentStatus.OBTAINED) {
+                            // App can start requesting ads.
                         }
-                    )
+
+                        // Handle dismissal by reloading form.
+                        loadForm()
+                    }
                 }
             },
             {
@@ -430,4 +208,78 @@ class MainActivity : AppCompatActivity() {
             }
         )
     }
+
+    private fun initPushNotifications() {
+        askNotificationPermission()
+
+        mainViewModel.loadPushNotificationSubscribedTopics()
+
+        Firebase.messaging.token.addOnCompleteListener { task ->
+            accountViewModel.registeredForPushNotifications = task.isSuccessful
+        }
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(this, arrayOf(POST_NOTIFICATIONS), 101)
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "arcxp_mobile_channel"
+            val descriptionText = "arcxp_mobile_channel"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val mChannel = NotificationChannel("arcxp_mobile_channel", name, importance)
+            mChannel.description = descriptionText
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(mChannel)
+        }
+    }
+
+
+    //Called when PIP is entered and exited
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        configuration: Configuration
+    ) {
+        videoViewModel.arcMediaPlayer.onPictureInPictureModeChanged(isInPictureInPictureMode = isInPictureInPictureMode, null)
+        if (!isInPictureInPictureMode) {
+            videoViewModel.arcMediaPlayer.returnToNormalFromPip()
+        }
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, configuration)
+    }
+
+    companion object {
+        const val CONTENT_UUID_ARG = "uuid"
+        const val CONTENT_TYPE_ARG = "content-type"
+        const val CONTENT_TYPE_ARG_ARTICLE = "article"
+        const val CONTENT_TYPE_ARG_VIDEO = "video"
+        const val CONTENT_TYPE_ARG_NONE = "none"
+    }
+
+
+}
+
+val LocalAccountViewModel = compositionLocalOf<AccountViewModel> {
+    error("No ViewModel provided")
+}
+val LocalVideoViewModel = compositionLocalOf<VideoViewModel> {
+    error("No ViewModel provided")
+}
+val LocalMainViewModel = compositionLocalOf<MainViewModel> {
+    error("No ViewModel provided")
+}
+val LocalArticleViewModel = compositionLocalOf<ArticleViewModel> {
+    error("No ViewModel provided")
+}
+val LocalFirebaseAnalyticsManager = compositionLocalOf<FirebaseAnalyticsManager?> {
+    error("No FirebaseAnalyticsManager provided")
+}
+val LocalWebViewModel = compositionLocalOf<WebViewModel> {
+    error("No ViewModel provided")
 }

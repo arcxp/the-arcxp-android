@@ -52,6 +52,7 @@
 
     <dimen name="padding_small">5dp</dimen>
     <dimen name="padding_large">10dp</dimen>
+    <dimen name="padding_mlarge">15dp</dimen>
     <dimen name="padding_xlarge">20dp</dimen>
 
     <dimen name="item_layout_top_margin">10dp</dimen>
@@ -64,6 +65,8 @@
 
     <integer name="rounded_corner_radius">30</integer>
     <integer name="rounded_corner_radius_thumbnail">20</integer>
+    <dimen name="rounded_corner_radius_dp">30dp</dimen>
+    <dimen name="rounded_corner_radius_thumbnail_dp">20dp</dimen>
 
     <dimen name="bottom_navigation_height">75dp</dimen>
 
@@ -89,6 +92,12 @@
     <dimen name="text_size_small">16sp</dimen>
     <dimen name="text_size_extra_small">12sp</dimen>
 
+    <integer name="text_size_xlarge">40</integer>
+    <integer name="text_size_large">35</integer>
+    <integer name="text_size">20</integer>
+    <integer name="text_size_small">16</integer>
+    <integer name="text_size_extra_small">12</integer>
+
     <dimen name="app_title_text_view_width">400dp</dimen>
 
     <item name="item_layout_guideline_percentage" format="float" type="dimen">0.65</item>
@@ -98,4 +107,8 @@
     <item name="content_edge_space_percentage_start" format="float" type="dimen">0.05</item>
     <item name="content_edge_space_percentage_end" format="float" type="dimen">0.95</item>
     <item name="content_edge_space_percentage_top" format="float" type="dimen">0.03</item>
+
+    <dimen name="ad_divider_size">2dp</dimen>
+    <dimen name="ad_padding">10dp</dimen>
+
 </resources>

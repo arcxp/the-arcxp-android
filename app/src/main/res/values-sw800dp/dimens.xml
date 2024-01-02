@@ -33,6 +33,12 @@
     <dimen name="text_size_small">20sp</dimen>
     <dimen name="text_size_extra_small">16sp</dimen>
 
+    <integer name="text_size_xlarge">40</integer>
+    <integer name="text_size_large">35</integer>
+    <integer name="text_size">24</integer>
+    <integer name="text_size_small">20</integer>
+    <integer name="text_size_extra_small">16</integer>
+
 
     <item name="item_layout_guideline_percentage" format="float" type="dimen">0.75</item>
 </resources>

@@ -26,6 +26,8 @@
 
     <integer name="rounded_corner_radius">15</integer>
     <integer name="rounded_corner_radius_thumbnail">10</integer>
+    <dimen name="rounded_corner_radius_dp">15dp</dimen>
+    <dimen name="rounded_corner_radius_thumbnail_dp">10dp</dimen>
 
     <dimen name="article_title_text_size">22sp</dimen>
     <dimen name="article_subtitle_text_size">15sp</dimen>

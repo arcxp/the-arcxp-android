@@ -4,8 +4,6 @@
         <item name="colorPrimary">@color/black</item>
         <item name="colorPrimaryVariant">@color/black</item>
         <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
-        <item name="searchViewStyle">@style/AppSearchView</item>
-        <item name="drawerArrowStyle">@style/DrawerIconStyle</item>
     </style>
 
     <style name="Theme.MyApplication.AppWidgetContainerParent" parent="@android:style/Theme.DeviceDefault">

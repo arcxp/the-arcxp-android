@@ -10,16 +10,14 @@ import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.text.bold
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import com.arcxp.commons.throwables.ArcXPException
-import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.R
-import com.arcxp.thearcxp.viewmodel.MainViewModel
 import com.google.android.material.snackbar.Snackbar
 
 
 open class BaseFragment : Fragment() {
-    val vm: MainViewModel by activityViewModels()
+//    val vm: MainViewModel by activityViewModels()
+//    val accountViewModel: AccountViewModel by activityViewModels()
 
     private var snackBarError: Snackbar? = null
 
@@ -53,11 +51,11 @@ open class BaseFragment : Fragment() {
             layoutParams.anchorGravity = Gravity.CENTER_HORIZONTAL
             layoutParams.width = CoordinatorLayout.LayoutParams.MATCH_PARENT
         } else {
-            val appBarView =
-                (activity as MainActivity).findViewById<TextView>(R.id.appTitleTextView)
-            val appBarParams = appBarView.layoutParams
+//            val appBarView =
+//                (activity as MainActivity).findViewById<TextView>(R.id.appTitleTextView)
+//            val appBarParams = appBarView.layoutParams
             val frameLayoutParams = snackBar.view.layoutParams as FrameLayout.LayoutParams
-            frameLayoutParams.topMargin = appBarParams.height
+//            frameLayoutParams.topMargin = appBarParams.height
             frameLayoutParams.gravity = Gravity.CENTER_HORIZONTAL
             frameLayoutParams.width = FrameLayout.LayoutParams.MATCH_PARENT
         }

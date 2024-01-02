@@ -4,8 +4,14 @@ import android.content.Context
 import android.util.Log
 import android.util.Patterns
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.arcxp.content.models.ArcXPSection
 import com.arcxp.thearcxp.R
@@ -28,13 +34,6 @@ fun Context.showErrorDialog(
 }
 
 fun CharSequence?.isValidEmail() = !isNullOrEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
-
-//fun ArcXPStory.print(): String {
-//    val output = StringBuilder()
-//    output.appendLine("<h1 style=text-align:center;> ${headlines?.basic}</h1>")
-//    return output.toString()
-//}
-
 
 fun Context.showAlertDialog(
     title: String = "Error",
@@ -67,6 +66,9 @@ fun ArcXPSection.getNameToUseFromSection() =
         this.name
     }
 
+fun ArcXPSection.getPushTopicName() =
+    id.subSequence(1, id.lastIndex+1)
+
 fun <T> FragmentActivity.collectOneTimeEvent(flow: Flow<T>, collect: suspend (T) -> Unit) {
     lifecycleScope.launchWhenCreated {
         launch {
@@ -80,6 +82,24 @@ fun <T> Fragment.collectOneTimeEvent(flow: Flow<T>, collect: suspend (T) -> Unit
         launch {
             flow.collect(collector = collect)
         }
+    }
+}
+
+@Composable
+fun OnLifecycleEvent(
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    onEvent: (owner: LifecycleOwner, event: Lifecycle.Event) -> Unit
+) {
+    DisposableEffect(lifecycleOwner) {
+        val lifecycle = lifecycleOwner.lifecycle
+        val observer = LifecycleEventObserver { owner, event ->
+            onEvent.invoke(owner, event)
+        }
+
+        lifecycle.addObserver(observer)
+        onDispose {
+                lifecycle.removeObserver(observer)
+            }
     }
 }
 

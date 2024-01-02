@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="ad_attribution">Advertisement</string>
+    <bool name="show_ads">true</bool>
+    <bool name="use_firebase">true</bool>
+    <integer name="section_ad_frequency">5</integer>
+    <bool name="use_rtl">false</bool>
+</resources>

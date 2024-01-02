@@ -3,7 +3,7 @@
     <string name="app_name">The Arc XP</string>
     <string name="orgName">arcsales</string>
     <string name="environment">sandbox</string>
-    <string name="siteName">site</string>
+    <string name="siteName">arcsales</string>
     <string name="commerceUrl">https://arcsales-arcsales-sandbox.api.cdn.arcpublishing.com</string>
     <string name="contentUrl">https://arcsales-arcsales-sandbox.web.arc-cdn.net</string>
     <string name="navigation_endpoint">mobile-nav</string>
@@ -16,18 +16,22 @@
     <string name="navigation_drawer_open">open</string>
     <string name="navigation_drawer_close">close</string>
     <string name="empty_collection">Get Collection result was Empty</string>
+    <string name="empty_video_collection">Video Collection result was Empty</string>
     <string name="create_account">Create Account</string>
     <string name="sign_up">Sign Up With Arc XP</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up_with_facebook">Sign Up with Facebook</string>
     <string name="sign_up_with_google">Sign Up with Google</string>
-    <string name="terms_string">By creating an account you agree to our Terms of Service, Privacy Policy and Community Policy.</string>
     <string name="already_have_account">Already have an account?</string>
+    <string name="terms_string">By creating an account you agree to our Terms of Service, Privacy Policy and Community Policy.</string>
     <string name="your_account_has_been_created">Your account has been created.</string>
     <string name="success">Success</string>
     <string name="password">Password</string>
+    <string name="cd_show_password">Show Password</string>
+    <string name="cd_hide_password">Hide Password</string>
     <string name="password_hint">Password Entry</string>
-    <string name="password_success">If there is an account associated with <![CDATA[<br/>%1$s]]>, you will receive an email shortly to reset your password. Thank you.</string>
+    <string name="password_success">If there is an account associated with this email, you will receive an email shortly with instructions on how to reset your password. Thank you.</string>
+    <string name="change_pwd_success">Your password has been successfully changed.</string>
     <string name="email">Email</string>
     <string name="email_address">Email address</string>
     <string name="last_name">Last Name</string>
@@ -35,6 +39,8 @@
     <string name="name">Name</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="terms_of_service">Terms of Service</string>
+    <string name="old_password">Old Password</string>
+    <string name="push_notifications">Push Notifications</string>
     <string name="new_password">New Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="password_no_match">Password does not match</string>
@@ -42,9 +48,10 @@
     <string name="enter_email">Enter the email address associated with your account. We will send you a password reset link.</string>
     <string name="send_password">Send Password Reset Email</string>
     <string name="incorrect_info">The information you provided is incorrect.\nPlease try again.</string>
-    <string name="remember_me">Remember me</string>
+    <string name="remember_me">Keep me logged in</string>
     <string name="no_account">Don\'t have an account?</string>
     <string name="policies">Policies</string>
+    <string name="preferences">Preferences</string>
     <string name="software_versions">Software Versions</string>
     <string name="readingTime">Time To Read: %s minutes</string>
     <string name="video_id_not_found">video id not found</string>
@@ -52,6 +59,7 @@
     <string name="playvideo">Play Video</string>
     <string name="searchtag">search</string>
     <string name="video">Video</string>
+    <string name="videos">Videos</string>
     <string name="login">Login</string>
     <string name="logout">Logout</string>
     <string name="register_account">Register Account</string>
@@ -65,6 +73,7 @@
     <string name="fb_signin">Sign in with Facebook</string>
     <string name="google_signin">Sign in with Google</string>
     <string name="back_to_sign_in">Back to Sign In</string>
+    <string name="back_to_account">Back to Account</string>
     <string name="search_results">Search Results</string>
     <string name="search">Search</string>
     <string name="search_hint">Search Term</string>
@@ -74,12 +83,17 @@
     <string name="get_every_story">Get every story</string>
     <string name="cancel_anytime"><![CDATA[You can <b>cancel anytime.</b>]]></string>
     <string name="account">Account</string>
+    <string name="home">Home</string>
     <string name="hometag">home</string>
     <string name="accounttag">account</string>
     <string name="videotag">video</string>
-    <string name="share_message">Share not implemented yet</string>
     <string name="video_load_error">Could not load video.</string>
+    <string name="article_load_error">Could not load article.</string>
     <string name="error">Error</string>
+    <string name="site_service_error">Site Service Failure:</string>
+    <string name="get_collection_error">Get Collection Failure:</string>
+    <string name="get_article_error">Get Article Failure:</string>
+    <string name="get_video_error">Get Video Failure:</string>
     <string name="device_type">mobile</string>
     <string name="glide_manager">com.bumptech.glide.manager</string>
     <string name="bullet">●</string>
@@ -112,6 +126,13 @@
     <string name="last_name_error">Missing input in list name field</string>
     <string name="email_error">Email must be formatted correctly (i.e. name@domain.com)</string>
     <string name="password_error">Missing input in password field</string>
+    <string name="password_invalid">Password is invalid</string>
+    <string name="password_error_full">Passwords must be at least 6 characters, contain at least 1 uppercase letter, at least 1 lowercase letter, 1 number and 1 special character</string>
+    <string name="password_error_length">Must be at least 6 characters</string>
+    <string name="password_error_uppercase">Must contain at least 1 uppercase character</string>
+    <string name="password_error_lowercase">Must contain at least 1 lowercase character</string>
+    <string name="password_error_numeral">Must contain at least 1 numerical character</string>
+    <string name="password_error_special">Must contain at least 1 special character</string>
     <string name="uppercase_pattern">^(?=.*[A-Z])</string>
     <string name="lowercase_pattern">^(?=.*[a-z])</string>
     <string name="numerical_pattern">^(?=.*\\d)</string>
@@ -119,4 +140,22 @@
     <string name="check_username_password">Please check username and password and try again.</string>
     <string name="SDK_colon_version">SDK: %s</string>
     <string name="By_author">By %s</string>
+    <string name="native_ad">ADVERTISEMENT</string>
+    <string name="play_arrow">play arrow</string>
+    <string name="all_categories">All Categories</string>
+    <string name="push_categories_title">Push Notification Categories</string>
+
+    <string name="notification_channel_default">arcxp_mobile_channel</string>
+
+    <string name="password_requirement_characters">At least 6 characters</string>
+    <string name="password_requirement_uppercase">At least 1 uppercase letter</string>
+    <string name="password_requirement_lowercase">At least 1 lowercase letter</string>
+    <string name="password_requirement_number">At least 1 numerical character</string>
+    <string name="password_requirement_special">At least 1 special character</string>
+    <string name="password_requirement_satisfied">%s, satisfied</string>
+    <string name="password_requirement_needed">%s, needed</string>
+
+    <string name="cannot_be_empty">%s cannot be empty</string>
+    <string name="site_service_result_was_empty">Site Service result was empty</string>
+
 </resources>

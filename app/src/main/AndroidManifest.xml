@@ -4,11 +4,13 @@
     package="com.arcxp.thearcxp">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".MainApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -16,7 +18,7 @@
         android:theme="@style/Theme.MyApplication"
         android:usesCleartextTraffic="false">
         <receiver
-            android:name=".ArcXPWidget"
+            android:name=".widget.ArcXPWidget"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -28,16 +30,28 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/arc_x_p_widget_info" />
         </receiver>
+        <service
+            android:name=".push.FirebaseMessageReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"></action>
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/admob_app_id"/>
+            android:value="@string/admob_app_id" />
         <meta-data
             android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"
-            android:value="true"/>
+            android:value="true" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/notification_channel_default" />
+
+        <meta-data android:name="google_analytics_automatic_screen_reporting_enabled" android:value="false" />
 
         <activity
-            android:name=".ArcXPWidgetConfigureActivity"
+            android:name=".widget.ArcXPWidgetConfigureActivity"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
@@ -47,13 +61,30 @@
             android:name=".MainActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:exported="true"
-            android:supportsPictureInPicture="true"
             android:launchMode="singleTop"
-            >
+            android:supportsPictureInPicture="true"
+            android:enableOnBackInvokedCallback="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="arcxp" android:host="article" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="arcxp" android:host="search" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="arcxp" android:host="video" />
             </intent-filter>
 
             <meta-data
@@ -61,8 +92,9 @@
                 android:resource="@xml/searchable" />
         </activity>
 
-        <service android:name=".ArcXPWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS"></service>
+        <service
+            android:name=".widget.ArcXPWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -73,8 +105,7 @@
 
         <activity
             android:name="com.facebook.FacebookActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name" />
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" />
         <activity
             android:name="com.facebook.CustomTabActivity"
             android:exported="true">
@@ -87,6 +118,13 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
+<!--        To avoid ad crash with no ad keys, uncomment the following -->
+<!--        <provider-->
+<!--            android:name="com.google.android.gms.ads.MobileAdsInitProvider"-->
+<!--            android:authorities="com.arcxp.thearcxp.google_mobile_ads_init_provider"-->
+<!--            tools:node="remove"-->
+<!--            android:exported="false" />-->
     </application>
 
 </manifest>

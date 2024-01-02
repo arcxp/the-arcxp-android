@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:configure="com.arcxp.thearcxp.ArcXPWidgetConfigureActivity"
+    android:configure="com.arcxp.thearcxp.widget.ArcXPWidgetConfigureActivity"
     android:description="@string/app_widget_description"
     android:initialKeyguardLayout="@layout/arc_x_p_widget"
     android:initialLayout="@layout/arc_x_p_widget"

@@ -4,6 +4,11 @@ plugins {
     id 'kotlin-kapt'
 }
 
+if (isGoogleServicesJsonPresent()) {
+    apply plugin: 'com.google.gms.google-services'
+    apply plugin: 'com.google.firebase.crashlytics'
+}
+
 def getLocalProperties() {
     def localProperties = new Properties()
     if (rootProject.file("local.properties").exists()) {
@@ -11,7 +16,6 @@ def getLocalProperties() {
     }
     return localProperties
 }
-
 
 
 android {
@@ -31,6 +35,11 @@ android {
         resValue "string", "admob_app_id", System.getenv("admob_app_id") ?: localProperties['admob_app_id'] ?: ""
         resValue "string", "admob_banner_id", System.getenv("admob_banner_id") ?: localProperties['admob_banner_id'] ?: ""
         resValue "string", "admob_native_id", System.getenv("admob_native_id") ?: localProperties['admob_native_id'] ?: ""
+        if (isGoogleServicesJsonPresent()) {
+            buildConfigField "boolean", "HAS_GOOGLE_SERVICES", "true"
+        } else {
+            buildConfigField "boolean", "HAS_GOOGLE_SERVICES", "false"
+        }
     }
 
     signingConfigs {
@@ -67,14 +76,18 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
     buildFeatures {
         viewBinding true
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.7"
     }
 
     //client implementation can safely ignore this section, for internal testing/development only
@@ -97,55 +110,99 @@ dependencies {
         }
     }
 
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+
+    implementation "androidx.compose.ui:ui:1.4.3"
+    implementation "androidx.compose.foundation:foundation:1.4.3"
+    implementation "androidx.compose.runtime:runtime-livedata:1.4.3"
 
     //Facebook
-    implementation 'com.facebook.android:facebook-login:8.2.0'
+    implementation 'com.facebook.android:facebook-login:12.3.0'
     implementation 'com.facebook.android:facebook-android-sdk:12.3.0'
     //Google
     implementation 'com.google.android.gms:play-services-auth:20.5.0'
     implementation 'com.google.android.gms:play-services-safetynet:18.0.1'
     implementation 'com.google.android.gms:play-services-basement:18.2.0'
+    implementation 'com.google.android.gms:play-services-cloud-messaging:17.0.2'
 
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'com.google.android.gms:play-services-ads-lite:22.1.0'
     kapt 'com.github.bumptech.glide:compiler:4.12.0'
-
     implementation 'com.google.android.gms:play-services-ads:22.1.0'
-    implementation('com.google.android.ads.consent:consent-library:1.0.8') {
-        exclude group: 'com.android.support', module: 'support-compat'
-        exclude group: 'com.android.support', module: 'support-media-compat'
-    }
+    //gdpr consent library for admob
+    implementation 'com.google.android.ump:user-messaging-platform:2.0.0'
 
     //include sdks
     //for client implementations, just use 'implementation ..' instead of creating/using arcPartnersImplementation flavor
-    arcPartnersImplementation 'arcxp-sdk-android:arcxp-mobile-sdk-android:1.0.1'
+    arcPartnersImplementation 'arcxp-sdk-android:arcxp-mobile-sdk-android:1.1.0'
 
     //internal use only!
     arcXPInternalImplementation project(":arcxp-mobile-sdk-android")
 
+    implementation 'androidx.fragment:fragment-ktx:1.6.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
 
-    implementation 'androidx.fragment:fragment-ktx:1.5.5'
-    implementation 'androidx.navigation:navigation-fragment:2.4.1'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.4.1'
+//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
+    def composeBom = platform('androidx.compose:compose-bom:2023.06.01')
+    implementation composeBom
+    androidTestImplementation composeBom
 
-    implementation 'com.facebook.android:facebook-login:8.2.0'
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
-    implementation 'com.squareup:pollexor:3.0.0'
+    implementation 'androidx.compose.material:material-icons-core'
+    implementation 'androidx.compose.material:material-icons-extended'
+    implementation 'androidx.compose.material3:material3-window-size-class'
+
+    def paging_version = "3.1.1"
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
+    implementation "androidx.paging:paging-compose:1.0.0-alpha17"
+    // Android Studio Preview support
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+
+    implementation 'androidx.activity:activity-compose:1.7.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
+    implementation 'androidx.compose.runtime:runtime-livedata'
+
+    implementation 'androidx.compose.ui:ui-viewbinding'
+
+    implementation 'androidx.compose.material3:material3'
+
+    implementation "androidx.navigation:navigation-compose:2.6.0"
+    implementation 'androidx.compose.runtime:runtime-livedata:1.5.0-beta02'
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.1"
+    implementation 'com.github.bumptech.glide:compose:1.0.0-alpha.1'
+
+    implementation "com.google.accompanist:accompanist-pager:0.31.5-beta"
+    implementation "com.google.accompanist:accompanist-pager-indicators:0.31.5-beta"
+
+    // Android Studio Preview support
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+
+    // Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:32.5.0')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-messaging-ktx'
 
     //test
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    testImplementation "io.mockk:mockk-android:1.13.8"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
 
-
-//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
+def isGoogleServicesJsonPresent() {
+    return file("google-services.json").exists()
 }

@@ -14,10 +14,10 @@ dependencyResolutionManagement {
         //for sdk dependencies from maven
 //        maven {
 //            credentials {
-//                username "$mavenUser"
-//                password "$mavenPassword"
+//                username "$GITHUB_USER_ID"
+//                password "$PAT"
 //            }
-//            url 'https://washingtonpost.jfrog.io/washingtonpost/arc-sdk-android'
+//            url 'https://maven.pkg.github.com/arcxp/arcxp-sdk-android'
 //        }
 
         //for sdk dependencies from local directory
@@ -25,7 +25,7 @@ dependencyResolutionManagement {
             url "${rootDir}/arcxp-libs/"
         }
 
-        //for video sdk internal debug flavor only
+        //for mobile sdk internal debug flavor only
         maven {
             url "${rootDir}/arcxp-mobile-sdk-android/om_sdk_repo"
         }

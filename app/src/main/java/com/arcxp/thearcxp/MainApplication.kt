@@ -7,12 +7,11 @@ import com.arcxp.content.ArcXPContentConfig
 
 /**
  * Main application class for the app.
- * This app is uses the single activity model with MainActivity being the only activity.
- * Therefore there is only ViewModel for the app.
+ * This app uses the single activity model with MainActivity being the only activity.
  *
  * This class does the following :
- * 1. Instantiates the viewmodel
- * 2. Initializes all of the ArcXP SDKs.
+ * 1.  Initialize the ArcXP SDK (with video module (default) and optional content and commerce modules).
+ * 2.  Retrieves the showAd setting from strings.xml as source of truth on whether to enable ads.
  *
  */
 class MainApplication : Application() {
@@ -24,7 +23,7 @@ class MainApplication : Application() {
 
         showAds = resources.getBoolean(R.bool.show_ads)
 
-        //Initialize the ArcXP Content SDK
+        // Initialize the optional Content Module for SDK
         val contentConfig = ArcXPContentConfig.Builder()
             //This is an additional parameter put on the base URL that retrieves the
             //section data for mobile devices.
@@ -41,10 +40,13 @@ class MainApplication : Application() {
             .setPreloading(preLoading = true)
             .build()
 
+
+        // Initialize the optional Commerce Module for SDK
+
         //If the client code caches UUID, refresh token and access token they can
         //be passed into the SDK using this variable
         val commerceAuthData = mutableMapOf<String, String>()
-        //Initialize the Commerce SDK.
+
         val commerceConfig = ArcXPCommerceConfig.Builder()
             .setContext(this)
             //IDs for Facebook and Google.  Needed for third party login capabilities.
@@ -61,7 +63,7 @@ class MainApplication : Application() {
             .build()
 
         //Set the base URL for content.  Set the organization, site and environment.
-        //These values can be gotten from the ArcXP admin
+        //These values can be gotten from your ArcXP admin
         ArcXPMobileSDK.initialize(
             application = this,
             site = getString(R.string.siteName),
@@ -73,15 +75,10 @@ class MainApplication : Application() {
         )
 
         //Check for ad enablement
-        if (ArcXPMobileSDK.commerceManager().sessionIsActive()) {
+        if (ArcXPMobileSDK.commerceInitialized() && ArcXPMobileSDK.commerceManager().sessionIsActive()) {
             showAds = false;
         }
     }
 
-    fun showAds(): Boolean {
-        if (ArcXPMobileSDK.commerceManager().sessionIsActive()) {
-            return false
-        }
-        return showAds
-    }
+    fun showAds() = showAds
 }
