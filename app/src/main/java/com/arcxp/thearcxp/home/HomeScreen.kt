@@ -60,11 +60,6 @@ fun HomeScreen(
             // Handle Success case
             val sections = (sectionsResult as Success<List<ArcXPSection>>).success
 
-            sections.forEachIndexed { index, section ->
-                val name = section.getNameToUseFromSection()
-                mainViewModel.sectionsIndexMap[index] = name
-                mainViewModel.indexSectionMap[name] = index
-            }
             val pagerState = rememberPagerState(pageCount = { sections.size })
 
             val coroutineScope = rememberCoroutineScope()

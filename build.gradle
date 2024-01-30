@@ -7,8 +7,8 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath 'com.google.gms:google-services:4.3.15'
+        classpath 'com.android.tools.build:gradle:8.1.4'
+        classpath 'com.google.gms:google-services:4.4.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -18,6 +18,7 @@ plugins {
     id 'com.android.application' version '7.1.2' apply false
     id 'com.android.library' version '7.1.2' apply false
     id 'com.google.firebase.crashlytics' version '2.9.9' apply false
+//    id 'com.google.devtools.ksp' version '1.8.10-1.0.9' apply false   //convert to ksp in the future
 }
 
 task clean(type: Delete) {

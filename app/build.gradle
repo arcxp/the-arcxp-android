@@ -19,12 +19,13 @@ def getLocalProperties() {
 
 
 android {
-    compileSdk 33
+    namespace 'com.arcxp.thearcxp'
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.arcxp.thearcxp"
         minSdk 22
-        targetSdk 33
+        targetSdk 34
         versionCode 5
         versionName project.property("app_version")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -32,7 +33,7 @@ android {
         resValue "string", "fb_login_protocol_scheme", System.getenv("fb_login_protocol_scheme") ?: localProperties['fb_login_protocol_scheme'] ?: ""
         resValue "string", "facebook_client_token", System.getenv("facebook_client_token") ?: localProperties['facebook_client_token'] ?: ""
         resValue "string", "resizer_key", System.getenv("resizer_key") ?: localProperties['resizer_key'] ?: ""
-        resValue "string", "admob_app_id", System.getenv("admob_app_id") ?: localProperties['admob_app_id'] ?: ""
+        resValue "string", "admob_app_id", System.getenv("admob_app_id") ?: localProperties['admob_app_id'] ?: project.admob_app_id ?: ""
         resValue "string", "admob_banner_id", System.getenv("admob_banner_id") ?: localProperties['admob_banner_id'] ?: ""
         resValue "string", "admob_native_id", System.getenv("admob_native_id") ?: localProperties['admob_native_id'] ?: ""
         if (isGoogleServicesJsonPresent()) {
@@ -76,11 +77,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = '17'
     }
     buildFeatures {
         viewBinding true
@@ -142,7 +143,7 @@ dependencies {
 
     //include sdks
     //for client implementations, just use 'implementation ..' instead of creating/using arcPartnersImplementation flavor
-    arcPartnersImplementation 'arcxp-sdk-android:arcxp-mobile-sdk-android:1.1.0'
+    arcPartnersImplementation 'arcxp-sdk-android:arcxp-mobile-sdk-android:1.2.0'
 
     //internal use only!
     arcXPInternalImplementation project(":arcxp-mobile-sdk-android")

@@ -5,30 +5,43 @@ pluginManagement {
         mavenCentral()
     }
 }
+
+def localProperties = new Properties()
+if (file("local.properties").exists()) {
+    file("local.properties").withInputStream {
+        localProperties.load(it)
+    }
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
 
-        //for sdk dependencies from maven
-//        maven {
-//            credentials {
-//                username "$GITHUB_USER_ID"
-//                password "$PAT"
-//            }
-//            url 'https://maven.pkg.github.com/arcxp/arcxp-sdk-android'
-//        }
+        // Define common credentials for GitHub repositories (needs read packages permission for PAT)
+        def githubCredentials = {
+            username = System.getenv('GITHUB_USER')
+                    ?: providers.gradleProperty('GITHUB_USER').get()
+                    ?: localProperties.getProperty("GITHUB_USER")
+                    ?: ""
+            password = System.getenv('GITHUB_PERSONAL_ACCESS_TOKEN')
+                    ?: providers.gradleProperty('GITHUB_PERSONAL_ACCESS_TOKEN').get()
+                    ?: localProperties.getProperty("GITHUB_PERSONAL_ACCESS_TOKEN")
+                    ?: ""
+        }
 
-        //for sdk dependencies from local directory
+        // for sdk dependencies from local directory
         maven {
             url "${rootDir}/arcxp-libs/"
         }
 
-        //for mobile sdk internal debug flavor only
+        // for sdk dependencies from maven
         maven {
-            url "${rootDir}/arcxp-mobile-sdk-android/om_sdk_repo"
+            credentials(githubCredentials)
+            url 'https://maven.pkg.github.com/arcxp/arcxp-sdk-android'
         }
+
     }
 }
 rootProject.name = "TheArcXP"
@@ -36,8 +49,8 @@ include ':app'
 
 //client implementation can ignore the following, for internal use only:
 try {
-    include ':arcxp-mobile-sdk-android' //':arcxp-content-sdk-android', ':arcxp-commerce-sdk-android', ':arcxp-video-sdk-android'
-} catch(Exception ignored) {
+    include ':arcxp-mobile-sdk-android'
+} catch (Exception ignored) {
     //safe to ignore in default arcPartnersDebug flavor
     //submodules are only for internal use only
 }

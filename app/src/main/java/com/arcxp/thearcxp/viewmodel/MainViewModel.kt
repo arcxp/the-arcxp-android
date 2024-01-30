@@ -3,7 +3,6 @@ package com.arcxp.thearcxp.viewmodel
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
@@ -61,9 +60,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _navigateTo = MutableLiveData<NavigationDataItem>()
     val navigateTo: LiveData<NavigationDataItem> = _navigateTo
 
-    var sections = HashMap<String, ArcXPSection>()
-    var sectionsIndexMap = HashMap<Int, String>()
-    var indexSectionMap = HashMap<String, Int>()
+    val sections = hashMapOf<String, ArcXPSection>()
+    val sectionsIndexMap = hashMapOf<Int, String>()
+    val indexSectionMap = hashMapOf<String, Int>()
 
     //to be replaced by identity solution
     var pushNotificationsTopicSubscriptions = hashMapOf<String,PushTopicSubscriptionItem>()
@@ -80,8 +79,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 when (val result = ArcXPMobileSDK.contentManager().getSectionListSuspend()) {
                     is Success -> {
                         sections.clear()
-                        result.success.forEach { section ->
-                            sections[section.getNameToUseFromSection()] = section
+                        result.success.forEachIndexed { index, section ->
+                            val name = section.getNameToUseFromSection()
+                            sectionsIndexMap[index] = name
+                            indexSectionMap[name] = index
+                            sections[name] = section
                         }
                         _sectionsListEvent.postValue(Success(result.success))
                     }
