@@ -6,7 +6,9 @@
     <string name="siteName">arcsales</string>
     <string name="commerceUrl">https://arcsales-arcsales-sandbox.api.cdn.arcpublishing.com</string>
     <string name="contentUrl">https://arcsales-arcsales-sandbox.web.arc-cdn.net</string>
+    <!-- main mobile navigation site service hierarchy -->
     <string name="navigation_endpoint">mobile-nav</string>
+    <!-- pre made video collection with this collection alias -->
     <string name="video_endpoint">mobile-video</string>
     <string name="tos_url">https://www.washingtonpost.com/information/2022/01/01/terms-of-service/</string>
     <string name="pp_url">https://www.arcxp.com/privacy/</string>
@@ -157,5 +159,6 @@
 
     <string name="cannot_be_empty">%s cannot be empty</string>
     <string name="site_service_result_was_empty">Site Service result was empty</string>
+    <string name="open_x">open %s</string>
 
 </resources>

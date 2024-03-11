@@ -18,13 +18,14 @@ import com.arcxp.commons.throwables.ArcXPException
 import com.arcxp.commons.util.Either
 import com.arcxp.commons.util.Failure
 import com.arcxp.commons.util.Success
+import com.arcxp.content.extendedModels.ArcXPContentElement
 import com.arcxp.content.models.ArcXPSection
+import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.push.NavigationDataItem
 import com.arcxp.thearcxp.push.PushTopicSubscriptionItem
 import com.arcxp.thearcxp.tabfragment.WebSectionFragment
+import com.arcxp.thearcxp.ui.paging.CollectionPagingSource
 import com.arcxp.thearcxp.ui.paging.SearchResultsPagingSource
-import com.arcxp.thearcxp.ui.paging.SectionListPagingSource
-import com.arcxp.thearcxp.ui.paging.VideoPagingSource
 import com.arcxp.thearcxp.utils.getNameToUseFromSection
 import com.facebook.login.widget.LoginButton
 import com.google.firebase.ktx.Firebase
@@ -32,6 +33,9 @@ import com.google.firebase.messaging.ktx.messaging
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.reflect.Type
@@ -64,11 +68,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val sectionsIndexMap = hashMapOf<Int, String>()
     val indexSectionMap = hashMapOf<String, Int>()
 
+    private val _alertBarState = MutableSharedFlow<ArcXPContentElement?>()
+    fun alertBarState(): SharedFlow<ArcXPContentElement?> = _alertBarState.asSharedFlow()
+
     //to be replaced by identity solution
-    var pushNotificationsTopicSubscriptions = hashMapOf<String,PushTopicSubscriptionItem>()
+    var pushNotificationsTopicSubscriptions = hashMapOf<String, PushTopicSubscriptionItem>()
 
     private var sharedPreferences: SharedPreferences =
         application.getSharedPreferences("Preferences", Context.MODE_PRIVATE)
+
+    init {
+        viewModelScope.launch {
+            val alertBarResult =
+                ArcXPMobileSDK.contentManager().getCollectionSuspend(collectionAlias = "alert-bar")
+            if (alertBarResult is Success) {
+                val list = alertBarResult.success
+                if (list.isNotEmpty()) {
+                    list[0]?.let { _alertBarState.emit(it) }
+                }
+            }
+        }
+    }
 
     /**
      * Fetches the navigation items from site service, and propagates the results via live data
@@ -76,7 +96,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun fetchSectionsList() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                when (val result = ArcXPMobileSDK.contentManager().getSectionListSuspend()) {
+                when (val result = ArcXPMobileSDK.contentManager().getSectionListSuspend(
+                    siteHierarchy = getApplication<Application>().resources.getString(R.string.navigation_endpoint) // create a site service hierarchy in advance
+                )) {
                     is Success -> {
                         sections.clear()
                         result.success.forEachIndexed { index, section ->
@@ -108,7 +130,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun loginWithFacebook(fbButton: LoginButton, owner: LifecycleOwner): LiveData<ArcXPAuth> {
         return ArcXPMobileSDK.commerceManager().loginWithFacebook(fbButton)
     }
-    
+
     private fun createWebSection(key: String?, name: String?) =
         WebSectionFragment().withUrlAndName(key, name)
 
@@ -117,27 +139,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         config = PagingConfig(
             pageSize = 20,
             enablePlaceholders = false,
-            prefetchDistance = 1 //TODO this controls how many units away when the next page is called for
+            prefetchDistance = 1 //this controls how many units away when the next page is called for
         ),
-        pagingSourceFactory = { SectionListPagingSource(id = collectionAlias, pageSize = 20) }
+        pagingSourceFactory = { CollectionPagingSource(id = collectionAlias, pageSize = 20) }
     ).flow
         .cachedIn(viewModelScope)
-    fun getVideoCollection() = Pager(
-        config = PagingConfig(
-            pageSize = 20,
-            enablePlaceholders = false,
-            prefetchDistance = 1 //TODO this controls how many units away when the next page is called for
-        ),
-        pagingSourceFactory = { VideoPagingSource(pageSize = 20) }
-    ).flow
-        .cachedIn(viewModelScope)
+
     fun getSearchResults(searchTerms: String) = Pager(
         config = PagingConfig(
             pageSize = 20,
             enablePlaceholders = false,
             prefetchDistance = 1 //TODO this controls how many units away when the next page is called for
         ),
-        pagingSourceFactory = { SearchResultsPagingSource(searchTerms = searchTerms, pageSize = 20) }
+        pagingSourceFactory = {
+            SearchResultsPagingSource(
+                searchTerms = searchTerms,
+                pageSize = 20
+            )
+        }
     ).flow
         .cachedIn(viewModelScope)
 
@@ -173,7 +192,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun subscribeToPushNotificationTopic(name: String, topic: String) {
         savePushNotificationSubscribedTopics()
-            Firebase.messaging.subscribeToTopic(topic)
+        Firebase.messaging.subscribeToTopic(topic)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     //to be replaced by identity solution
@@ -182,7 +201,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     savePushNotificationSubscribedTopics()
                 } else {
                     //remove before release
-                    Toast.makeText(getApplication(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(getApplication(), task.exception?.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
     }
@@ -196,7 +216,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     savePushNotificationSubscribedTopics()
                 } else {
                     //remove before release
-                    Toast.makeText(getApplication(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(getApplication(), task.exception?.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
     }

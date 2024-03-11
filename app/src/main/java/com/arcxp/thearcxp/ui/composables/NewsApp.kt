@@ -35,6 +35,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -43,19 +48,20 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -69,12 +75,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.arcxp.commons.throwables.ArcXPException
 import com.arcxp.commons.util.Either
 import com.arcxp.commons.util.Success
+import com.arcxp.content.extendedModels.title
 import com.arcxp.content.models.ArcXPSection
 import com.arcxp.thearcxp.LocalArticleViewModel
 import com.arcxp.thearcxp.LocalMainViewModel
@@ -103,6 +111,9 @@ import com.arcxp.thearcxp.ui.navigation.AppDestination.Video
 import com.arcxp.thearcxp.ui.navigation.AppDestination.VideoTab
 import com.arcxp.thearcxp.ui.navigation.AppNavHost
 import com.arcxp.thearcxp.ui.theme.AppTheme
+import com.arcxp.thearcxp.ui.theme.alertBarActionText
+import com.arcxp.thearcxp.ui.theme.alertBarBackground
+import com.arcxp.thearcxp.ui.theme.alertBarText
 import com.arcxp.thearcxp.utils.encodeUrl
 import com.arcxp.thearcxp.utils.getNameToUseFromSection
 import com.arcxp.thearcxp.utils.noRippleClickable
@@ -111,7 +122,7 @@ import com.arcxp.thearcxp.viewmodel.MainViewModel
 import com.arcxp.thearcxp.web.WebViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsApp(
     mainViewModel: MainViewModel = LocalMainViewModel.current,
@@ -122,6 +133,34 @@ fun NewsApp(
     val navController = rememberNavController()
     val currentDestination = navController.currentBackStackEntryAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val alertBar = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+
+    val alertBarState by mainViewModel.alertBarState().collectAsStateWithLifecycle(initialValue = null)
+    LaunchedEffect(alertBarState) {
+        alertBarState?.let {
+            val result = alertBar.showSnackbar(
+                message = it.title(),
+                duration = SnackbarDuration.Indefinite,
+                actionLabel = context.getString(R.string.open_x, it.type),
+                withDismissAction = true
+            )
+            when (result) {
+                SnackbarResult.ActionPerformed -> {
+                    val navItem = IntentNavigationDataItem(
+                        uuid = it._id,
+                        contentType = it.type
+                    )
+                    mainViewModel.triggerNavigation(navItem)
+                }
+
+                SnackbarResult.Dismissed -> {
+                }
+            }
+        }
+    }
+
 
     DisposableEffect(mainViewModel.navigateTo) {
         val observer = Observer<NavigationDataItem> { value ->
@@ -210,6 +249,16 @@ fun NewsApp(
                 },
                 content = {
                     Scaffold(
+                        snackbarHost = {
+                            SnackbarHost(hostState = alertBar) {
+                                Snackbar(
+                                    snackbarData = it,
+                                    containerColor = alertBarBackground,
+                                    contentColor = alertBarText,
+                                    actionColor = alertBarActionText,
+                                )
+                            }
+                        },
                         topBar = {
                             AnimatedVisibility(
                                 visible = barsVisible

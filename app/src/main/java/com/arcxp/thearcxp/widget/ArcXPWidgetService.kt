@@ -12,13 +12,13 @@ import android.widget.RemoteViewsService
 import com.arcxp.ArcXPMobileSDK
 import com.arcxp.ArcXPMobileSDK.application
 import com.arcxp.commons.throwables.ArcXPException
-import com.arcxp.content.extendedModels.ArcXPCollection
-import com.arcxp.content.extendedModels.thumbnail
 import com.arcxp.commons.util.Either
 import com.arcxp.commons.util.Success
+import com.arcxp.content.extendedModels.ArcXPContentElement
+import com.arcxp.content.extendedModels.thumbnail
 import com.arcxp.thearcxp.R
-import com.arcxp.thearcxp.widget.ArcXPWidget.Companion.ARTICLE_ID_KEY
 import com.arcxp.thearcxp.utils.TAG
+import com.arcxp.thearcxp.widget.ArcXPWidget.Companion.ARTICLE_ID_KEY
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -35,7 +35,7 @@ class ArcXPWidgetService : RemoteViewsService() {
     ) : RemoteViewsFactory {
 
         private val headlinesBasics = mutableListOf<String>()
-        private val items = mutableListOf<ArcXPCollection>()
+        private val items = mutableListOf<ArcXPContentElement>()
         private val widgetArticleId = mutableListOf<String>()
         private var sectionId = ""
 
@@ -59,12 +59,12 @@ class ArcXPWidgetService : RemoteViewsService() {
 
             val coroutineContext = CoroutineScope(Dispatchers.IO + SupervisorJob())
             coroutineContext.launch {
-                val result: Either<ArcXPException, Map<Int, ArcXPCollection>> =
+                val result: Either<ArcXPException, Map<Int, ArcXPContentElement>> =
                     ArcXPMobileSDK.contentManager().getCollectionSuspend(sectionId)
                 if (result is Success) {
                     result.success.forEach { entry ->
-                        entry.value.headlines.basic?.let { headlinesBasics.add(it) }
-                        entry.value.id.let { widgetArticleId.add(it) }
+                        entry.value.headlines?.basic?.let { headlinesBasics.add(it) }
+                        entry.value._id.let { widgetArticleId.add(it) }
 
                         if (entry.value.thumbnail().isNotEmpty()) {
                             items.add(entry.value)

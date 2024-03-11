@@ -17,7 +17,11 @@ import com.arcxp.commons.util.Success
 import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.databinding.ArcXPWidgetConfigureBinding
 import com.arcxp.thearcxp.utils.TAG
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 /**
@@ -29,9 +33,9 @@ class ArcXPWidgetConfigureActivity : Activity() {
     private lateinit var binding: ArcXPWidgetConfigureBinding
     private val configSectionListItems = mutableListOf<String>()
     private val configListIds = mutableListOf<String>()
-
-    private val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private val mainContext = CoroutineScope(Dispatchers.Main + SupervisorJob()).coroutineContext
+    private val job = SupervisorJob()
+    private val ioScope = CoroutineScope(Dispatchers.IO + job)
+    private val mainContext = CoroutineScope(Dispatchers.Main + job).coroutineContext
 
     public override fun onCreate(icicle: Bundle?) {
         super.onCreate(icicle)
@@ -43,19 +47,20 @@ class ArcXPWidgetConfigureActivity : Activity() {
         setContentView(binding.root)
 
         ioScope.launch {
-            ArcXPMobileSDK.contentManager().getSectionListSuspend().apply {
-                if (this is Success) {
-                    success.forEach {
-                        configSectionListItems.add(it.navigation.nav_title.toString())
-                        configListIds.add(it.id)
+            ArcXPMobileSDK.contentManager().getSectionListSuspend(siteHierarchy = "mobile-nav")
+                .apply {
+                    if (this is Success) {
+                        success.forEach {
+                            configSectionListItems.add(it.navigation.nav_title.toString())
+                            configListIds.add(it.id)
+                        }
+                        withContext(context = mainContext) {
+                            finishInit()
+                        }
+                    } else {
+                        Log.d(TAG, "Widget Section List Retrieval Failure")
                     }
-                    withContext(context = mainContext) {
-                        finishInit()
-                    }
-                } else {
-                    Log.d(TAG, "Widget Section List Retrieval Failure")
                 }
-            }
         }
     }
 
@@ -105,6 +110,11 @@ class ArcXPWidgetConfigureActivity : Activity() {
             finish()
             return
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
     }
 }
 

@@ -83,7 +83,7 @@ class VideoViewModel(application: Application) : AndroidViewModel(application) {
         arcXPVideoConfigBuilder.setShouldShowFullScreenButton(shouldShowFullScreenButton = false)
         arcXPVideoConfigBuilder.showSeekButton(show = true)
         arcXPVideoConfigBuilder.useDialogForFullscreen(use = true)
-        arcXPVideoConfigBuilder.setDisableControlsToggleWithTouch(disable = false) //setting to true will disable touch events showing player controller
+        arcXPVideoConfigBuilder.showProgressBar(show = true)
         arcXPVideoConfig = arcXPVideoConfigBuilder.build()
         arcMediaPlayer.configureMediaPlayer(config = arcXPVideoConfig)
     }

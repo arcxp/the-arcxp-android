@@ -15,6 +15,7 @@ import androidx.compose.ui.composed
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import com.arcxp.thearcxp.AppEnvironment
 import com.arcxp.thearcxp.R
 import com.arcxp.video.ArcMediaPlayer
 import com.arcxp.video.ArcXPVideoConfig
@@ -54,7 +55,12 @@ fun spinner(context: Context): CircularProgressDrawable {
     val circularProgressDrawable = CircularProgressDrawable(context)
     circularProgressDrawable.strokeWidth = 5f
     circularProgressDrawable.centerRadius = 30f
-    circularProgressDrawable.setColorSchemeColors(ContextCompat.getColor(context, R.color.primaryDark))
+    circularProgressDrawable.setColorSchemeColors(
+        ContextCompat.getColor(
+            context,
+            R.color.primaryDark
+        )
+    )
     circularProgressDrawable.start()
     return circularProgressDrawable
 }
@@ -90,9 +96,15 @@ fun Context.findActivity(): Activity {
     throw IllegalStateException("no activity")
 }
 
-fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
-    clickable(indication = null,
-        interactionSource = remember { MutableInteractionSource() }) {
-        onClick()
-    }
-}
+fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = then(
+    if (AppEnvironment.isTestEnvironment) {
+        // In test environment, return the modifier unaltered
+        this
+    } else
+        composed {
+            clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = onClick
+            )
+        })

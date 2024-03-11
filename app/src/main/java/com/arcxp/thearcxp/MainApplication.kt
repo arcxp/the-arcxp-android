@@ -25,11 +25,6 @@ class MainApplication : Application() {
 
         // Initialize the optional Content Module for SDK
         val contentConfig = ArcXPContentConfig.Builder()
-            //This is an additional parameter put on the base URL that retrieves the
-            //section data for mobile devices.
-            .setNavigationEndpoint(endpoint = getString(R.string.navigation_endpoint))
-            //This is a string corresponding to a video collection content alias
-            .setVideoCollectionName(videoCollectionName = getString(R.string.video_endpoint))
             //Content SDK caches data to decrease the amount of bandwidth needed.
             //This value can be between 10 and 1024 MB
             .setCacheSize(sizeInMB = 1024)

@@ -5,25 +5,25 @@ import androidx.paging.PagingState
 import com.arcxp.ArcXPMobileSDK
 import com.arcxp.commons.util.Failure
 import com.arcxp.commons.util.Success
-import com.arcxp.content.extendedModels.ArcXPCollection
+import com.arcxp.content.extendedModels.ArcXPContentElement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SearchResultsPagingSource(val searchTerms: String, val pageSize: Int) : PagingSource<Int, ArcXPCollection>() {
+class SearchResultsPagingSource(val searchTerms: String, val pageSize: Int) : PagingSource<Int, ArcXPContentElement>() {
 
-    override fun getRefreshKey(state: PagingState<Int, ArcXPCollection>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, ArcXPContentElement>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
             anchorPage?.prevKey?.plus(pageSize) ?: anchorPage?.nextKey?.minus(pageSize)
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ArcXPCollection> =
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ArcXPContentElement> =
         withContext(Dispatchers.IO) {
             return@withContext try {
                 val page = params.key ?: 0
                 when (val response =
-                    ArcXPMobileSDK.contentManager().searchCollectionSuspend(searchTerm = searchTerms, from = page)) {
+                    ArcXPMobileSDK.contentManager().searchSuspend(searchTerm = searchTerms, from = page)) {
                     is Success -> {
                         val list = response.success.toSortedMap().values.toList()
                         LoadResult.Page(

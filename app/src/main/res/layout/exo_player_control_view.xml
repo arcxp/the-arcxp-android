@@ -182,14 +182,14 @@
             style="@style/ExoStyledControls.Button.Center.Previous"
             android:contentDescription="@string/prev_button_content_description" />
 
-        <include layout="@layout/exo_styled_player_control_rewind_button" />
+        <include layout="@layout/exo_player_control_rewind_button" />
 
         <ImageButton
             android:id="@id/exo_play_pause"
             style="@style/ExoStyledControls.Button.Center.PlayPause"
             android:contentDescription="@string/play_pause_button_content_description" />
 
-        <include layout="@layout/exo_styled_player_control_ffwd_button" />
+        <include layout="@layout/exo_player_control_ffwd_button" />
 
         <ImageButton
             android:id="@+id/exo_next_button"

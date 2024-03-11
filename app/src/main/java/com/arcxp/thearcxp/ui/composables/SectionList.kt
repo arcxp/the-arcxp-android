@@ -41,8 +41,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemsIndexed
-import com.arcxp.content.extendedModels.ArcXPCollection
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
+import com.arcxp.content.extendedModels.ArcXPContentElement
 import com.arcxp.content.extendedModels.author
 import com.arcxp.content.extendedModels.date
 import com.arcxp.content.extendedModels.description
@@ -71,7 +72,7 @@ enum class SectionType {
 fun SectionList(
     modifier: Modifier = Modifier,
     accountViewModel: AccountViewModel = LocalAccountViewModel.current,
-    collectionFlow: Flow<PagingData<ArcXPCollection>>,
+    collectionFlow: Flow<PagingData<ArcXPContentElement>>,
     sectionType: SectionType,
     openArticle: (String) -> Unit = {},
     openVideo: (String) -> Unit = {},
@@ -95,17 +96,18 @@ fun SectionList(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        itemsIndexed(
-            items = collections,
-            key = { _, collection -> collection.id } // Use unique id as a key
-        ) { index, collection ->
-            collection?.apply {
+        items(
+            count = collections.itemCount,
+            key = collections.itemKey(),
+            contentType = collections.itemContentType(),
+        ) { index ->
+            collections[index]?.apply {
 
                 val onClick = {
                     if (isVideo()) {
-                        openVideo(id)
+                        openVideo(_id)
                     } else {
-                        openArticle(id)
+                        openArticle(_id)
                     }
                 }
 
@@ -201,7 +203,7 @@ fun SectionList(
 
 
 @Composable
-fun ArcXPCollection.SectionListCard(
+fun ArcXPContentElement.SectionListCard(
     onContentClick: () -> Unit
 ) {
     Row(
@@ -270,7 +272,7 @@ fun ArcXPCollection.SectionListCard(
 }
 
 @Composable
-fun ArcXPCollection.CollectionCardTop(
+fun ArcXPContentElement.CollectionCardTop(
     onContentClick: () -> Unit
 ) {
     Column(

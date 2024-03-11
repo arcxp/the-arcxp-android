@@ -47,3 +47,8 @@ val splashScreenText = textMenu
 val googleSignInButtonTextColor = black
 val videoBackground = Color.Black
 val icon = primaryDark
+
+/* Breaking News Alert Bar Colors */
+val alertBarBackground = error
+val alertBarText = buttonText
+val alertBarActionText = buttonText

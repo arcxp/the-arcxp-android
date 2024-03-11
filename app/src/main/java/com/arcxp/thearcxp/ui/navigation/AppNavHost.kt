@@ -2,12 +2,14 @@ package com.arcxp.thearcxp.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.arcxp.thearcxp.LocalArticleViewModel
 import com.arcxp.thearcxp.LocalMainViewModel
 import com.arcxp.thearcxp.LocalVideoViewModel
+import com.arcxp.thearcxp.R
 import com.arcxp.thearcxp.article.ArticleMainScreen
 import com.arcxp.thearcxp.article.ArticleViewModel
 import com.arcxp.thearcxp.home.HomeScreen
@@ -31,6 +33,7 @@ import com.arcxp.thearcxp.ui.composables.SplashScreen
 import com.arcxp.thearcxp.ui.composables.navigateToAccountWebScreen
 import com.arcxp.thearcxp.ui.composables.navigateToArticle
 import com.arcxp.thearcxp.ui.composables.navigateToVideo
+import com.arcxp.thearcxp.ui.navigation.AppDestination.AccountWebScreen
 import com.arcxp.thearcxp.ui.navigation.AppDestination.Article
 import com.arcxp.thearcxp.ui.navigation.AppDestination.ChangePassword
 import com.arcxp.thearcxp.ui.navigation.AppDestination.ChangePasswordSuccess
@@ -49,12 +52,10 @@ import com.arcxp.thearcxp.ui.navigation.AppDestination.SignUpSuccessScreen
 import com.arcxp.thearcxp.ui.navigation.AppDestination.SplashLogoScreen
 import com.arcxp.thearcxp.ui.navigation.AppDestination.Video
 import com.arcxp.thearcxp.ui.navigation.AppDestination.VideoTab
-import com.arcxp.thearcxp.ui.navigation.AppDestination.AccountWebScreen
 import com.arcxp.thearcxp.utils.decodeUrl
 import com.arcxp.thearcxp.video.VideoMainScreen
 import com.arcxp.thearcxp.video.VideoViewModel
 import com.arcxp.thearcxp.viewmodel.MainViewModel
-import com.arcxp.thearcxp.web.WebViewModel
 import com.arcxp.thearcxp.web.WebViewScreen
 
 @Composable
@@ -117,8 +118,9 @@ fun AppNavHost(
                 navigateToSignIn = { navHostController.navigate(route = SignIn.route) })
         }
         composable(route = VideoTab.route) {
+            //make video collection in advance with videos to pull from
             SectionList(
-                collectionFlow = mainViewModel.getVideoCollection(),
+                collectionFlow = mainViewModel.getCollection(collectionAlias = stringResource(id = R.string.video_endpoint)),
                 sectionType = SectionType.VIDEO,
                 openVideo = navHostController::navigateToVideo
             )
