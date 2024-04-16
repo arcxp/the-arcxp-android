@@ -33,9 +33,6 @@ import com.google.firebase.messaging.ktx.messaging
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.reflect.Type
@@ -68,8 +65,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val sectionsIndexMap = hashMapOf<Int, String>()
     val indexSectionMap = hashMapOf<String, Int>()
 
-    private val _alertBarState = MutableSharedFlow<ArcXPContentElement?>()
-    fun alertBarState(): SharedFlow<ArcXPContentElement?> = _alertBarState.asSharedFlow()
+    private val _alertBarState = MutableLiveData<ArcXPContentElement>()
+    val alertBarState: LiveData<ArcXPContentElement>  = _alertBarState
 
     //to be replaced by identity solution
     var pushNotificationsTopicSubscriptions = hashMapOf<String, PushTopicSubscriptionItem>()
@@ -84,7 +81,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (alertBarResult is Success) {
                 val list = alertBarResult.success
                 if (list.isNotEmpty()) {
-                    list[0]?.let { _alertBarState.emit(it) }
+                    list[0]?.let {
+                        _alertBarState.postValue(it)
+                    }
                 }
             }
         }

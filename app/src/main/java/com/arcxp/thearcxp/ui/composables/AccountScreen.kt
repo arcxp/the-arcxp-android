@@ -54,11 +54,12 @@ fun AccountScreen(
     openCreateAccount: () -> Unit = {},
     openSignIn: () -> Unit = {},
     openChangePassword: () -> Unit = {},
-    openWebViewWithUrl: (String, Boolean) -> Unit = { s: String, b: Boolean-> },
+    openWebViewWithUrl: (String, Boolean) -> Unit = { s: String, b: Boolean -> },
     openPreferences: () -> Unit = {},
     analyticsManager: FirebaseAnalyticsManager? = LocalFirebaseAnalyticsManager.current
 ) {
     val isLoggedIn by accountViewModel.isLoggedIn.observeAsState()
+    val policies by accountViewModel.policiesState.observeAsState()
 
     LaunchedEffect(true) {
         accountViewModel.checkSession()
@@ -114,7 +115,8 @@ fun AccountScreen(
                 )
                 AccountSection(
                     textId = R.string.login,
-                    onNextClick = openSignIn)
+                    onNextClick = openSignIn
+                )
             }
         }
         if (!ArcXPMobileSDK.commerceManager().sessionIsActive()) {
@@ -125,18 +127,18 @@ fun AccountScreen(
             AccountHeader(textId = R.string.preferences)
             AccountSection(
                 textId = R.string.push_notifications,
-                onNextClick = openPreferences)
+                onNextClick = openPreferences
+            )
         }
-
-        AccountHeader(textId = R.string.policies)
-        val tosUrl = stringResource(id = R.string.tos_url)
-        val privacyPolicyUrl = stringResource(id = R.string.pp_url)
-        AccountSection(
-            textId = R.string.terms_of_service,
-            onNextClick = { openWebViewWithUrl(tosUrl, false) })
-        AccountSection(
-            textId = R.string.privacy_policy,
-            onNextClick = { openWebViewWithUrl(privacyPolicyUrl, true) })
+        if (policies?.isNotEmpty() == true) {
+            val root = policies!![0]
+            AccountHeader(text = root.navigation.nav_title ?: "")
+            root.children?.forEach {
+                AccountSection(
+                    text = it.navigation.nav_title ?: "",
+                    onNextClick = { openWebViewWithUrl(it.site?.siteUrl ?: "", false) })
+            }
+        }
 
         AccountHeader(textId = R.string.software_versions)
         Text(
@@ -188,9 +190,42 @@ fun AccountSection(textId: Int, onNextClick: () -> Unit) {
 }
 
 @Composable
+fun AccountSection(text: String, onNextClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = dimensionResource(id = R.dimen.space))
+            .clickable(onClick = onNextClick),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+        )
+        Image(
+            painter = painterResource(R.drawable.ic_chevron_right_24),
+            contentDescription = text,
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+        )
+    }
+}
+
+@Composable
 fun AccountHeader(textId: Int) {
     Text(
         text = stringResource(id = textId),
+        style = MaterialTheme.typography.headlineMedium,
+        color = MaterialTheme.colorScheme.secondary,
+        modifier = Modifier
+            .padding(top = dimensionResource(id = R.dimen.padding_small))
+    )
+}
+
+@Composable
+fun AccountHeader(text: String) {
+    Text(
+        text = text,
         style = MaterialTheme.typography.headlineMedium,
         color = MaterialTheme.colorScheme.secondary,
         modifier = Modifier
@@ -206,19 +241,22 @@ fun PreferenceScreen(
     val switchList = mutableListOf<Boolean>().apply {
         mainViewModel.sectionsIndexMap.toSortedMap().values.forEachIndexed { _, title ->
             val section = mainViewModel.sections[title]
-            val item = mainViewModel.pushNotificationsTopicSubscriptions[section!!.getPushTopicName()]
+            val item =
+                mainViewModel.pushNotificationsTopicSubscriptions[section!!.getPushTopicName()]
             val checked = item?.subscribed ?: false
             add(checked)
         }
     }
     val switchStates = remember { switchList.toMutableStateList() }
-    val allSwitchState = remember { mutableStateOf(mainViewModel.pushNotificationsTopicSubscriptions["all"]!!.subscribed) }
+    val allSwitchState =
+        remember { mutableStateOf(mainViewModel.pushNotificationsTopicSubscriptions["all"]!!.subscribed) }
 
     PreferenceSwitches(
         allSwitchState = allSwitchState,
         switchStates = switchStates,
         mainViewModel = mainViewModel,
-        modifier = modifier)
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -272,7 +310,10 @@ fun PreferenceSwitches(
                             mainViewModel.saveSubscribeToAll(isChecked)
                             val sectionId = mainViewModel.sections[it.value]!!.getPushTopicName()
                             if (isChecked) {
-                                mainViewModel.subscribeToPushNotificationTopic(it.value, sectionId.toString())
+                                mainViewModel.subscribeToPushNotificationTopic(
+                                    it.value,
+                                    sectionId.toString()
+                                )
                             } else {
                                 mainViewModel.unsubscribeFromPushNotificationTopic(sectionId.toString())
                             }
@@ -310,7 +351,10 @@ fun PreferenceSwitches(
                         onCheckedChange = { isChecked ->
                             switchStates[it.key] = isChecked
                             if (isChecked) {
-                                mainViewModel.subscribeToPushNotificationTopic(it.value, sectionId.toString())
+                                mainViewModel.subscribeToPushNotificationTopic(
+                                    it.value,
+                                    sectionId.toString()
+                                )
                             } else {
                                 mainViewModel.unsubscribeFromPushNotificationTopic(sectionId.toString())
                                 allSwitchState.value = false

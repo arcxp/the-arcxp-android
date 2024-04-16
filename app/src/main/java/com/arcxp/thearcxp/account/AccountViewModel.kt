@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.arcxp.ArcXPMobileSDK
 import com.arcxp.commerce.callbacks.ArcXPIdentityListener
 import com.arcxp.commerce.extendedModels.ArcXPProfileManage
@@ -16,6 +17,7 @@ import com.arcxp.commons.throwables.ArcXPException
 import com.arcxp.commons.util.Either
 import com.arcxp.commons.util.Failure
 import com.arcxp.commons.util.Success
+import com.arcxp.content.models.ArcXPSection
 import com.arcxp.thearcxp.MainActivity
 import com.arcxp.thearcxp.MainApplication
 import com.arcxp.thearcxp.R
@@ -28,25 +30,27 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.nativead.NativeAd
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 
-class AccountViewModel(val analyticsManager: FirebaseAnalyticsManager?, val app: Application) : AndroidViewModel(app) {
+class AccountViewModel(val analyticsManager: FirebaseAnalyticsManager?, val app: Application) :
+    AndroidViewModel(app) {
     sealed class LoginState {
-        object IDLE: LoginState()
+        object IDLE : LoginState()
         object Success : LoginState()
         object LOADING : LoginState()
         class Error(val arcXPException: ArcXPException) : LoginState()
     }
 
     sealed class ForgotPasswordState {
-        object IDLE: ForgotPasswordState()
+        object IDLE : ForgotPasswordState()
         object Success : ForgotPasswordState()
         object LOADING : ForgotPasswordState()
         class Error(val arcXPException: ArcXPException) : ForgotPasswordState()
     }
 
     sealed class ChangePasswordState {
-        object IDLE: ChangePasswordState()
+        object IDLE : ChangePasswordState()
         object Success : ChangePasswordState()
         object LOADING : ChangePasswordState()
         class Error(val arcXPException: ArcXPException) : ChangePasswordState()
@@ -59,7 +63,7 @@ class AccountViewModel(val analyticsManager: FirebaseAnalyticsManager?, val app:
     val openFacebookLoginEvent: LiveData<Boolean> = _facebookLoginEvent
 
     val isLoggedIn: LiveData<Boolean> = ArcXPMobileSDK.commerceManager().loggedInState
-    
+
     private val _showAds = MutableLiveData(true)
     val showAds: LiveData<Boolean> = _showAds
 
@@ -75,12 +79,16 @@ class AccountViewModel(val analyticsManager: FirebaseAnalyticsManager?, val app:
     private val _changePasswordState = Channel<ChangePasswordState>()
     val changePasswordState = _changePasswordState.receiveAsFlow()
 
+    private val _policiesState = MutableLiveData<List<ArcXPSection>>()
+    val policiesState: LiveData<List<ArcXPSection>> = _policiesState
+
     private var contentId = Pair("", "")
 
     var registeredForPushNotifications = false
 
     init {
         downloadAds(app)
+        getPolicies()
     }
 
     private lateinit var adLoader: AdLoader
@@ -143,7 +151,7 @@ class AccountViewModel(val analyticsManager: FirebaseAnalyticsManager?, val app:
         email: String,
         password: String,
     ) {
-        ArcXPMobileSDK.commerceManager().login(email, password, object: ArcXPIdentityListener() {
+        ArcXPMobileSDK.commerceManager().login(email, password, object : ArcXPIdentityListener() {
             override fun onLoginSuccess(response: ArcXPAuth) {
                 _loginState.trySend(LoginState.Success)
                 toggleLogin(true)
@@ -157,28 +165,30 @@ class AccountViewModel(val analyticsManager: FirebaseAnalyticsManager?, val app:
     }
 
     fun forgotPassword(email: String) {
-        ArcXPMobileSDK.commerceManager().requestResetPassword(email, object: ArcXPIdentityListener() {
-            override fun onPasswordResetNonceSuccess(response: ArcXPRequestPasswordReset?) {
-                _forgotPasswordState.trySend(ForgotPasswordState.Success)
-            }
+        ArcXPMobileSDK.commerceManager()
+            .requestResetPassword(email, object : ArcXPIdentityListener() {
+                override fun onPasswordResetNonceSuccess(response: ArcXPRequestPasswordReset?) {
+                    _forgotPasswordState.trySend(ForgotPasswordState.Success)
+                }
 
-            override fun onPasswordResetNonceFailure(error: ArcXPException) {
-                _forgotPasswordState.trySend(ForgotPasswordState.Error(error))
-            }
-        })
+                override fun onPasswordResetNonceFailure(error: ArcXPException) {
+                    _forgotPasswordState.trySend(ForgotPasswordState.Error(error))
+                }
+            })
     }
 
     fun changePassword(newPassword: String, oldPassword: String) {
-        ArcXPMobileSDK.commerceManager().updatePassword(newPassword, oldPassword, object: ArcXPIdentityListener() {
-            override fun onPasswordChangeSuccess(response: ArcXPIdentity) {
-                _changePasswordState.trySend(ChangePasswordState.Success)
-            }
+        ArcXPMobileSDK.commerceManager()
+            .updatePassword(newPassword, oldPassword, object : ArcXPIdentityListener() {
+                override fun onPasswordChangeSuccess(response: ArcXPIdentity) {
+                    _changePasswordState.trySend(ChangePasswordState.Success)
+                }
 
-            override fun onPasswordChangeError(error: ArcXPException) {
-                _changePasswordState.trySend(ChangePasswordState.Error(error))
+                override fun onPasswordChangeError(error: ArcXPException) {
+                    _changePasswordState.trySend(ChangePasswordState.Error(error))
+                }
             }
-        }
-        )
+            )
     }
 
     fun idleForgotPassword() {
@@ -232,9 +242,27 @@ class AccountViewModel(val analyticsManager: FirebaseAnalyticsManager?, val app:
         _facebookLoginEvent.postValue(true)
     }
 
-    
+
     private fun toggleLogin(value: Boolean) {
         _showAds.postValue((app as MainApplication).showAds() && !value)
+    }
+
+    private fun getPolicies() {
+        viewModelScope.launch {
+            ArcXPMobileSDK.contentManager().getSectionListSuspend(
+                siteHierarchy = getApplication<Application>().resources.getString(R.string.policies_hierarchy)
+            ).apply {
+                when (this) {
+                    is Success -> {
+                        _policiesState.postValue(this.success)
+                    }
+                    is Failure -> {
+                        //TODO
+                    }
+                }
+            }
+        }
+
     }
 
     companion object {

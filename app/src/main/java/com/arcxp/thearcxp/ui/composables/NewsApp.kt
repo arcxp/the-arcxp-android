@@ -75,7 +75,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -135,10 +134,12 @@ fun NewsApp(
     val lifecycleOwner = LocalLifecycleOwner.current
     val alertBar = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val alertBarState by mainViewModel.alertBarState.observeAsState()
 
 
-    val alertBarState by mainViewModel.alertBarState().collectAsStateWithLifecycle(initialValue = null)
-    LaunchedEffect(alertBarState) {
+    LaunchedEffect(key1 = alertBarState) {
         alertBarState?.let {
             val result = alertBar.showSnackbar(
                 message = it.title(),
@@ -160,6 +161,8 @@ fun NewsApp(
             }
         }
     }
+
+
 
 
     DisposableEffect(mainViewModel.navigateTo) {
@@ -235,7 +238,6 @@ fun NewsApp(
             color = MaterialTheme.colorScheme.background
         ) {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
-            val coroutineScope = rememberCoroutineScope()
 
             ModalNavigationDrawer(
                 drawerState = drawerState,

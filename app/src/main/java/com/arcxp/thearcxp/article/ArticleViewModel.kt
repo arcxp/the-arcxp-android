@@ -11,7 +11,6 @@ import com.arcxp.commerce.ArcXPPageviewEvaluationResult
 import com.arcxp.commons.throwables.ArcXPException
 import com.arcxp.content.extendedModels.ArcXPStory
 import com.arcxp.content.models.ArcXPContentCallback
-import com.arcxp.thearcxp.video.VideoViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -48,10 +47,6 @@ class ArticleViewModel(application: Application) : AndroidViewModel(application)
 
     private var prePaywallContentId = Pair("", "")
 
-    //Event sent when navigating from paywall to open the article being viewed
-    //when the paywall was invoked
-    private val _openLastArticleEvent = Channel<Pair<String, String>>()
-    val openLastArticleEvent = _openLastArticleEvent.receiveAsFlow()
 
     //Retrieve a story based on ID
     fun getStory(id: String) {
@@ -97,26 +92,5 @@ class ArticleViewModel(application: Application) : AndroidViewModel(application)
                 _paywallState.trySend(PaywallState.Done(result))
             }
         }
-    }
-
-    /* if user logs in from paywall dialog, should go back to article being viewed */
-    fun restoreContentEvent() {
-        viewModelScope.launch {
-            prePaywallContentId.apply {
-                if (first.isNotBlank() and second.isNotBlank()) {
-                    _openLastArticleEvent.trySend(Pair(first, second))
-                }
-            }
-        }
-    }
-    /* this clears the cached article/video to 'return' to if a user has manually navigated away from paywall dialog */
-    fun clearLastView() {
-        prePaywallContentId = Pair("", "") //clear the cached item
-        _openLastArticleEvent.trySend(prePaywallContentId) // in case the article event has not been observed, clear it
-    }
-
-    /* if a user logs in from paywall screen, it should return to the content viewed so we cache that value here */
-    fun setContentToReturnToFromPaywall(id: String, contentType: String?) {
-        prePaywallContentId = Pair(contentType.orEmpty(), id)
     }
 }

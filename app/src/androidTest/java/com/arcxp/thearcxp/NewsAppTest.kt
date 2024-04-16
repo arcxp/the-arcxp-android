@@ -25,8 +25,6 @@ import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.slot
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -72,10 +70,10 @@ class NewsAppTest {
     @Test
     fun alertBarTest() = runTest{
         // Create a MutableSharedFlow that you will control in the test
-        val testFlow = MutableSharedFlow<ArcXPContentElement?>()
+        val testFlow = MutableLiveData<ArcXPContentElement>()
 
         // Mock the ViewModel to use the testFlow
-        coEvery { mainViewModel.alertBarState() } returns testFlow.asSharedFlow()
+        coEvery { mainViewModel.alertBarState } returns testFlow
 
 
         val videoHideBarsLiveData = MutableLiveData(false)
@@ -108,7 +106,7 @@ class NewsAppTest {
         }
 
         runBlocking {
-            testFlow.emit(alertBarContentElement) // Replace with a mock or real object
+            testFlow.postValue(alertBarContentElement) // Replace with a mock or real object
         }
 
 
@@ -127,8 +125,8 @@ class NewsAppTest {
     @Test
     fun alertBarTestWithNullNotVisible() = runTest{
 
-        val testFlow = MutableSharedFlow<ArcXPContentElement?>()
-        coEvery { mainViewModel.alertBarState() } returns testFlow.asSharedFlow()
+        val testFlow = MutableLiveData<ArcXPContentElement>(null)
+        coEvery { mainViewModel.alertBarState } returns testFlow
 
         val videoHideBarsLiveData = MutableLiveData(false)
         coEvery { videoViewModel.hideBars } returns videoHideBarsLiveData
@@ -155,7 +153,7 @@ class NewsAppTest {
         }
 
         runBlocking {
-            testFlow.emit(null) // Replace with a mock or real object
+            testFlow.postValue(null) // Replace with a mock or real object
         }
 
 

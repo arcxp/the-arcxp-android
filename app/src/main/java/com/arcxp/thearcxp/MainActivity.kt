@@ -24,7 +24,6 @@ import com.arcxp.thearcxp.analytics.FirebaseAnalyticsManager
 import com.arcxp.thearcxp.article.ArticleViewModel
 import com.arcxp.thearcxp.push.IntentNavigationDataItem
 import com.arcxp.thearcxp.push.SettingsNavigationItem
-import com.arcxp.thearcxp.tabfragment.*
 import com.arcxp.thearcxp.ui.composables.NewsApp
 import com.arcxp.thearcxp.video.VideoViewModel
 import com.arcxp.thearcxp.viewmodel.MainViewModel
@@ -32,11 +31,14 @@ import com.arcxp.thearcxp.web.WebViewModel
 import com.arcxp.thearcxp.widget.ArcXPWidget.Companion.WIDGET_ARTICLE_ID_KEY
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
-import com.google.android.ump.*
+import com.google.android.ump.ConsentDebugSettings
+import com.google.android.ump.ConsentForm
+import com.google.android.ump.ConsentInformation
+import com.google.android.ump.ConsentRequestParameters
+import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
-import java.util.*
 
 /**
  * The only activity in the app.
@@ -143,25 +145,23 @@ class MainActivity : AppCompatActivity() {
             ) { }
 
             val configuration = RequestConfiguration.Builder()
-                .setTestDeviceIds(listOf("8D8020A7397013BE250CD10E86A6C886")).build()
+                .setTestDeviceIds(emptyList()).build()
             MobileAds.setRequestConfiguration(configuration)
 
             val debugSettings = ConsentDebugSettings.Builder(this)
-                .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
-                .addTestDeviceHashedId("3e2f8b7f-0d21-4822-808e-10ca1ad1abe1")//a
-//                .addTestDeviceHashedId("8FC9A274F9A08E13BED62AC919248847")//d
-                .addTestDeviceHashedId("2B9A25FD025DD3148569D49B34BFF8BE")//emu
-                .addTestDeviceHashedId("2215580C8E69B36249BAFE34B66DB230")//z
+//                .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
+//                .addTestDeviceHashedId("...")//
                 /*  for this value, check logcat with device for the following line (where ... is actual id):
                     Use new ConsentDebugSettings.Builder().addTestDeviceHashedId("...") to set this as a debug device.
                     note the id and add or replace a test device here
                 */
+                /* this now gets used regardless of id with all emulators */
 
                 .build()
 
             val params = ConsentRequestParameters
                 .Builder()
-                .setConsentDebugSettings(debugSettings)
+//                .setConsentDebugSettings(debugSettings)
                 .build()
 
             consentInformation = UserMessagingPlatform.getConsentInformation(this)
