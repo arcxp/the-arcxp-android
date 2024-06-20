@@ -1,10 +1,6 @@
 package com.arcxp.thearcxp.video
 
 import ErrorText
-import android.app.Activity
-import android.app.PictureInPictureParams
-import android.os.Build
-import android.util.Rational
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -43,8 +39,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun VideoMainScreen(
-    videoViewModel: VideoViewModel = LocalVideoViewModel.current,
     modifier: Modifier = Modifier,
+    videoViewModel: VideoViewModel = LocalVideoViewModel.current,
     openCreateAccount: () -> Unit = {},
     openSignIn: () -> Unit = {},
     backNavigation: () -> Unit,
@@ -75,8 +71,6 @@ fun VideoMainScreen(
                 message = (state as VideoViewModel.State.Error).arcXPException.localizedMessage.orEmpty()
             )
         }
-
-        else -> {}
     }
 
 }
@@ -120,7 +114,6 @@ fun VideoScreen(modifier: Modifier = Modifier,
         }
     )
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val currentLifecycle = LocalLifecycleOwner.current
     DisposableEffect(lifecycle) {
         lifecycle.addObserver(lifecycleObserver.value)
         onDispose {
@@ -143,16 +136,14 @@ fun VideoScreen(modifier: Modifier = Modifier,
         videoViewModel.configurePlayer(arcVideoFrame = view, activity = activity)
         video.apply {
             videoViewModel.setVideoTracking(
-                backNavigation = backNavigation,
                 shareAction = { context.shareSheet(url = url()) })
             player.initMediaWithShareURL(video = this, shareURL = url())
-            videoViewModel.clearVideos()//TODO make a one time event
             player.displayVideo()
         }
     }
 
     val onBack = {
-        checkPip(activity, videoViewModel, backNavigation)
+        backNavigation.invoke()
     }
 
     ModalBottomSheetLayout(
@@ -214,24 +205,6 @@ fun VideoScreen(modifier: Modifier = Modifier,
         }
 
         else -> {}
-    }
-}
-
-fun checkPip(
-    activity: Activity,
-    videoViewModel: VideoViewModel,
-    backNavigation: () -> Unit)
-{
-    if (videoViewModel.arcXPVideoConfig!!.isEnablePip) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            activity.enterPictureInPictureMode(
-                PictureInPictureParams.Builder().setAspectRatio(Rational(16, 9)).build()
-            )
-            videoViewModel.arcMediaPlayer.resume()
-            videoViewModel.arcMediaPlayer.hideControls()
-        }
-    } else {
-        backNavigation.invoke()
     }
 }
 

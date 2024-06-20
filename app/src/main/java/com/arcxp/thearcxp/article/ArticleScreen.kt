@@ -9,7 +9,18 @@ import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -29,8 +40,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,7 +70,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcxp.commons.throwables.ArcXPSDKErrorType
-import com.arcxp.content.extendedModels.*
+import com.arcxp.content.extendedModels.ArcXPStory
+import com.arcxp.content.extendedModels.author
+import com.arcxp.content.extendedModels.date
+import com.arcxp.content.extendedModels.imageUrl
+import com.arcxp.content.extendedModels.subheadlines
+import com.arcxp.content.extendedModels.title
+import com.arcxp.content.extendedModels.url
 import com.arcxp.content.models.Code
 import com.arcxp.content.models.Correction
 import com.arcxp.content.models.CustomEmbed
@@ -90,9 +114,7 @@ import com.arcxp.thearcxp.utils.shareSheet
 import com.arcxp.video.ArcMediaPlayer
 import com.arcxp.video.ArcVideoStreamCallback
 import com.arcxp.video.model.ArcVideoStream
-import com.arcxp.video.views.ArcVideoFrame
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.google.android.gms.ads.*
 import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.launch
 
@@ -453,16 +475,6 @@ private fun InlineText(text: Spanned) {
             //it.maxLines = currentMaxLines
             it.text = text
         }
-    )
-}
-
-@Composable
-private fun VideoView(view: ArcVideoFrame) {
-    AndroidView(
-        factory = {
-            view
-        },
-        modifier = Modifier.padding(start = 10.dp, top = 20.dp, end = 10.dp, bottom = 20.dp)
     )
 }
 

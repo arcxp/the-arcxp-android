@@ -139,8 +139,9 @@ dependencies {
     implementation 'com.google.android.ump:user-messaging-platform:2.2.0'
 
     //include sdks
+    def currentArcXPMobileSDKVersion = '1.3.0'
     //for client implementations, just use 'implementation ..' instead of creating/using arcPartnersImplementation flavor
-    arcPartnersImplementation 'arcxp-sdk-android:arcxp-mobile-sdk-android:1.2.4'
+    arcPartnersImplementation "arcxp-sdk-android:arcxp-mobile-sdk-android:$currentArcXPMobileSDKVersion"
 
     //internal use only!
     arcXPInternalImplementation project(":arcxp-mobile-sdk-android")

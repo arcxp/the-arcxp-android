@@ -11,14 +11,10 @@ import com.arcxp.ArcXPMobileSDK
 import com.arcxp.commerce.ArcXPPageviewEvaluationResult
 import com.arcxp.commons.throwables.ArcXPException
 import com.arcxp.commons.throwables.ArcXPSDKErrorType
-import com.arcxp.commons.util.Either
-import com.arcxp.commons.util.Failure
-import com.arcxp.commons.util.Success
 import com.arcxp.video.ArcMediaPlayer
 import com.arcxp.video.ArcVideoStreamCallback
 import com.arcxp.video.ArcXPVideoConfig
 import com.arcxp.video.listeners.ArcVideoEventsListener
-import com.arcxp.video.model.ArcVideoResponse
 import com.arcxp.video.model.ArcVideoStream
 import com.arcxp.video.model.TrackingType
 import com.arcxp.video.model.TrackingTypeData
@@ -32,9 +28,8 @@ class VideoViewModel(application: Application) : AndroidViewModel(application) {
 
     sealed class State {
         class Success(val arcXPVideo: List<ArcVideoStream>?) : State()
-        object LOADING : State()
+        data object LOADING : State()
         class Error(val arcXPException: ArcXPException) : State()
-        object IDLE : State()
     }
 
     sealed class PaywallState {
@@ -49,9 +44,6 @@ class VideoViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _state = Channel<State>()
     val state = _state.receiveAsFlow()
-
-    private val _videoResult = MutableLiveData<Either<ArcXPException, List<ArcVideoStream>?>>()
-    val videoResult: LiveData<Either<ArcXPException, List<ArcVideoStream>?>> = _videoResult
 
     private val videoClient = ArcXPMobileSDK.mediaClient()
 
@@ -72,14 +64,13 @@ class VideoViewModel(application: Application) : AndroidViewModel(application) {
     //recreated on device rotation
     private val arcXPVideoConfigBuilder = ArcXPVideoConfig.Builder()
 
-    var arcXPVideoConfig: ArcXPVideoConfig? = null
+    private var arcXPVideoConfig: ArcXPVideoConfig? = null
 
     fun configurePlayer(arcVideoFrame: ArcVideoFrame, activity: Activity) {
         arcXPVideoConfigBuilder.setVideoFrame(videoFrame = arcVideoFrame)
         arcXPVideoConfigBuilder.enablePip(enable = true)
         arcXPVideoConfigBuilder.setActivity(activity = activity)
         arcXPVideoConfigBuilder.setAutoStartPlay(play = false)
-        arcXPVideoConfigBuilder.setShouldShowBackButton(shouldShowBackButton = true)
         arcXPVideoConfigBuilder.setShouldShowFullScreenButton(shouldShowFullScreenButton = false)
         arcXPVideoConfigBuilder.showSeekButton(show = true)
         arcXPVideoConfigBuilder.useDialogForFullscreen(use = true)
@@ -88,7 +79,7 @@ class VideoViewModel(application: Application) : AndroidViewModel(application) {
         arcMediaPlayer.configureMediaPlayer(config = arcXPVideoConfig)
     }
 
-    fun setVideoTracking(backNavigation: () -> Unit, shareAction: () -> Unit) {
+    fun setVideoTracking(shareAction: () -> Unit) {
         arcMediaPlayer.trackMediaEvents(object : ArcVideoEventsListener {
             override fun onVideoTrackingEvent(
                 type: TrackingType?,
@@ -96,10 +87,6 @@ class VideoViewModel(application: Application) : AndroidViewModel(application) {
             ) {
                 when (type) {
                     TrackingType.ON_SHARE -> shareAction()
-                    TrackingType.BACK_BUTTON_PRESSED -> {
-                        disposeVideoPlayer()
-                        backNavigation()
-                    }
                     else -> {}
                 }
             }
@@ -129,12 +116,9 @@ class VideoViewModel(application: Application) : AndroidViewModel(application) {
         videoClient.findByUuid(
             uuid = id,
             listener = object : ArcVideoStreamCallback {
-                override fun onVideoResponse(arcVideoResponse: ArcVideoResponse?) {
-                }
 
                 override fun onVideoStream(videos: List<ArcVideoStream>?) {
                     if (videos?.isNotEmpty() == true) {
-                        _videoResult.postValue(Success(videos))
                         _state.trySend(State.Success(arcXPVideo = videos))
                     }
                 }
@@ -151,7 +135,6 @@ class VideoViewModel(application: Application) : AndroidViewModel(application) {
                         type = ArcXPSDKErrorType.SERVER_ERROR,
                         value = value
                     )
-                    _videoResult.postValue(Failure(error))
                     _state.trySend(State.Error(arcXPException = error))
                 }
 
@@ -185,10 +168,6 @@ class VideoViewModel(application: Application) : AndroidViewModel(application) {
                 _paywallState.trySend(PaywallState.Done(result))
             }
         }
-    }
-
-    fun clearVideos() {
-        _videoResult.value = Success(emptyList())
     }
 
     override fun onCleared() {
