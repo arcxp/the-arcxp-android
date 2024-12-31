@@ -36,11 +36,17 @@ dependencyResolutionManagement {
             url "${rootDir}/arcxp-libs/"
         }
 
+        maven {
+            credentials(githubCredentials)
+            url 'https://maven.pkg.github.com/arcxp/arcxp-sdk-android-omid/'
+        }
+
         // for sdk dependencies from maven
         maven {
             credentials(githubCredentials)
             url 'https://maven.pkg.github.com/arcxp/arcxp-sdk-android'
         }
+
 
     }
 }

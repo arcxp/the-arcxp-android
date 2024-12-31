@@ -3,6 +3,10 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
 }
+apply plugin: 'jacoco'
+jacoco {
+    toolVersion = "0.8.8"
+}
 
 if (isGoogleServicesJsonPresent()) {
     apply plugin: 'com.google.gms.google-services'
@@ -16,7 +20,6 @@ def getLocalProperties() {
     }
     return localProperties
 }
-
 
 android {
     namespace 'com.arcxp.thearcxp'
@@ -67,6 +70,7 @@ android {
             resValue "string", "app_version", "App: $app_version$versionNameSuffix"
             resValue "string", "google_key", localProperties['debug_google_key'] ?: ""
             signingConfig signingConfigs.debug
+            testCoverageEnabled = project.hasProperty('enableCoverage') ? project.property('enableCoverage') : false
         }
         release {
             resValue "string", "app_version", "App: $app_version"
@@ -90,7 +94,6 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.8"
     }
-
     //client implementation can safely ignore this section, for internal testing/development only
     flavorDimensions "version"
     productFlavors {
@@ -104,9 +107,44 @@ android {
     }
 }
 
+tasks.register('jacocoTestReport', JacocoReport) {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+
+    def exclusions = [
+            "**/R.class",
+            "**/R\$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "**/*Test*.*"
+    ]
+    def javaClasses = fileTree(dir: "${buildDir}/intermediates/javac/arcXPInternalDebug/classes", excludes: exclusions)
+    def kotlinClasses = fileTree(dir: "${buildDir}/tmp/kotlin-classes/arcXPInternalDebug", excludes: exclusions)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files([mainSrc]))
+    // Include both Java and Kotlin class files
+    classDirectories.setFrom(files([javaClasses, kotlinClasses]))
+    executionData.setFrom(fileTree(dir: "$buildDir", includes: [
+            "jacoco/testArcXPInternalDebugUnitTest.exec",
+            "outputs/code_coverage/arcXPInternalDebugAndroidTest/connected/**/*.ec"
+    ]))
+}
+
+tasks.withType(Test).configureEach {
+    jvmArgs = ["--add-opens", "java.base/java.net=ALL-UNNAMED",
+               "--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED",
+               '--add-opens', 'java.base/java.util=ALL-UNNAMED']
+    jacoco {
+        includeNoLocationClasses = true
+        excludes = ['jdk.internal.*']
+    }
+    finalizedBy jacocoTestReport
+}
 
 dependencies {
-
 
 
     implementation 'androidx.core:core-ktx:1.12.0'
@@ -139,9 +177,9 @@ dependencies {
     implementation 'com.google.android.ump:user-messaging-platform:2.2.0'
 
     //include sdks
-    def currentArcXPMobileSDKVersion = '1.3.0'
+    def currentArcXPMobileSDKVersion = '1.3.1'
     //for client implementations, just use 'implementation ..' instead of creating/using arcPartnersImplementation flavor
-    arcPartnersImplementation "arcxp-sdk-android:arcxp-mobile-sdk-android:$currentArcXPMobileSDKVersion"
+    arcPartnersImplementation "arcxp-mobile:arcxp-mobile-sdk-android:$currentArcXPMobileSDKVersion"
 
     //internal use only!
     arcXPInternalImplementation project(":arcxp-mobile-sdk-android")

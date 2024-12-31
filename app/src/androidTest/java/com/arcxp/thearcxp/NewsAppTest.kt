@@ -13,6 +13,7 @@ import com.arcxp.commons.util.Either
 import com.arcxp.content.extendedModels.ArcXPContentElement
 import com.arcxp.content.extendedModels.title
 import com.arcxp.content.models.ArcXPSection
+import com.arcxp.thearcxp.analytics.FirebaseAnalyticsManager
 import com.arcxp.thearcxp.article.ArticleViewModel
 import com.arcxp.thearcxp.push.IntentNavigationDataItem
 import com.arcxp.thearcxp.ui.composables.NewsApp
@@ -55,6 +56,9 @@ class NewsAppTest {
 
     @RelaxedMockK
     private lateinit var webViewModel: WebViewModel
+
+    @RelaxedMockK
+    private lateinit var firebaseAnalytics: FirebaseAnalyticsManager
 
     @Before
     fun setUp() {
@@ -99,7 +103,8 @@ class NewsAppTest {
                 LocalVideoViewModel provides videoViewModel,
                 LocalArticleViewModel provides articleViewModel,
                 LocalMainViewModel provides mainViewModel,
-                LocalWebViewModel provides webViewModel
+                LocalWebViewModel provides webViewModel,
+                LocalFirebaseAnalyticsManager provides firebaseAnalytics,
             ) {
                 NewsApp()
             }
